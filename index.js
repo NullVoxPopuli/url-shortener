@@ -11,14 +11,14 @@ import { lofiRoutes } from "./routes/+lo-fi.js";
 import { errorRoutes } from "./routes/+errors.js";
 
 const app = express()
-  .enable('trust proxy');
+  .enable("trust proxy")
   .set("views", join(__dirname, "views"))
   .set("view engine", "ejs");
 
 // force HTTPS
 app.use(function (request, response, next) {
-  if (process.env.NODE_ENV != 'development' && !request.secure) {
-    return response.redirect('https://' + request.headers.host + request.url);
+  if (process.env.NODE_ENV != "development" && !request.secure) {
+    return response.redirect("https://" + request.headers.host + request.url);
   }
 
   next();
