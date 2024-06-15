@@ -1,34 +1,44 @@
-import express from "express";
+import Fastify from "fastify";
+
+import assert from "node:assert";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
 const PORT = process.env.PORT || 5001;
+const DATABASE_URL = process.env.DATABASE_URL;
 
-import { abbrRoute } from "./routes/:abbr.js";
-import { lofiRoutes } from "./routes/+lo-fi.js";
-import { errorRoutes } from "./routes/+errors.js";
+assert(DATABASE_URL, "DATABASE_URL must be set");
+
+const here = dirname(fileURLToPath(import.meta.url));
+const assets = join(here, "public");
+const d = async (modulePath) => (await import(modulePath)).default;
 
 /**
  * NOTE:
  *  http => https conversion is handled by Cloudflare,
  *  the DNS provider
  */
-const app = express()
-  .set("views", join(__dirname, "views"))
-  .set("view engine", "ejs");
+const f = Fastify({ logger: true });
 
-app.get("/", (req, res) => {
-  res.render("index.ejs", { title: "Hey", message: "Hello there!" });
-  res.end();
-});
+f.register(await d("@fastify/static"), { root: assets });
+f.register(await d("@fastify/postgres"), { connectionString: DATABASE_URL });
+f.register(await d("@fastify/formbody"));
+f.register(await d("@fastify/rate-limit"), { max: 100 });
 
-lofiRoutes(app);
-abbrRoute(app);
-//errorRoutes(app);
+f.register(await d("./routes/+home.js"));
+f.register(await d("./routes/+api.js"));
+f.register(await d("./routes/+lo-fi.js"));
+f.register(await d("./routes/:abbr.js"));
 
-app.use(express.static(join(__dirname, "public")));
-app.listen(PORT, () => {
-  console.log(`Listening on ${PORT}`);
-});
+/**
+ * Run the server!
+ */
+const start = async () => {
+  try {
+    await f.listen({ port: PORT, host: "0.0.0.0" });
+  } catch (err) {
+    f.log.error(err);
+    process.exit(1);
+  }
+};
+start();

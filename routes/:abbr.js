@@ -1,43 +1,25 @@
-import { pool } from "./db.js";
+import { selectExact, selectStartingWith } from "./db.js";
 
-export async function abbr(req, res) {
-  let abbr = req.params.abbr;
-  console.log(req.url);
-  let client;
-  let result;
-  try {
-    client = await pool.connect();
+export default async function routes(f, options) {
+  f.get("/:abbr", async (req, reply) => {
+    console.log(req.url, req.params);
 
-    if (abbr.length === 36) {
-      const result = await client.query(
-        `
-          SELECT * FROM "links"
-          WHERE 
-            "abbr" = "$1"
-        `,
-        [abbr],
-      );
-    } else {
-      //result = await client.query(
-      //  `
-      //  SELECT * FROM "links"
-      //  WHERE
-      //    "abbr" LIKE "$1%"
-      //`,
-      //  [abbr],
-      //);
+    let abbr = req.params.abbr;
+    let client;
+    let result;
+
+    try {
+      client = await fastify.pg.connect();
+
+      if (abbr.length === 36) {
+        result = await selectExact(abbr, client);
+      } else {
+        result = await selectStartingWith(abbr, client);
+      }
+      return result;
+    } finally {
+      // Release the client immediately after query resolves, or upon error
+      client.release();
     }
-    console.log(result);
-    const results = { results: result ? result.rows : null };
-    res.render(JSON.stringify(results));
-  } catch (err) {
-    console.error(err);
-    res.send("Error " + err);
-  } finally {
-    client.release();
-  }
-}
-
-export function abbrRoute(app) {
-  app.get("/:abbr", abbr);
+  });
 }
