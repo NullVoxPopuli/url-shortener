@@ -1,0 +1,26 @@
+{
+  "name": "url-shortener",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "A URL Shortener app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "NullVoxPopuli",
+  "license": "GPL-3.0",
+  "engines": {
+    "node": ">= 20"
+  },
+  "volta": {
+    "node": "20.14.0",
+    "pnpm": "9.3.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.2"
+  }
+}
