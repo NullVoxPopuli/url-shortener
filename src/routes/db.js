@@ -25,17 +25,6 @@ export async function selectExact(client, uuid) {
   );
 }
 
-export async function selectStartingWith(client, uuidPart) {
-  return await client.query(
-    `
-      SELECT * FROM "links"
-      WHERE
-        id LIKE $1%
-    `,
-    [uuidPart],
-  );
-}
-
 export async function createLink(client, url) {
   assert(url, "Cannot create a link mapping without an URL");
 
@@ -58,4 +47,13 @@ export async function createLink(client, url) {
 
 export async function updateCount(client, id) {
   assert(id, "Cannot update a link without an ID");
+
+  await client.query(
+    `
+    UPDATE links 
+       SET visits = visits + 1
+       WHERE id = $1
+    `,
+    [id],
+  );
 }

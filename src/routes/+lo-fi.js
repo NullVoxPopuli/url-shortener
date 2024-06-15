@@ -1,3 +1,4 @@
+import { compressedUUID } from "../utils/uuid.js";
 import { createLink, pg } from "./db.js";
 
 export default async function routes(f, options) {
@@ -21,10 +22,10 @@ export default async function routes(f, options) {
 
     return await pg(f, async (client) => {
       let id = await createLink(client, originalUrl);
-      let shorter = id.split("-")[0];
+      let shorter = compressedUUID.encode(id);
 
       return reply.viewAsync("lofi/success.ejs.html", {
-        shortUrl: `https://nvp.gg/${shorter}`,
+        shortUrl: `${req.hostname}/${shorter}`,
       });
     });
   });

@@ -42,7 +42,7 @@ f.register(await d("@fastify/rate-limit"), { max: 100 });
 f.register(await d("./routes/+home.js"));
 f.register(await d("./routes/+api.js"));
 f.register(await d("./routes/+lo-fi.js"));
-f.register(await d("./routes/:abbr.js"));
+f.register(await d("./routes/:id.js"));
 
 /**
  * Run the server!
