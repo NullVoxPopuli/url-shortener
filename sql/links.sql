@@ -1,10 +1,12 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE public.links
 (
-    "createdAt" date NOT NULL,
-    abbr uuid NOT NULL,
+    id uuid NOT NULL DEFAULT uuid_generate_v4(),
     original text NOT NULL,
     submitter character varying(128) NOT NULL,
-    PRIMARY KEY (abbr)
+    "createdAt" date NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (id)
 );
 
 ALTER TABLE IF EXISTS public.links

@@ -1,21 +1,61 @@
-export async function selectExact(abbr, client) {
+import assert from "node:assert";
+
+export async function pg(f, fn) {
+  let client;
+
+  try {
+    client = await f.pg.connect();
+
+    return await fn(client);
+  } catch (e) {
+    throw e;
+  } finally {
+    client?.release();
+  }
+}
+
+export async function selectExact(client, uuid) {
   return await client.query(
     `
       SELECT * FROM "links"
       WHERE 
-        "links.abbr" = "$1"
+        id = $1
     `,
-    [abbr],
+    [uuid],
   );
 }
 
-export async function selectStartingWith(abbr, client) {
+export async function selectStartingWith(client, uuidPart) {
   return await client.query(
     `
       SELECT * FROM "links"
       WHERE
-        "links.abbr" LIKE "$1%"
+        id LIKE $1%
     `,
-    [abbr],
+    [uuidPart],
   );
+}
+
+export async function createLink(client, url) {
+  assert(url, "Cannot create a link mapping without an URL");
+
+  const result = await client.query(
+    `
+    INSERT 
+      INTO links (original, submitter) 
+      VALUES($1, $2) 
+      RETURNING id;
+    `,
+    [url, "test-user"],
+  );
+
+  if (result.rows.length < 1) {
+    throw new Error(`Something went wrong when creating your link.`);
+  }
+
+  return result.rows[0].id;
+}
+
+export async function updateCount(client, id) {
+  assert(id, "Cannot update a link without an ID");
 }

@@ -9,14 +9,22 @@ export default async function routes(f, options) {
     let result;
 
     try {
-      client = await fastify.pg.connect();
+      client = await f.pg.connect();
 
       if (abbr.length === 36) {
-        result = await selectExact(abbr, client);
+        result = await selectExact(client, abbr);
       } else {
-        result = await selectStartingWith(abbr, client);
+        result = await selectStartingWith(client, abbr);
       }
-      return result;
+
+      if (result.rows.length !== 0) {
+        // TODO: 404
+        throw new Error("Not found");
+      }
+
+      let row = result.rows[0];
+
+      return reply.redirect(row.original);
     } finally {
       // Release the client immediately after query resolves, or upon error
       client.release();
