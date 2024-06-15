@@ -4,11 +4,7 @@
   "version": "1.0.0",
   "description": "A URL Shortener app",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "start": "node ./index.js",
   },
   "keywords": [],
   "author": "NullVoxPopuli",
