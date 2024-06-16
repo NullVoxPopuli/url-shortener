@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-import { compressedUUID } from "./utils/uuid.js";
+import { compressedUUID } from "../src/utils/uuid.js";
 
 let samples = `
 320684ca-8c22-43fa-884b-db9d687fbe71
