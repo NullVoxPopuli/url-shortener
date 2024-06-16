@@ -19,4 +19,3 @@ export default class CustomLink extends BaseModel {
   @belongsTo(() => Link, { localKey: 'link_id' })
   declare link: BelongsTo<typeof Link>
 }
-

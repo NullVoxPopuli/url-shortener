@@ -31,9 +31,9 @@
       OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
       SOFTWARE.
 **/
-const letters = "abcdefghijklmnopqrstuvwxyz"; // * 2 = 52
-const digits = "0123456789"; // 52 + 10 = 62
-const special = `_.`;
+const letters = 'abcdefghijklmnopqrstuvwxyz' // * 2 = 52
+const digits = '0123456789' // 52 + 10 = 62
+const special = `_.`
 // Adding more characters has diminishing returns on the output length
 //const unicode = `    ㄱ ㄲ ㄴ ㄷ ㄸ ㄹ ㅁ ㅂ ㅃ ㅅ ㅆ ㅇ ㅈ ㅉ ㅊ ㅋ ㅌ ㅍ ㅎ
 //    ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅗ ㅘ ㅙ ㅚ ㅛ ㅜ ㅝ ㅞ ㅟ ㅠ ㅡ ㅢ ㅣ
@@ -53,17 +53,17 @@ const charset = [
   //unicode
 ]
   .filter(Boolean)
-  .join("")
+  .join('')
   .split(/\s/)
-  .join("");
-export const MAX_BASE = charset.length;
+  .join('')
+export const MAX_BASE = charset.length
 
 /**
  * @param {unknown} digit;
  * @param {unknown} base;
  */
 function invalidDigit(digit, base) {
-  throw new Error(`Invalid digit '${digit}' for base ${base}.`);
+  throw new Error(`Invalid digit '${digit}' for base ${base}.`)
 }
 
 /**
@@ -72,12 +72,12 @@ function invalidDigit(digit, base) {
  * @param {unknown} maxBase;
  */
 function invalidBase(ref, base, maxBase) {
-  throw new Error(`'${ref}' must be between 2 and ${maxBase} not '${base}'.`);
+  throw new Error(`'${ref}' must be between 2 and ${maxBase} not '${base}'.`)
 }
 
-const ZERO = BigInt(0);
-const ONE = BigInt(1);
-const TWO = BigInt(2);
+const ZERO = BigInt(0)
+const ONE = BigInt(1)
+const TWO = BigInt(2)
 
 /**
  * @param {bigint} x
@@ -85,14 +85,14 @@ const TWO = BigInt(2);
  * @returns {bigint}
  */
 function bigIntPow(x, y) {
-  if (y === ZERO) return ONE;
-  const p2 = bigIntPow(x, y / TWO);
-  if (y % TWO === ZERO) return p2 * p2;
-  return x * p2 * p2;
+  if (y === ZERO) return ONE
+  const p2 = bigIntPow(x, y / TWO)
+  if (y % TWO === ZERO) return p2 * p2
+  return x * p2 * p2
 }
 
-const defaultAlphabet = charset;
-const defaultAlphabetRange = defaultAlphabet.split("");
+const defaultAlphabet = charset
+const defaultAlphabetRange = defaultAlphabet.split('')
 
 /**
  * @param {string} integerValue
@@ -100,18 +100,18 @@ const defaultAlphabetRange = defaultAlphabet.split("");
  * @returns {bigint}
  */
 function convertToBase10Integer(integerValue, fromAlphabet) {
-  const fromBase = BigInt(fromAlphabet.length);
+  const fromBase = BigInt(fromAlphabet.length)
 
   return integerValue
-    .split("")
+    .split('')
     .reverse()
     .reduce((carry, digit, index) => {
-      const fromIndex = fromAlphabet.indexOf(digit);
+      const fromIndex = fromAlphabet.indexOf(digit)
       if (fromIndex === -1) {
-        invalidDigit(digit, fromAlphabet.length);
+        invalidDigit(digit, fromAlphabet.length)
       }
-      return carry + BigInt(fromIndex) * bigIntPow(fromBase, BigInt(index));
-    }, BigInt(0));
+      return carry + BigInt(fromIndex) * bigIntPow(fromBase, BigInt(index))
+    }, BigInt(0))
 }
 
 /**
@@ -120,15 +120,15 @@ function convertToBase10Integer(integerValue, fromAlphabet) {
  * @returns {string}
  */
 function convertFromBase10Integer(base10Integer, toAlphabet) {
-  const toBase = BigInt(toAlphabet.length);
+  const toBase = BigInt(toAlphabet.length)
 
-  let value = "";
+  let value = ''
   while (base10Integer > 0) {
-    value = toAlphabet[Number(base10Integer % toBase)] + value;
-    base10Integer = (base10Integer - (base10Integer % toBase)) / toBase;
+    value = toAlphabet[Number(base10Integer % toBase)] + value
+    base10Integer = (base10Integer - (base10Integer % toBase)) / toBase
   }
 
-  return value || "0";
+  return value || '0'
 }
 
 /**
@@ -137,20 +137,20 @@ function convertFromBase10Integer(base10Integer, toAlphabet) {
  * @param {number} toBase
  */
 export function convertBase(value, fromBase, toBase) {
-  const range = defaultAlphabetRange;
+  const range = defaultAlphabetRange
 
   if (fromBase < 2 || fromBase > range.length) {
-    invalidBase("fromBase", fromBase, range.length);
+    invalidBase('fromBase', fromBase, range.length)
   }
   if (toBase < 2 || toBase > range.length) {
-    invalidBase("toBase", toBase, range.length);
+    invalidBase('toBase', toBase, range.length)
   }
 
-  const fromRange = range.slice(0, fromBase);
-  const toRange = range.slice(0, toBase);
+  const fromRange = range.slice(0, fromBase)
+  const toRange = range.slice(0, toBase)
 
-  const base10Integer = convertToBase10Integer(value, fromRange);
-  const toBaseInteger = convertFromBase10Integer(base10Integer, toRange);
+  const base10Integer = convertToBase10Integer(value, fromRange)
+  const toBaseInteger = convertFromBase10Integer(base10Integer, toRange)
 
-  return toBaseInteger;
+  return toBaseInteger
 }
