@@ -25,16 +25,16 @@
     "@fastify/rate-limit": "^9.1.0",
     "@fastify/static": "^7.0.4",
     "@fastify/view": "^9.1.0",
-    "baseroo": "^2.0.1",
     "ejs": "^3.1.10",
-    "express": "^4.19.2",
     "fastify": "^4.28.0",
-    "pg": "^8.12.0",
-    "pug": "^3.0.3"
+    "pg": "^8.12.0"
   },
   "devDependencies": {
+    "@fastify/cookie": "^9.3.1",
+    "@fastify/oauth2": "^7.8.1",
     "@tsconfig/node20": "^20.1.4",
     "@tsconfig/strictest": "^2.0.5",
+    "@types/ejs": "^3.1.5",
     "@types/node": "^20.14.2",
     "@types/pg": "^8.11.6",
     "nodemon": "^3.1.3",
