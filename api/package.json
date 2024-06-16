@@ -44,6 +44,7 @@
     "@swc/core": "^1.5.7",
     "@types/luxon": "^3.4.2",
     "@types/node": "^20.12.12",
+    "better-sqlite3": "^11.0.0",
     "eslint": "^8.57.0",
     "hot-hook": "^0.2.6",
     "pino-pretty": "^11.1.0",
@@ -69,9 +70,6 @@
       "./app/controllers/**/*.ts",
       "./app/middleware/*.ts"
     ]
-  },
-  "eslintConfig": {
-    "extends": "@adonisjs/eslint-config/app"
   },
   "prettier": "@adonisjs/prettier-config"
 }

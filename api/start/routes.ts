@@ -12,33 +12,53 @@ import router from '@adonisjs/core/services/router'
 const GH = () => import('#controllers/auth/github')
 
 /**
- * API Routes
+ * Prefix so that we are more likely to avoid collisions with custom URLs
+ * (and custom URLS will require that they be at least so many characters)
  */
 router
   .group(() => {
+    /**
+     * API Routes
+     */
     router
       .group(() => {
-        router.get('links', [() => import('#controllers/api/v1/links'), 'index'])
+        router
+          .group(() => {
+            router.get('links', [() => import('#controllers/api/v1/links'), 'index'])
+          })
+          .prefix('/v1')
       })
-      .prefix('/v1')
-  })
-  .prefix('/api')
+      .prefix('/api')
 
-/**
- * Auth
- */
-router
-  .group(() => {
-    router.get('callback/github', [GH, 'callback'])
+    /**
+     * Auth
+     */
     router
-      .get('/:provider/redirect', ({ ally, params }) => {
-        const driverInstance = ally.use(params.provider)
+      .group(() => {
+        router.get('callback/github', [GH, 'callback'])
+        router
+          .get('/:provider/redirect', ({ ally, params }) => {
+            const driverInstance = ally.use(params.provider)
 
-        console.log(driverInstance)
+            console.log(driverInstance)
+          })
+          .where('provider', /github|google|twitter/)
       })
-      .where('provider', /github|google|twitter/)
+      .prefix('/auth')
+
+    /**
+     * Mostly dev testing as I figure out Adonis
+     */
+    router
+      .group(() => {
+        let lofi = () => import('#controllers/lo-fi')
+
+        router.get('/create', [lofi, 'create'])
+        router.post('/create', [lofi, 'createLink'])
+      })
+      .prefix('/lo-fi')
   })
-  .prefix('/auth')
+  .prefix('/_')
 
 /**
  * "SSR" / Traditional

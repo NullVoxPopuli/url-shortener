@@ -1,5 +1,6 @@
 import app from '@adonisjs/core/services/app'
 import { HttpContext, ExceptionHandler } from '@adonisjs/core/http'
+import { StatusPageRange, StatusPageRenderer } from '@adonisjs/core/types/http'
 
 export default class HttpExceptionHandler extends ExceptionHandler {
   /**
@@ -24,5 +25,10 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    */
   async report(error: unknown, ctx: HttpContext) {
     return super.report(error, ctx)
+  }
+
+  protected statusPages: Record<StatusPageRange, StatusPageRenderer> = {
+    '404': (_, { view }) => view.render('errors/not-found'),
+    '500..599': (_, { view }) => view.render('errors/server-error'),
   }
 }
