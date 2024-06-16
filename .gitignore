@@ -1,3 +1,30 @@
+# Dependencies and AdonisJS build
+node_modules
+build
+tmp
+
+# Secrets
+.env
+.env.local
+.env.production
+.env.production.local
+.env.development.local
+
+# Frontend assets compiled code
+public/assets
+
+# Build tools specific
+npm-debug.log
+yarn-error.log
+
+# Editors specific
+.fleet
+.idea
+.vscode
+
+# Platform specific
+.DS_Store
+
 # build output
 dist/
 
@@ -12,13 +39,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-
-# environment variables
-.env
-.env.production
-
-# macOS-specific files
-.DS_Store
 
 # jetbrains setting folder
 .idea/

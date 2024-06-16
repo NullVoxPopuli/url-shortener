@@ -1,7 +1,14 @@
 {
-  "extends": ["@tsconfig/strictest", "@tsconfig/node20"],
+  "extends": [
+    "@tsconfig/strictest",
+    "@adonisjs/tsconfig/tsconfig.app.json",
+  ],
   "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./build",
+
     // Stylistic
-    "noPropertyAccessFromIndexSignature": false
-  }
+    "noPropertyAccessFromIndexSignature": false,
+    "noImplicitReturns": false,
+  },
 }
