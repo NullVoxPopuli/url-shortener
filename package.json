@@ -1,5 +1,6 @@
 {
-  "name": "url-shortener",
+  "name": "url-shortener-root",
+  "private": true,
   "description": "A URL Shortener app",
   "version": "0.0.0",
   "private": true,

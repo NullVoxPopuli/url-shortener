@@ -1,14 +1,13 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE public.links
+CREATE TABLE IF NOT EXISTS public.links
 (
     id uuid NOT NULL DEFAULT uuid_generate_v4(),
-    original text NOT NULL,
+    original text COLLATE pg_catalog."default" NOT NULL,
+    "createdAt" date NOT NULL DEFAULT now(),
     visits integer NOT NULL DEFAULT 0,
-    submitter character varying(128) NOT NULL,
-    "createdAt" date NOT NULL DEFAULT NOW(),
-    PRIMARY KEY (id)
-);
+    CONSTRAINT links_pkey PRIMARY KEY (id)
+)
 
 ALTER TABLE IF EXISTS public.links
     OWNER to u7e79dlsbt643o;

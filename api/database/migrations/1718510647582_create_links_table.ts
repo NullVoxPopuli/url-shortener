@@ -8,10 +8,6 @@ export default class extends BaseSchema {
       table.uuid('id').primary()
       table.text('original').notNullable()
       table.integer('visits').defaultTo(0)
-      // account
-      table.foreign('owned_by').references('accounts.id').notNullable().index('owned_by_index')
-      // user
-      table.foreign('created_by').references('users.id').notNullable()
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').notNullable()

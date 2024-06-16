@@ -1,6 +1,7 @@
 import env from '#start/env'
 import { defineConfig } from '@adonisjs/lucid'
 
+console.log('hi')
 const dbConfig = defineConfig({
   connection: 'postgres',
   connections: {
@@ -8,7 +9,7 @@ const dbConfig = defineConfig({
       client: 'pg',
       connection: {
         ssl: {
-          rejectUnauthorized: false
+          rejectUnauthorized: false,
         },
         host: env.get('DB_HOST'),
         port: env.get('DB_PORT'),
@@ -25,3 +26,4 @@ const dbConfig = defineConfig({
 })
 
 export default dbConfig
+
