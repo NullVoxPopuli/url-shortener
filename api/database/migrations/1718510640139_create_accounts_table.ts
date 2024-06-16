@@ -8,6 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
 
       table.string('name').notNullable()
+      table.integer('admin_id')
 
       table.timestamp('created_at')
       table.timestamp('updated_at')
@@ -18,4 +19,3 @@ export default class extends BaseSchema {
     this.schema.dropTable(this.tableName)
   }
 }
-

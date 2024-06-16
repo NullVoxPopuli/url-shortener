@@ -9,6 +9,9 @@ export default class extends BaseSchema {
       table.text('original').notNullable()
       table.integer('visits').defaultTo(0)
 
+      table.integer('owned_by').notNullable()
+      table.integer('created_by').notNullable()
+
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').notNullable()
     })
@@ -18,4 +21,3 @@ export default class extends BaseSchema {
     this.schema.dropTable(this.tableName)
   }
 }
-

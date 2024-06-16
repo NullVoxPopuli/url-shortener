@@ -16,16 +16,21 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column({ isPrimary: true })
   declare id: number
 
+  @column()
+  declare name: string
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 
-  @belongsTo(() => Account, { localKey: 'account_id' })
+  @column()
+  declare account_id: number
+
+  @belongsTo(() => Account, { foreignKey: 'account_id' })
   declare account: BelongsTo<typeof Account>
 
   @hasMany(() => Link, { foreignKey: 'created_by' })
   declare links: HasMany<typeof Link>
 }
-

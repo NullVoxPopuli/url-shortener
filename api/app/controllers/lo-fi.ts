@@ -1,3 +1,6 @@
+import User from '#models/user'
+import db from '@adonisjs/lucid/services/db'
+import Account from '#models/account'
 import Link from '#models/link'
 import { compressedUUID } from '#utils/uuid'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -16,13 +19,36 @@ export default class LoFiLinks {
       return
     }
 
-    let link = await Link.create({
-      original: originalUrl,
+    let user!: User
+    let account!: Account
+    await db.transaction(async (trx) => {
+      user = new User()
+      account = new Account()
+
+      user.name = 'NVP'
+      account.name = 'Test'
+
+      user.useTransaction(trx)
+      account.useTransaction(trx)
+
+      await user.related('account').associate(account)
+      await account.related('admin').associate(user)
+
+      user.save()
+      account.save()
     })
+
+    let link = new Link()
+    link.original = originalUrl
+    link.owned_by = account.id
+    link.created_by = user.id
+    await link.save()
+
     let shorter = compressedUUID.encode(link.id)
+    let shortUrl = `${request.host()}/${shorter}`
 
     response.status(201)
 
-    view.render('lofi/success', { shortUrl: `${request.host}/${shorter}` })
+    return view.render('lo-fi/success', { shortUrl })
   }
 }

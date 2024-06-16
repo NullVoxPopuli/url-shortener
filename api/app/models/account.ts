@@ -16,10 +16,12 @@ export default class Account extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
-  @belongsTo(() => User, { localKey: 'admin_id' })
+  @column()
+  declare admin_id: number
+
+  @belongsTo(() => User, { foreignKey: 'admin_id' })
   declare admin: BelongsTo<typeof User>
 
   @hasMany(() => User, { foreignKey: 'account_id' })
   declare users: HasMany<typeof User>
 }
-
