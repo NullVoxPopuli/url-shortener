@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "vitest";
 
-import { compressedUUID } from './utils/uuid.js';
+import { compressedUUID } from "./utils/uuid.js";
 
 let samples = `
 320684ca-8c22-43fa-884b-db9d687fbe71
@@ -10,9 +10,12 @@ let samples = `
 b7d20768-6cf3-4380-b377-cbf7b50cfbde
 d1c797d7-4510-4b0a-bed4-04ef95e18366
 f9903964-5dd5-4f98-b907-1c45ba313baa
-`.split('\n').map(s => s.trim()).filter(Boolean);
+`
+  .split("\n")
+  .map((s) => s.trim())
+  .filter(Boolean);
 
-describe('compressed UUID', () => {
+describe("compressed UUID", () => {
   for (let sample of samples) {
     it(`shrinks ${sample}`, () => {
       let result = compressedUUID.encode(sample);
