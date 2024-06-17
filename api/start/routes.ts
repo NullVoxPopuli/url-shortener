@@ -36,6 +36,8 @@ router
     router
       .group(() => {
         router.get('callback/github', [GH, 'callback']);
+        //router.get('callback/google', [GH, 'callback']);
+        //router.get('callback/twitter', [GH, 'callback']);
         router
           .get('/:provider/redirect', ({ ally, params }) => {
             const driverInstance = ally.use(params.provider);
