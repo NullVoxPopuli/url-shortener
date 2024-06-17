@@ -7,9 +7,9 @@
 |
 */
 
-import router from '@adonisjs/core/services/router'
+import router from '@adonisjs/core/services/router';
 
-const GH = () => import('#controllers/auth/github')
+const GH = () => import('#controllers/auth/github');
 
 /**
  * Prefix so that we are more likely to avoid collisions with custom URLs
@@ -24,42 +24,42 @@ router
       .group(() => {
         router
           .group(() => {
-            router.get('links', [() => import('#controllers/api/v1/links'), 'index'])
+            router.get('links', [() => import('#controllers/api/v1/links'), 'index']);
           })
-          .prefix('/v1')
+          .prefix('/v1');
       })
-      .prefix('/api')
+      .prefix('/api');
 
     /**
      * Auth
      */
     router
       .group(() => {
-        router.get('callback/github', [GH, 'callback'])
+        router.get('callback/github', [GH, 'callback']);
         router
           .get('/:provider/redirect', ({ ally, params }) => {
-            const driverInstance = ally.use(params.provider)
+            const driverInstance = ally.use(params.provider);
 
-            return driverInstance.redirect()
+            return driverInstance.redirect();
           })
-          .where('provider', /github|google|twitter/)
+          .where('provider', /github|google|twitter/);
       })
-      .prefix('/auth')
+      .prefix('/auth');
 
     /**
      * Mostly dev testing as I figure out Adonis
      */
     router
       .group(() => {
-        let lofi = () => import('#controllers/lo-fi')
+        let lofi = () => import('#controllers/lo-fi');
 
-        router.on('/').render('lo-fi/index')
-        router.get('/create', [lofi, 'create'])
-        router.post('/create', [lofi, 'createLink'])
+        router.on('/').render('lo-fi/index');
+        router.get('/create', [lofi, 'create']);
+        router.post('/create', [lofi, 'createLink']);
       })
-      .prefix('/lo-fi')
+      .prefix('/lo-fi');
   })
-  .prefix('/_')
+  .prefix('/_');
 
 /**
  * "SSR" / Traditional
@@ -69,5 +69,5 @@ router
  *
  * Everything else will be SPA, as it's guarded by auth
  */
-router.get(':id', [() => import('#controllers/redirect'), 'findLink'])
-router.get('/', [() => import('#controllers/home'), 'index'])
+router.get(':id', [() => import('#controllers/redirect'), 'findLink']);
+router.get('/', [() => import('#controllers/home'), 'index']);

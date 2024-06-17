@@ -1,7 +1,7 @@
-import path from 'node:path'
-import env from '#start/env'
-import { defineConfig } from '@adonisjs/lucid'
-import { findUp } from 'find-up'
+import path from 'node:path';
+import env from '#start/env';
+import { defineConfig } from '@adonisjs/lucid';
+import { findUp } from 'find-up';
 
 // Adonis builds the whole app into a `build` directory
 // so all our paths end up being incorrect.
@@ -9,12 +9,12 @@ import { findUp } from 'find-up'
 //
 // Adonis should consider getting rid of the build directory.
 // (And Svelte should do the same with their .svelte) directory.
-const pJsonPath = await findUp('package.json')
+const pJsonPath = await findUp('package.json');
 if (!pJsonPath) {
-  throw new Error('Could not  determine project path')
+  throw new Error('Could not  determine project path');
 }
-const project = path.dirname(pJsonPath)
-const sqlitePath = path.join(project, 'db.sqlite3')
+const project = path.dirname(pJsonPath);
+const sqlitePath = path.join(project, 'db.sqlite3');
 
 const dbConfig = defineConfig({
   connection: env.get('DB_CONNECTION'),
@@ -44,6 +44,6 @@ const dbConfig = defineConfig({
       },
     },
   },
-})
+});
 
-export default dbConfig
+export default dbConfig;

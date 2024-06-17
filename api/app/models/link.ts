@@ -1,42 +1,42 @@
-import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo, beforeCreate } from '@adonisjs/lucid/orm'
-import Account from './account.js'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
-import User from './user.js'
-import { randomUUID } from 'node:crypto'
+import { DateTime } from 'luxon';
+import { BaseModel, column, belongsTo, beforeCreate } from '@adonisjs/lucid/orm';
+import Account from './account.js';
+import type { BelongsTo } from '@adonisjs/lucid/types/relations';
+import User from './user.js';
+import { randomUUID } from 'node:crypto';
 
 export default class Link extends BaseModel {
   @column({ isPrimary: true })
-  declare id: string
+  declare id: string;
 
   @column()
-  declare original: string
+  declare original: string;
 
   @column()
-  declare visits: number
+  declare visits: number;
 
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  declare createdAt: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  declare updatedAt: DateTime;
 
   @column()
-  declare owned_by: number
+  declare owned_by: number;
 
   @belongsTo(() => Account, { foreignKey: 'owned_by' })
-  declare ownedBy: BelongsTo<typeof Account>
+  declare ownedBy: BelongsTo<typeof Account>;
 
   @column()
-  declare created_by: number
+  declare created_by: number;
 
   @belongsTo(() => User, { foreignKey: 'created_by' })
-  declare createdBy: BelongsTo<typeof User>
+  declare createdBy: BelongsTo<typeof User>;
 
-  static selfAssignPrimaryKey = true
+  static selfAssignPrimaryKey = true;
 
   @beforeCreate()
   static assignUuid(link: Link) {
-    link.id = randomUUID()
+    link.id = randomUUID();
   }
 }

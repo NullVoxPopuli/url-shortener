@@ -1,0 +1,26 @@
+{
+  "name": "@nullvoxpopuli/url-compression",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "author": "NullVoxPopuli",
+  "license": "GPL-3.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./uuid.d.ts",
+      "default": "./uuid.js"
+    }
+  },
+  "keywords": [],
+  "devDependencies": {
+    "@tsconfig/ember": "^3.0.8",
+    "@tsconfig/strictest": "^2.0.5",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}

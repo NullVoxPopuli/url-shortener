@@ -1,5 +1,5 @@
-import env from '#start/env'
-import { defineConfig, services } from '@adonisjs/ally'
+import env from '#start/env';
+import { defineConfig, services } from '@adonisjs/ally';
 
 const allyConfig = defineConfig({
   github: services.github({
@@ -24,9 +24,9 @@ const allyConfig = defineConfig({
     clientSecret: env.get('TWITTER_CLIENT_SECRET')!,
     callbackUrl: `${env.get('HOST')}/auth/callback/x`,
   }),
-})
+});
 
-export default allyConfig
+export default allyConfig;
 
 declare module '@adonisjs/ally/types' {
   interface SocialProviders extends InferSocialProviders<typeof allyConfig> {}

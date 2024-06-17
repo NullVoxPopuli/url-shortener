@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 module.exports = {
   extends: ['@adonisjs/eslint-config/app'],
@@ -9,4 +9,4 @@ module.exports = {
     // to wire everything up with explicit imports
     'unicorn/filename-case': 'off',
   },
-}
+};
