@@ -40,7 +40,7 @@ router
           .get('/:provider/redirect', ({ ally, params }) => {
             const driverInstance = ally.use(params.provider)
 
-            console.log(driverInstance)
+            return driverInstance.redirect()
           })
           .where('provider', /github|google|twitter/)
       })
@@ -53,6 +53,7 @@ router
       .group(() => {
         let lofi = () => import('#controllers/lo-fi')
 
+        router.on('/').render('lo-fi/index')
         router.get('/create', [lofi, 'create'])
         router.post('/create', [lofi, 'createLink'])
       })
@@ -69,4 +70,4 @@ router
  * Everything else will be SPA, as it's guarded by auth
  */
 router.get(':id', [() => import('#controllers/redirect'), 'findLink'])
-router.on('/').render('index')
+router.get('/', [() => import('#controllers/home'), 'index'])
