@@ -21,11 +21,9 @@ export default class extends BaseSchema {
   async down() {
     this.schema.alterTable('users', (table) => {
       table.dropForeign('account_id');
-      table.dropColumn('account_id');
     });
     this.schema.alterTable('accounts', (table) => {
       table.dropForeign('admin_id');
-      table.dropColumn('admin_id');
     });
     this.schema.alterTable('links', (table) => {
       table.dropIndex('owned_by_index');

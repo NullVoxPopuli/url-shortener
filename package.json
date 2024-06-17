@@ -7,7 +7,6 @@
   "type": "module",
   "author": "NullVoxPopuli",
   "license": "GPL-3.0",
-  "packageManager": "pnpm@9.3.0",
   "scripts": {
     "start": "cd api && node bin/server.js",
     "build": "cd api && node ace build",
@@ -22,6 +21,7 @@
   "pnpm": {
     "onlyBuiltDependencies":["better-sqlite3"]
   },
+  "packageManager": "pnpm@9.3.0",
   "volta": {
     "node": "22.3.0",
     "pnpm": "9.3.0"

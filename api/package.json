@@ -72,5 +72,8 @@
       "./app/controllers/**/*.ts",
       "./app/middleware/*.ts"
     ]
+  },
+  "volta": {
+    "extends": "../package.json"
   }
 }
