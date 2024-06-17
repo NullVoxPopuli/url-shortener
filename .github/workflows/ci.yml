@@ -29,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
-      - run: pnpm --filter '*' typecheck
+      - run: pnpm typecheck
 
   tests:
     name: Tests
@@ -38,4 +38,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
-      - run: pnpm --filter '*' test
+      # bug with ignore-scripts=true?
+      - run: pnpm prepare
+      - run: pnpm test
