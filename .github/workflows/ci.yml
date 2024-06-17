@@ -20,8 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
-      - run: pnpm --filter '*' format
-      - run: pnpm --filter '*' lint --fix
+      - run: "pnpm lint:fix"
       - run: git diff --exit-code
 
   types:
