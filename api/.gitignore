@@ -2,12 +2,10 @@
 node_modules
 build
 tmp
-db.sqlite3
 
 # Secrets
 .env
 .env.local
-.env.production
 .env.production.local
 .env.development.local
 
@@ -25,21 +23,3 @@ yarn-error.log
 
 # Platform specific
 .DS_Store
-
-# build output
-dist/
-
-# generated types
-.astro/
-
-# dependencies
-node_modules/
-
-# logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# jetbrains setting folder
-.idea/

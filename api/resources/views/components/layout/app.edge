@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+    @if (title)
+    {{ title }} |
+    @endif
+
+    nvp.gg | URL Shortener
+  </title>
+
+  <meta charset="utf-8">
+  @if ($slots.meta)
+  {{{ await $slots.meta() }}}
+  @endif
+</head>
+
+<body>
+  <header>
+    <h1>nvp.gg</h1>
+
+    <hr />
+    <a href="/">home</a>
+    <hr />
+  </header>
+
+  {{{ await $slots.main() }}}
+</body>
+
+</html>

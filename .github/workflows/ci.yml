@@ -20,7 +20,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
-      - run: pnpm prettier . --check
+      - run: "pnpm lint:fix"
+      - run: git diff --exit-code
+
+  types:
+    name: Types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
+      - run: pnpm typecheck
 
   tests:
     name: Tests
@@ -29,4 +38,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
+      # bug with ignore-scripts=true?
+      - run: pnpm prepare
       - run: pnpm test

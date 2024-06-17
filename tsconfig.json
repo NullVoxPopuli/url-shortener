@@ -1,7 +1,0 @@
-{
-  "extends": ["@tsconfig/strictest", "@tsconfig/node20"],
-  "compilerOptions": {
-    // Stylistic
-    "noPropertyAccessFromIndexSignature": false
-  }
-}

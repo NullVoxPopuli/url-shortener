@@ -1,0 +1,17 @@
+{
+  "extends": "@adonisjs/tsconfig/tsconfig.app.json",
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./build",
+
+    // Compat
+    "allowJs": true,
+    "checkJs": true,
+
+    // Be less annoying
+    "noEmitOnError": false,
+
+    // Stylistic
+    "noPropertyAccessFromIndexSignature": false
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "extends": ["@tsconfig/strictest", "@tsconfig/ember"],
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+
+    // Be less annoying
+    "noEmitOnError": false,
+
+
+    // Stylistic
+    "noPropertyAccessFromIndexSignature": false
+  }
+}
