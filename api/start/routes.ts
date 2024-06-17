@@ -40,9 +40,15 @@ router
         //router.get('callback/twitter', [GH, 'callback']);
         router
           .get('/:provider/redirect', ({ ally, params }) => {
+            //switch (params.provider) {
+            //  case 'github':
+            //    return ally.use('github').redirect((request) => {
+            //      request.scopes(['user:email']);
+            //    });
+            //  default:
             const driverInstance = ally.use(params.provider);
-
             return driverInstance.redirect();
+            //}
           })
           .where('provider', /github|google|twitter/);
       })

@@ -9,6 +9,7 @@ const allyConfig = defineConfig({
     clientId: env.get('GITHUB_CLIENT_ID')!,
     clientSecret: env.get('GITHUB_CLIENT_SECRET')!,
     callbackUrl: `${baseUrl}/github`,
+    scopes: ['user:email'],
   }),
   google: services.google({
     clientId: env.get('TWITTER_CLIENT_ID')!,
@@ -26,6 +27,8 @@ const allyConfig = defineConfig({
     clientId: env.get('TWITTER_CLIENT_ID')!,
     clientSecret: env.get('TWITTER_CLIENT_SECRET')!,
     callbackUrl: `${baseUrl}/twitter`,
+    // Twitter doesn't support scopes
+    //scopes: ['email'],
   }),
 });
 
