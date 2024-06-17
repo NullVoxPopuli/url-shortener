@@ -11,6 +11,7 @@
   "scripts": {
     "start": "cd api && node bin/server.js",
     "build": "cd api && node ace build",
+    "lint:fix": "pnpm --filter '*' lint --fix && pnpm --filter '*' format",
     "dev": "cd api && node ace serve --hmr"
   },
   "devDependencies": {

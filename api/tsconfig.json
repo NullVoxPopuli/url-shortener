@@ -11,7 +11,7 @@
     // Be less annoying
     "noEmitOnError": false,
 
-     // Stylistic
+    // Stylistic
     "noPropertyAccessFromIndexSignature": false
-  },
+  }
 }
