@@ -11,7 +11,6 @@ export default class extends BaseSchema {
     this.schema.alterTable('links', (table) => {
       table.foreign('owned_by').references('accounts.id');
       table.foreign('created_by').references('users.id');
-      table.index('owned_by', 'owned_by_index');
     });
     this.schema.alterTable('custom_links', (table) => {
       table.foreign('link_id').references('links.id');
@@ -26,7 +25,6 @@ export default class extends BaseSchema {
       table.dropForeign('admin_id');
     });
     this.schema.alterTable('links', (table) => {
-      table.dropIndex('owned_by', 'owned_by_index');
       table.dropForeign('owned_by');
       table.dropForeign('created_by');
     });

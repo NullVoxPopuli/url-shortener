@@ -1,4 +1,4 @@
-import { defineConfig } from '@adonisjs/core/app';
+import { defineConfig } from '@adonisjs/core/app'
 
 export default defineConfig({
   /*
@@ -35,6 +35,7 @@ export default defineConfig({
     () => import('@adonisjs/auth/auth_provider'),
     () => import('@adonisjs/core/providers/edge_provider'),
     () => import('@adonisjs/ally/ally_provider'),
+    () => import('@adonisjs/static/static_provider')
   ],
 
   /*
@@ -76,5 +77,9 @@ export default defineConfig({
       pattern: 'resources/views/**/*.edge',
       reloadServer: false,
     },
+    {
+      pattern: 'public/**',
+      reloadServer: false,
+    }
   ],
-});
+})

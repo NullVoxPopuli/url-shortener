@@ -60,6 +60,7 @@
     "@adonisjs/cors": "^2.2.1",
     "@adonisjs/lucid": "^20.6.0",
     "@adonisjs/session": "^7.4.1",
+    "@adonisjs/static": "^1.1.1",
     "@nullvoxpopuli/url-compression": "workspace:^",
     "@vinejs/vine": "^2.0.0",
     "edge.js": "^6.0.2",

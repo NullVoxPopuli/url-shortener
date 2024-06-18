@@ -4,7 +4,13 @@ import Account from '#models/account';
 import Link from '#models/link';
 import { compressedUUID } from '@nullvoxpopuli/url-compression';
 import type { HttpContext } from '@adonisjs/core/http';
+
 export default class LoFiLinks {
+  async index({ view, auth }: HttpContext) {
+    await auth.check();
+    return view.render('lo-fi/index');
+  }
+
   async create({ view }: HttpContext) {
     return view.render('lo-fi/create');
   }

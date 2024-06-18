@@ -35,6 +35,7 @@ router
      */
     router
       .group(() => {
+        router.get('logout', [() => import('#controllers/auth'), 'logout']);
         router.get('callback/github', [GH, 'callback']);
         //router.get('callback/google', [GH, 'callback']);
         //router.get('callback/twitter', [GH, 'callback']);
@@ -61,7 +62,7 @@ router
       .group(() => {
         let lofi = () => import('#controllers/lo-fi');
 
-        router.on('/').render('lo-fi/index');
+        router.get('/', [lofi, 'index']);
         router.get('/create', [lofi, 'create']);
         router.post('/create', [lofi, 'createLink']);
       })
