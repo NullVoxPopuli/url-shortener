@@ -37,7 +37,7 @@ export default class GitHubController {
     const ghUser = await gh.user();
     const accessToken = ghUser.token.token;
 
-    const user = await this.findOrCreate(ghUser.id, ghUser.original.login, accessToken.token);
+    const user = await this.findOrCreate(ghUser.id, ghUser.original.login, accessToken);
 
     if (!user) {
       throw new Error('failed to find / create user');
