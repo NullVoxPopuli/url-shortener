@@ -2,14 +2,16 @@ import env from '#start/env';
 import { defineConfig, services } from '@adonisjs/ally';
 
 const baseUrl =
-  env.get('NODE_ENV') === 'development' ? 'localhost:5001' : 'https://nvp.gg/_/auth/callback';
+  env.get('NODE_ENV') === 'development'
+    ? 'http://nvp.gg/_/auth/callback'
+    : 'https://nvp.gg/_/auth/callback';
 
 const allyConfig = defineConfig({
   github: services.github({
     clientId: env.get('GITHUB_CLIENT_ID')!,
     clientSecret: env.get('GITHUB_CLIENT_SECRET')!,
     callbackUrl: `${baseUrl}/github`,
-    scopes: ['user:email'],
+    scopes: ['user:name'],
   }),
   google: services.google({
     clientId: env.get('TWITTER_CLIENT_ID')!,

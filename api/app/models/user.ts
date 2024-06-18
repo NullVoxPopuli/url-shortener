@@ -33,4 +33,10 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @hasMany(() => Link, { foreignKey: 'created_by' })
   declare links: HasMany<typeof Link>;
+
+  @column()
+  declare oauth_github_id: string;
+
+  @column()
+  declare oauth_github_token: string;
 }
