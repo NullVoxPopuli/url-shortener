@@ -10,7 +10,7 @@ export default class AuthMiddleware {
   /**
    * The URL to redirect to, when authentication fails
    */
-  redirectTo = '/login';
+  redirectTo = '/_/lo-fi';
 
   async handle(
     ctx: HttpContext,
@@ -20,6 +20,20 @@ export default class AuthMiddleware {
     } = {}
   ) {
     await ctx.auth.authenticateUsing(options.guards, { loginRoute: this.redirectTo });
+    let provider = ctx.session.get('accessProvider');
+
+    switch (provider) {
+      case 'github':
+        let token = ctx.auth.user?.oauth_github_token;
+        if (!token) {
+          return ctx.response.redirect(this.redirectTo);
+        }
+        ctx.ally.use('github').userFromToken(token);
+        break;
+      default:
+        ctx.auth.use('web').logout();
+        return ctx.response.redirect(this.redirectTo);
+    }
     return next();
   }
 }

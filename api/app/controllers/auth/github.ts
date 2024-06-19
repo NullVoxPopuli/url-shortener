@@ -44,11 +44,9 @@ export default class GitHubController {
     }
 
     session.put('accessProvider', 'github');
-    session.put('accessToken', accessToken);
 
     await auth.use('web').login(user);
     await auth.authenticate();
-    console.log(auth.isAuthenticated);
 
     response.redirect('/');
   }

@@ -6,7 +6,7 @@
 | The routes file is used for defining the HTTP routes.
 |
 */
-
+import { middleware } from '#start/kernel';
 import router from '@adonisjs/core/services/router';
 
 const GH = () => import('#controllers/auth/github');
@@ -63,8 +63,13 @@ router
         let lofi = () => import('#controllers/lo-fi');
 
         router.get('/', [lofi, 'index']);
-        router.get('/create', [lofi, 'create']);
-        router.post('/create', [lofi, 'createLink']);
+
+        router
+          .group(() => {
+            router.get('/create', [lofi, 'create']);
+            router.post('/create', [lofi, 'createLink']);
+          })
+          .use([middleware.auth()]);
       })
       .prefix('/lo-fi');
   })
