@@ -6,10 +6,20 @@
     // work with TypeScript.
     "baseUrl": ".",
     "paths": {
-      "web-client/tests/*": ["tests/*"],
-      "web-client/*": ["app/*"],
-      "*": ["types/*"]
+      "web-client/tests/*": [
+        "tests/*"
+      ],
+      "web-client/*": [
+        "app/*"
+      ],
+      "*": [
+        "types/*"
+      ]
     },
-    "types": ["ember-source/types"]
+    "types": [
+      "./node_modules/@ember-data-types/request-utils/unstable-preview-types",
+      "./node_modules/ember-data-types/unstable-preview-types",
+      "ember-source/types"
+    ]
   }
 }
