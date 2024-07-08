@@ -2,16 +2,26 @@ import Link from '#models/link';
 import type { HttpContext } from '@adonisjs/core/http';
 import { compressedUUID } from '@nullvoxpopuli/url-compression';
 import CustomLink from '#models/custom_link';
+import { action } from '../base.js';
+import { createLink } from './actions/create.js';
 
 export default class LinksController {
-  async store({ request }: HttpContext) {
-    const payload = request.body();
-
-    return Link.create(payload);
+  async store(context: HttpContext) {
+    return action(context, async ({ request, response }) => {
+      response.status(201);
+      return {
+        data: await createLink(context),
+        included: [],
+      };
+    });
   }
 
   async index({}: HttpContext) {
-    return Link.query();
+    return {
+      included: [],
+      links: [],
+      data: await Link.query(),
+    };
   }
 
   async findLink({ request, response }: HttpContext) {

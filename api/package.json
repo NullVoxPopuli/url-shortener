@@ -8,13 +8,16 @@
     "rebuild": "pnpm rebuild node-gyp && pnpm rebuild better-sqlite3",
     "start": "node bin/server.js",
     "build": "node ace build --ignore-ts-errors",
-    "dev": "node ace serve --hmr",
-    "test": "node ace test",
+    "ace": "NODE_OPTIONS='--no-deprecation' node ace ",
+    "dev": "NODE_OPTIONS='--no-deprecation' node ace serve --hmr",
+    "test": "NODE_OPTIONS='--no-deprecation' node ace test",
+    "test:watch": "NODE_OPTIONS='--no-deprecation' node ace test --watch",
     "lint": "eslint .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit"
   },
   "imports": {
+    "#jsonapi": "./app/jsonapi/index.js",
     "#controllers/*": "./app/controllers/*.js",
     "#exceptions/*": "./app/exceptions/*.js",
     "#models/*": "./app/models/*.js",
@@ -67,7 +70,8 @@
     "find-up": "^7.0.0",
     "luxon": "^3.4.4",
     "pg": "^8.12.0",
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "^0.2.2",
+    "ts-japi": "^1.11.4"
   },
   "hotHook": {
     "boundaries": [
