@@ -9,6 +9,15 @@ interface ErrorResponse {
   errors: Error[];
 }
 
+export interface DataResponse {
+  meta?: unknown;
+  data: unknown;
+  links?: unknown[];
+  included?: unknown[];
+}
+
+export type Response = ErrorResponse | DataResponse;
+
 /**
  * One of an error entry
  * https://jsonapi.org/examples/#error-objects
@@ -37,5 +46,32 @@ export const jsonapi = {
     builder(createError);
 
     return result;
+  },
+  statusFrom: (payload: Response) => {
+    if ('errors' in payload) {
+      let status = payload.errors.map((error) => error.status).filter(Boolean) as number[];
+
+      let max = Math.max(...status);
+      return max;
+    }
+
+    return 200;
+  },
+  notImplemented: () => {
+    return jsonapi.errors((error) => {
+      error({
+        status: 501,
+        title: 'Not Implemented',
+      });
+    });
+  },
+  serverError: (e: { message: string; stack: string }) => {
+    return jsonapi.errors((error) => {
+      error({
+        status: 500,
+        title: e.message,
+        detail: e.stack,
+      });
+    });
   },
 };

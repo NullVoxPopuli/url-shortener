@@ -8,11 +8,7 @@ import { createLink } from './actions/create.js';
 export default class LinksController {
   async store(context: HttpContext) {
     return action(context, async ({ request, response }) => {
-      response.status(201);
-      return {
-        data: await createLink(context),
-        included: [],
-      };
+      return await createLink(context);
     });
   }
 

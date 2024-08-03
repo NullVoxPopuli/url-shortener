@@ -5,11 +5,11 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id').notNullable();
+      table.uuid('id').primary();
       table.string('name').nullable();
 
       // Foreign Keys
-      table.integer('account_id');
+      table.uuid('account_id');
 
       // Oauth
       table.string('oauth_github_id');

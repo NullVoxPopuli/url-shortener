@@ -1,3 +1,4 @@
+import { jsonapi } from '#jsonapi';
 import type { HttpContext } from '@adonisjs/core/http';
 
 export async function action(context: HttpContext, callback: (context: HttpContext) => unknown) {
@@ -6,24 +7,11 @@ export async function action(context: HttpContext, callback: (context: HttpConte
   try {
     let result = await callback(context);
 
-    /**
-     * TODO: handle accept headers
-     */
-    return {
-      data: result,
-    };
+    response.safeStatus(jsonapi.statusFrom(result));
+    return result;
   } catch (error) {
     response.status(500);
 
-    return {
-      errors: [
-        {
-          status: 500,
-          title: error.message,
-          details: error.stack,
-        },
-      ],
-    };
+    return jsonapi.serverError(error);
   }
 }
-

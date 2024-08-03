@@ -9,7 +9,12 @@ test.group('POST v1/links', () => {
 
     response.assertStatus(422);
     response.assertBody({
-      data: {},
+      errors: [
+        {
+          status: 422,
+          title: 'Missing URL',
+        },
+      ],
     });
   });
 
@@ -18,7 +23,12 @@ test.group('POST v1/links', () => {
 
     response.assertStatus(422);
     response.assertBody({
-      data: {},
+      errors: [
+        {
+          status: 422,
+          title: 'Missing URL',
+        },
+      ],
     });
   });
 
@@ -27,7 +37,12 @@ test.group('POST v1/links', () => {
 
     response.assertStatus(422);
     response.assertBody({
-      data: {},
+      errors: [
+        {
+          status: 422,
+          title: 'Cannot parse URL, check the URL',
+        },
+      ],
     });
   });
 
@@ -36,7 +51,12 @@ test.group('POST v1/links', () => {
 
     response.assertStatus(401);
     response.assertBody({
-      data: {},
+      errors: [
+        {
+          status: 401,
+          title: 'Authentication required',
+        },
+      ],
     });
   });
 
