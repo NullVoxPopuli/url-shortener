@@ -1,5 +1,7 @@
-import { hasUUID, hasRelationship, attr, hasAttr } from '#tests/jsonapi';
+import { hasUUID, hasRelationship, attr, hasAttr, relationship } from '#tests/jsonapi';
+import { changedRecords } from '#tests/db';
 import { ApiClient } from '@japa/api-client';
+import Link from '#models/link';
 import { test } from '@japa/runner';
 
 const post = (client: ApiClient, body = {}) => client.post('_/api/v1/links').json(body);
@@ -62,11 +64,14 @@ test.group('POST v1/links', () => {
   });
 
   test('Success: URLs from glimdown.com are always allowed', async ({ client, assert }) => {
-    let response = await post(client, { originalUrl: 'https://glimdown.com' });
+    let data: any;
+    await changedRecords(Link, async () => {
+      let response = await post(client, { originalUrl: 'https://glimdown.com' });
 
-    response.assertStatus(201);
+      response.assertStatus(201);
 
-    let data = response.body().data;
+      data = response.body().data;
+    });
 
     hasUUID(data);
     hasAttr(data, 'createdAt');
@@ -75,5 +80,7 @@ test.group('POST v1/links', () => {
 
     hasRelationship(data, 'createdBy', 'user');
     hasRelationship(data, 'ownedBy', 'account');
+
+    relationship(data, 'createdBy');
   });
 });
