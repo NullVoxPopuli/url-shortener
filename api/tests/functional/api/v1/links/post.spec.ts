@@ -1,3 +1,4 @@
+import { hasUUID, hasRelationship, attr, hasAttr } from '#tests/jsonapi';
 import { ApiClient } from '@japa/api-client';
 import { test } from '@japa/runner';
 
@@ -60,12 +61,19 @@ test.group('POST v1/links', () => {
     });
   });
 
-  test('Success: URLs from glimdown.com are always allowed', async ({ client }) => {
+  test('Success: URLs from glimdown.com are always allowed', async ({ client, assert }) => {
     let response = await post(client, { originalUrl: 'https://glimdown.com' });
 
     response.assertStatus(201);
-    response.assertBody({
-      data: {},
-    });
+
+    let data = response.body().data;
+
+    hasUUID(data);
+    hasAttr(data, 'createdAt');
+    hasAttr(data, 'updatedAt');
+    assert.ok(attr(data, 'shortUrl').startsWith('localhost'));
+
+    hasRelationship(data, 'createdBy', 'user');
+    hasRelationship(data, 'ownedBy', 'account');
   });
 });

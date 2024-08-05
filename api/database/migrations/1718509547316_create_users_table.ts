@@ -11,10 +11,11 @@ export default class extends BaseSchema {
       // Foreign Keys
       table.uuid('account_id');
 
-      // Oauth
+      // Oauth - ids / names
       table.string('oauth_github_id');
       table.string('oauth_twitter_id');
       table.string('oauth_google_id');
+      // Oauth - auth
       table.string('oauth_github_token');
       table.string('oauth_twitter_token');
       table.string('oauth_google_token');

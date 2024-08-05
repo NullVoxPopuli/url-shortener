@@ -1,0 +1,21 @@
+diff --git a/build/commands/migration/_base.js b/build/commands/migration/_base.js
+index 182975ea330a4c824800870e8a5cabf8ddee7dec..259f1b206cfdb812cc27b599fe30dd04c6967b02 100644
+--- a/build/commands/migration/_base.js
++++ b/build/commands/migration/_base.js
+@@ -107,10 +107,14 @@ export default class MigrationsBase extends BaseCommand {
+                 output = this.colors.grey(message);
+                 break;
+             case 'error':
+-                const skippedMigrations = Object.values(migrator.migratedFiles).filter((file) => file.status === 'pending').length;
+-                message = `❯ Executed ${processedFiles.size} migrations, 1 error, ${skippedMigrations} skipped`;
++                const files = Object.values(migrator.migratedFiles);
++                const skippedMigrations = files.filter((file) => file.status === 'pending').length;
++                 message = `❯ Executed ${processedFiles.size} migrations, 1 error, ${skippedMigrations} skipped`;
+                 this.logger.log(this.colors.red(message));
++                this.logger.log(JSON.stringify(files, null, 2));
+                 this.logger.log('\n' + this.colors.red(migrator.error.message));
++                this.logger.log('\n' + this.colors.red(migrator.error.code));
++                this.logger.log('\n' + this.colors.red(new Error().stack));
+                 this.exitCode = 1;
+                 break;
+         }
