@@ -38,6 +38,7 @@ export async function createLink(context: HttpContext) {
         error({
           status: 401,
           title: 'Authentication required',
+          detail: 'You are not logged in and / or did not provide an API key.',
         });
       });
     }
