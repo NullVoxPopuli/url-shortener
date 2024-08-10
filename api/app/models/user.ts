@@ -7,6 +7,7 @@ import { withAuthFinder } from '@adonisjs/auth/mixins/lucid';
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations';
 import Account from './account.js';
 import Link from './link.js';
+import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens';
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -45,4 +46,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   static assignUuid(user: User) {
     user.id ||= randomUUID();
   }
+
+  static accessTokens = DbAccessTokensProvider.forModel(User);
 }

@@ -93,7 +93,9 @@ test.group('POST v1/links', () => {
     let { user } = await createNewAccount();
 
     await changedRecords(Link, async () => {
-      let response = await post(client, { originalUrl: 'https://emberjs.com' }).loginAs(user);
+      let response = await post(client, { originalUrl: 'https://emberjs.com' })
+        .withGuard('web')
+        .loginAs(user);
 
       console.log(response.body());
       response.assertStatus(201);
