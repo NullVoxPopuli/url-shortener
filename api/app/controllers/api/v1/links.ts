@@ -7,6 +7,8 @@ import { createLink } from './actions/create.js';
 
 export default class LinksController {
   async store(context: HttpContext) {
+    await context.auth.use('web').check();
+
     return action(context, async ({ request, response }) => {
       return await createLink(context);
     });
