@@ -1,0 +1,25 @@
+{
+  "extends": "@tsconfig/ember/tsconfig.json",
+  "compilerOptions": {
+    // The combination of `baseUrl` with `paths` allows Ember's classic package
+    // layout, which is not resolvable with the Node resolution algorithm, to
+    // work with TypeScript.
+    "baseUrl": ".",
+    "paths": {
+      "web-client/tests/*": [
+        "tests/*"
+      ],
+      "web-client/*": [
+        "app/*"
+      ],
+      "*": [
+        "types/*"
+      ]
+    },
+    "types": [
+      "./node_modules/@ember-data-types/request-utils/unstable-preview-types",
+      "./node_modules/ember-data-types/unstable-preview-types",
+      "ember-source/types"
+    ]
+  }
+}

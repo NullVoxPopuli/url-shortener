@@ -22,13 +22,13 @@ export default class Link extends BaseModel {
   declare updatedAt: DateTime;
 
   @column()
-  declare owned_by: number;
+  declare owned_by: string;
 
   @belongsTo(() => Account, { foreignKey: 'owned_by' })
   declare ownedBy: BelongsTo<typeof Account>;
 
   @column()
-  declare created_by: number;
+  declare created_by: string;
 
   @belongsTo(() => User, { foreignKey: 'created_by' })
   declare createdBy: BelongsTo<typeof User>;

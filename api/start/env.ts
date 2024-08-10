@@ -11,7 +11,7 @@
 
 import { Env } from '@adonisjs/core/env';
 
-export default await Env.create(new URL('../', import.meta.url), {
+const env = await Env.create(new URL('../', import.meta.url), {
   NODE_ENV: Env.schema.enum(['development', 'production', 'test'] as const),
   PORT: Env.schema.number(),
   APP_KEY: Env.schema.string(),
@@ -23,7 +23,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   | Variables for configuring database connection
   |----------------------------------------------------------
   */
-  DB_CONNECTION: Env.schema.string(),
+  DB_CONNECTION: Env.schema.string() || 'sqlite3',
   DATABASE_URL: Env.schema.string(),
 
   /*
@@ -45,3 +45,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   TWITTER_CLIENT_ID: Env.schema.string(),
   TWITTER_CLIENT_SECRET: Env.schema.string(),
 });
+
+export default env;
+
+console.log(`
+  DB_CONNECTION: ${env.get('DB_CONNECTION')}
+`);

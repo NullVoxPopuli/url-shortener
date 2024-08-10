@@ -24,7 +24,10 @@ router
       .group(() => {
         router
           .group(() => {
-            router.get('links', [() => import('#controllers/api/v1/links'), 'index']);
+            let links = () => import('#controllers/api/v1/links');
+
+            router.get('links', [links, 'index']);
+            router.post('links', [links, 'store']);
           })
           .prefix('/v1');
       })

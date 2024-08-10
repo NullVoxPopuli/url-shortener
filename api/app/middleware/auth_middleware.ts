@@ -19,6 +19,7 @@ export default class AuthMiddleware {
       guards?: (keyof Authenticators)[];
     } = {}
   ) {
+    console.log(`middleware -- this doesn't print -- which means unused?`);
     await ctx.auth.authenticateUsing(options.guards, { loginRoute: this.redirectTo });
     let provider = ctx.session.get('accessProvider');
 
