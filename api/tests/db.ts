@@ -4,6 +4,7 @@ import db from '@adonisjs/lucid/services/db';
 import Account from '#models/account';
 import User from '#models/user';
 import { faker } from '@faker-js/faker';
+import Link from '#models/link';
 
 export async function changedRecords(klass: typeof BaseModel, fn: () => unknown) {
   let beforeAll = await klass.all();
@@ -42,4 +43,14 @@ export async function createNewAccount() {
   });
 
   return { user, account };
+}
+
+export async function createLink(user, account) {
+  let link = new Link();
+  link.original = faker.internet.url();
+  link.owned_by = account.id;
+  link.created_by = user.id;
+  await link.save();
+
+  return link;
 }

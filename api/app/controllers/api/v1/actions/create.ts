@@ -3,6 +3,7 @@ import { jsonapi } from '#jsonapi';
 import Link from '#models/link';
 import { render } from '#jsonapi/data';
 import { glimdownOwner } from '#consts';
+import User from '#models/user';
 
 export async function createLink(context: HttpContext) {
   let { request, response } = context;
@@ -30,10 +31,8 @@ export async function createLink(context: HttpContext) {
   let parsed = new URL(originalUrl);
   let isGlimdown = parsed.host === 'glimdown.com';
 
-  // await context.auth.authenticateUsing(['web', 'api'], {});
-  let result = await context.auth.use('web').check();
+  await context.auth.check();
   let user = context.auth.user;
-  console.log({ user, result });
 
   if (!isGlimdown) {
     if (!user) {
@@ -46,20 +45,33 @@ export async function createLink(context: HttpContext) {
       });
     }
 
-    return jsonapi.notImplemented();
+    let link = await createMeteredLink(user, parsed);
+
+    response.status(201);
+    return render.link(request, link);
   }
 
-  let link = await createUnmeteredLink(context, parsed);
+  let link = await createUnmeteredLink(parsed);
 
   response.status(201);
   return render.link(request, link);
 }
 
-async function createUnmeteredLink(context: HttpContext, url: URL): Promise<Link> {
+async function createUnmeteredLink(url: URL): Promise<Link> {
   let link = new Link();
   link.original = url.toString();
   link.owned_by = glimdownOwner.id;
   link.created_by = glimdownOwner.id;
+  await link.save();
+
+  return link;
+}
+
+async function createMeteredLink(user: User, url: URL): Promise<Link> {
+  let link = new Link();
+  link.original = url.toString();
+  link.owned_by = user.account_id;
+  link.created_by = user.id;
   await link.save();
 
   return link;

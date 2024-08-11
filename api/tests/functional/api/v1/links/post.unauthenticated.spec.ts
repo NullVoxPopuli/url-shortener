@@ -49,7 +49,7 @@ test.group('POST [unauthenticated]', () => {
     });
   });
 
-  test('Error: any non-glimdown.com URL requires authentication', async ({ client }) => {
+  test('Success: any non-glimdown.com URL requires authentication', async ({ client }) => {
     let response = await post(client, { originalUrl: 'https://google.com' });
 
     response.assertStatus(401);

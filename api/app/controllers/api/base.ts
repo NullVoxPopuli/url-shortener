@@ -22,7 +22,6 @@ export async function action(
        *   context.auth.authenticateUsing(...)
        */
       if (error.name === 'E_UNAUTHORIZED_ACCESS') {
-        console.log('custom error');
         response.status(401);
 
         return jsonapi.notAuthenticated(error);
