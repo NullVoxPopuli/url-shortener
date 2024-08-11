@@ -5,6 +5,7 @@ export default Route(
   <template>
     {{pageTitle "nvp.gg"}}
 
+  Hello?
     {{outlet}}
   </template>
 )

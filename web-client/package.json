@@ -87,7 +87,7 @@
     "ember-resolver": "^12.0.1",
     "ember-resources": "^7.0.2",
     "ember-route-template": "^1.0.3",
-    "ember-source": "~5.9.0",
+    "ember-source": "~5.12.0-alpha.3",
     "reactiveweb": "^1.3.0",
     "tracked-built-ins": "^3.3.0",
     "tracked-toolbox": "^2.0.0"

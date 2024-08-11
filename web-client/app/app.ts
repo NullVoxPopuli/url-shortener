@@ -1,5 +1,4 @@
 import Application from '@ember/application';
-import { setBuildURLConfig } from '@ember-data/request-utils';
 import compatModules from '@embroider/core/entrypoint';
 
 import loadInitializers from 'ember-load-initializers';
@@ -13,11 +12,6 @@ for (const [name, module] of Object.entries(compatModules)) {
     return module;
   });
 }
-
-setBuildURLConfig({
-  host: 'https://nvp.gg',
-  namespace: '_/v1',
-});
 
 export default class App extends Application {
   modulePrefix = config.modulePrefix;
