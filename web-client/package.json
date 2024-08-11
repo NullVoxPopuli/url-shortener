@@ -22,7 +22,8 @@
     "start": "vite",
     "test": "concurrently \"pnpm:lint\" \"pnpm:test:*\" --names \"lint,test:\"",
     "test:ember": "vite build --mode test && ember test --path dist",
-    "ember:update": "npx ember-cli@latest init --blueprint @embroider/app-blueprint --pnpm --typescript --name web-client"
+    "ember:update": "npx ember-cli-update",
+    "ember:update:the-hard-way": "npx ember-cli@latest init --blueprint @embroider/app-blueprint --pnpm --typescript --name web-client"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",
