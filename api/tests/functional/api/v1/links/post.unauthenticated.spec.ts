@@ -1,12 +1,12 @@
 import { hasUUID, hasRelationship, attr, hasAttr, relationship } from '#tests/jsonapi';
-import { changedRecords, createNewAccount } from '#tests/db';
+import { changedRecords } from '#tests/db';
 import { ApiClient } from '@japa/api-client';
 import Link from '#models/link';
 import { test } from '@japa/runner';
 
 const post = (client: ApiClient, body = {}) => client.post('_/api/v1/links').json(body);
 
-test.group('POST v1/links', () => {
+test.group('POST [unauthenticated]', () => {
   test('Error: no url', async ({ client }) => {
     let response = await post(client, {});
 
@@ -69,35 +69,6 @@ test.group('POST v1/links', () => {
     await changedRecords(Link, async () => {
       let response = await post(client, { originalUrl: 'https://glimdown.com' });
 
-      response.assertStatus(201);
-
-      data = response.body().data;
-    });
-
-    hasUUID(data);
-    hasAttr(data, 'createdAt');
-    hasAttr(data, 'updatedAt');
-    assert.ok(attr(data, 'shortUrl').startsWith('localhost'));
-
-    hasRelationship(data, 'createdBy', 'user');
-    hasRelationship(data, 'ownedBy', 'account');
-
-    relationship(data, 'createdBy');
-  });
-
-  test('Success: URLs from non-glimdown.com URL requires authentication', async ({
-    client,
-    assert,
-  }) => {
-    let data: any;
-    let { user } = await createNewAccount();
-
-    await changedRecords(Link, async () => {
-      let response = await post(client, { originalUrl: 'https://emberjs.com' })
-        .withGuard('web')
-        .loginAs(user);
-
-      console.log(response.body());
       response.assertStatus(201);
 
       data = response.body().data;

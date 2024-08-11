@@ -1,13 +1,11 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import { jsonapi } from '#jsonapi';
-import db from '@adonisjs/lucid/services/db';
 import Link from '#models/link';
 import { render } from '#jsonapi/data';
 import { glimdownOwner } from '#consts';
 
 export async function createLink(context: HttpContext) {
-  let { auth, request, response } = context;
-  let user = auth.user;
+  let { request, response } = context;
   let data = request.body();
   let originalUrl = data.originalUrl;
 
@@ -31,6 +29,11 @@ export async function createLink(context: HttpContext) {
 
   let parsed = new URL(originalUrl);
   let isGlimdown = parsed.host === 'glimdown.com';
+
+  // await context.auth.authenticateUsing(['web', 'api'], {});
+  let result = await context.auth.use('web').check();
+  let user = context.auth.user;
+  console.log({ user, result });
 
   if (!isGlimdown) {
     if (!user) {

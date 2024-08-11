@@ -1,6 +1,6 @@
 import { test } from '@japa/runner';
 
-test.group('GET v1/links', () => {
+test.group('GET', () => {
   // TODO: needs auth
   test('default endpoint returns a list', async ({ client }) => {
     let response = await client.get('_/api/v1/links');
