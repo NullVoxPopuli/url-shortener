@@ -65,6 +65,24 @@ export const jsonapi = {
       });
     });
   },
+  notAuthenticated: (e: { stack: string }) => {
+    return jsonapi.errors((error) => {
+      error({
+        status: 401,
+        title: 'Not Authenticated',
+        detail: e.stack,
+      });
+    });
+  },
+  notAuthorized: (e: { stack: string }) => {
+    return jsonapi.errors((error) => {
+      error({
+        status: 403,
+        title: 'Not Authorized',
+        detail: e.stack,
+      });
+    });
+  },
   serverError: (e: { message: string; stack: string }) => {
     return jsonapi.errors((error) => {
       error({

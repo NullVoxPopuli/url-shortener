@@ -1,13 +1,12 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import { jsonapi } from '#jsonapi';
-import db from '@adonisjs/lucid/services/db';
 import Link from '#models/link';
 import { render } from '#jsonapi/data';
 import { glimdownOwner } from '#consts';
+import User from '#models/user';
 
 export async function createLink(context: HttpContext) {
-  let { auth, request, response } = context;
-  let user = auth.user;
+  let { request, response } = context;
   let data = request.body();
   let originalUrl = data.originalUrl;
 
@@ -32,6 +31,9 @@ export async function createLink(context: HttpContext) {
   let parsed = new URL(originalUrl);
   let isGlimdown = parsed.host === 'glimdown.com';
 
+  await context.auth.check();
+  let user = context.auth.user;
+
   if (!isGlimdown) {
     if (!user) {
       return jsonapi.errors((error) => {
@@ -43,20 +45,33 @@ export async function createLink(context: HttpContext) {
       });
     }
 
-    return jsonapi.notImplemented();
+    let link = await createMeteredLink(user, parsed);
+
+    response.status(201);
+    return render.link(request, link);
   }
 
-  let link = await createUnmeteredLink(context, parsed);
+  let link = await createUnmeteredLink(parsed);
 
   response.status(201);
   return render.link(request, link);
 }
 
-async function createUnmeteredLink(context: HttpContext, url: URL): Promise<Link> {
+async function createUnmeteredLink(url: URL): Promise<Link> {
   let link = new Link();
   link.original = url.toString();
   link.owned_by = glimdownOwner.id;
   link.created_by = glimdownOwner.id;
+  await link.save();
+
+  return link;
+}
+
+async function createMeteredLink(user: User, url: URL): Promise<Link> {
+  let link = new Link();
+  link.original = url.toString();
+  link.owned_by = user.account_id;
+  link.created_by = user.id;
   await link.save();
 
   return link;

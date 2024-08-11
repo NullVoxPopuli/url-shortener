@@ -1,5 +1,6 @@
 import Application from '@ember/application';
 import { setBuildURLConfig } from '@ember-data/request-utils';
+// @ts-expect-error hmmmm
 import compatModules from '@embroider/core/entrypoint';
 
 import loadInitializers from 'ember-load-initializers';
@@ -10,15 +11,14 @@ import config from 'web-client/config/environment';
 let d = window.define;
 
 for (const [name, module] of Object.entries(compatModules)) {
-  d(name, function() {
+  d(name, function () {
     return module;
   });
 }
 
 setBuildURLConfig({
   host: 'https://nvp.gg',
-  // TODO: add API versioning
-  // namespace: 'v1',
+  namespace: '_/v1',
 });
 
 export default class App extends Application {

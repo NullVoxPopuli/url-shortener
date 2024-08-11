@@ -5,6 +5,8 @@ import User from './user.js';
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations';
 
 export default class Account extends BaseModel {
+  static selfAssignPrimaryKey = true;
+
   @column({ isPrimary: true })
   declare id: string;
 

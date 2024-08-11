@@ -30,6 +30,10 @@ router
             router.post('links', [links, 'store']);
           })
           .prefix('/v1');
+        // The auth middleware requires that auth be present.
+        // Our links endpoint has optional auth, because we allow
+        // some unauthenticated usage on select domains.
+        // .use([middleware.auth()]);
       })
       .prefix('/api');
 

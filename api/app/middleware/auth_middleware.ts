@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import type { NextFn } from '@adonisjs/core/types/http';
 import type { Authenticators } from '@adonisjs/auth/types';
+import env from '#start/env';
 
 /**
  * Auth middleware is used authenticate HTTP requests and deny
@@ -19,7 +20,6 @@ export default class AuthMiddleware {
       guards?: (keyof Authenticators)[];
     } = {}
   ) {
-    console.log(`middleware -- this doesn't print -- which means unused?`);
     await ctx.auth.authenticateUsing(options.guards, { loginRoute: this.redirectTo });
     let provider = ctx.session.get('accessProvider');
 
