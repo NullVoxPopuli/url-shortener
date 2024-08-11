@@ -1,13 +1,11 @@
 import Application from '@ember/application';
 import { setBuildURLConfig } from '@ember-data/request-utils';
-// @ts-expect-error hmmmm
 import compatModules from '@embroider/core/entrypoint';
 
 import loadInitializers from 'ember-load-initializers';
 import Resolver from 'ember-resolver';
 import config from 'web-client/config/environment';
 
-// @ts-expect-error - temporary
 let d = window.define;
 
 for (const [name, module] of Object.entries(compatModules)) {
