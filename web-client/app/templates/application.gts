@@ -1,3 +1,5 @@
+import './styles.css';
+
 import { pageTitle } from 'ember-page-title';
 import { StickyFooter } from 'ember-primitives';
 import Route from 'ember-route-template';
