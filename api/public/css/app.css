@@ -1,0 +1,124 @@
+/**
+* Copied from
+*
+* https://github.com/universal-ember/ember-primitives/tree/main/ember-primitives/src/components/layout
+*/
+.ember-primitives__sticky-footer__wrapper {
+  height: 100%;
+  overflow: auto;
+}
+.ember-primitives__sticky-footer__container {
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.ember-primitives__hero__wrapper {
+  width: 100dvw;
+  height: 100dvh;
+  position: relative;
+}
+
+
+/**
+* Copied from SPA
+*/
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, Geneva, Tahoma, Arial, sans-serif;
+}
+
+h1 {
+  font-family: 'Arial';
+  font-style: italic;
+  text-decoration: underline;
+}
+
+/**
+* Opposite of aria-hidden=true
+*/
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.ember-primitives__hero__wrapper {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(-45deg in oklch, #1252e3, #485de5, #7812e5, #3512c5);
+  background-size: 400% 400%;
+  animation: gradient-animation 16s ease infinite;
+}
+
+.hero-content {
+  display: grid;
+  gap: 1rem;
+
+  h1 {
+    margin: 0;
+    font-size: 3rem;
+    color: white;
+  }
+
+  em {
+    color: white;
+  }
+}
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.shorten-url-form {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(5px);
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+
+  label {
+    display: grid;
+    gap: 1rem;
+    font-weight: bold;
+  }
+
+  input {
+    padding: 0.25rem 0.5rem;
+  }
+
+  button {
+    justify-self: end;
+    font-size: 1rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+
+header {
+  position: fixed;
+  top: 0;
+}
+
+footer {
+  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.5rem;
+}

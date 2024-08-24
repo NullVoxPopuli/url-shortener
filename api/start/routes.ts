@@ -12,31 +12,31 @@ import router from '@adonisjs/core/services/router';
 const GH = () => import('#controllers/auth/github');
 
 /**
+ * API Routes
+ */
+router
+  .group(() => {
+    router
+      .group(() => {
+        let links = () => import('#controllers/api/v1/links');
+
+        router.get('links', [links, 'index']);
+        router.post('links', [links, 'store']);
+      })
+      .prefix('/v1');
+    // The auth middleware requires that auth be present.
+    // Our links endpoint has optional auth, because we allow
+    // some unauthenticated usage on select domains.
+    // .use([middleware.auth()]);
+  })
+  .domain('api');
+
+/**
  * Prefix so that we are more likely to avoid collisions with custom URLs
  * (and custom URLS will require that they be at least so many characters)
  */
 router
   .group(() => {
-    /**
-     * API Routes
-     */
-    router
-      .group(() => {
-        router
-          .group(() => {
-            let links = () => import('#controllers/api/v1/links');
-
-            router.get('links', [links, 'index']);
-            router.post('links', [links, 'store']);
-          })
-          .prefix('/v1');
-        // The auth middleware requires that auth be present.
-        // Our links endpoint has optional auth, because we allow
-        // some unauthenticated usage on select domains.
-        // .use([middleware.auth()]);
-      })
-      .prefix('/api');
-
     /**
      * Auth
      */
@@ -80,7 +80,7 @@ router
       })
       .prefix('/lo-fi');
   })
-  .prefix('/_');
+  .domain('app');
 
 /**
  * "SSR" / Traditional

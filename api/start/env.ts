@@ -49,5 +49,8 @@ const env = await Env.create(new URL('../', import.meta.url), {
 export default env;
 
 console.log(`
+  NODE_ENV: ${env.get('NODE_ENV')}
+  HOST: ${env.get('HOST')}
+  PORT: ${env.get('PORT')}
   DB_CONNECTION: ${env.get('DB_CONNECTION')}
 `);

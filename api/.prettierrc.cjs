@@ -32,5 +32,16 @@ module.exports = {
         trailingComma: 'es5',
       },
     },
+    {
+      files: ['*.edge'],
+      options: {
+        singleQuote: true,
+        useTabs: false,
+        quoteProps: 'consistent',
+        bracketSpacing: true,
+        arrowParens: 'always',
+        plugins: ['prettier-edgejs'],
+      },
+    },
   ],
 };

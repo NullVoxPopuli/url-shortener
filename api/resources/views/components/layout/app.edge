@@ -14,18 +14,32 @@
   @if ($slots.meta)
   {{{ await $slots.meta() }}}
   @endif
+
+
+  <link href="/css/app.css" rel="stylesheet" />
 </head>
 
 <body>
-  <header>
-    <h1>nvp.gg</h1>
+  <div class="ember-primitives__sticky-footer__wrapper">
+    <div class="ember-primitives__sticky-footer__container">
+      <div class="ember-primitives__sticky-footer__content">
+        {{{ await $slots.main() }}}
+      </div>
+      <div class="ember-primitives__sticky-footer__footer">
+        <footer>
+          Coming from g.co?
+          (shutdown on <a
+            href="https://developers.googleblog.com/en/google-url-shortener-links-will-no-longer-be-available/">August
+            25,
+            2025</a>)?
 
-    <hr />
-    <a href="/">home</a>
-    <hr />
-  </header>
+          <br>
+          (aka <a href="https://firebase.google.com/docs/dynamic-links/">Firebase Dynamic Links</a>)
+        </footer>
+      </div>
+    </div>
+  </div>
 
-  {{{ await $slots.main() }}}
 </body>
 
 </html>
