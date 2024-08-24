@@ -1,50 +1,50 @@
-@layout.app({ title: "Create" })
+@layout.app()
 
-@slot('meta')
-<meta name="description" content="Easy tiny URLs">
-@endslot
+  @slot('meta')
+    <meta name="description" content="Easy tiny URLs" />
+  @endslot
+  <div class="ember-primitives__hero__wrapper">
 
+    <header>
+      @if (isLocal || isDev)
+        <div class="left">
+          <a href="https://docs.nvp.gg">API Documentation</a>
+          |
+      <a href="://{{ rootHost }}/_/docs">Pricing</a>
+        </div>
 
-<div class="ember-primitives__hero__wrapper">
+        <div class="right">
+          @if(auth.isAuthenticated)
+            <a class="logout" href="://app.{{ rootHost }}/auth/logout">Logout</a>
+            <p>
+              Hello {{ auth.user.name }}
+            </p>
+          @else
+            <a class="login" href="://app.{{ rootHost }}/auth/login">Login</a>
+            <a class="signup" href="://app.{{ rootHost }}/auth/signup">Signup</a>
+          @end
+        </div>
+      @endif
+    </header>
 
+    <div class="hero-content">
 
-  <header>
-    @if (isLocal || isDev)
+      <h1>
+        nvp.gg
+      </h1>
+      <em>The professional, API-first, user-friendly, URL shortener</em>
 
-    <fieldset style="padding:1rem;border:1px solid">
-      <legend>lo-fi</legend>
-      <a href="/_/lo-fi/">lo-fi testing</a>
-    </fieldset>
+      <form class="shorten-url-form">
+        <label>
+          <span class="visually-hidden">Long URL</span>
+          <input placeholder="https://enter.a.long/url" name="url" />
+        </label>
+        <button type="submit">Shorten</button>
+      </form>
 
-    @if(auth.isAuthenticated)
-    <a href="://app.{{ rootHost }}/auth/logout">Logout</a>
-    <p> Hello {{ auth.user.name }} </p>
-    @else
-    <a href="://app.{{ rootHost }}/auth/login">Login</a>
-    @end
+      <em>5.3×10<sup>36</sup>(5.3 undecillion) Possible Links</em>
+    </div>
 
-    @endif
-  </header>
-
-
-  <div class="hero-content">
-
-    <h1>nvp.gg</h1>
-    <em>The professional, API-first, user-friendly, URL shortener</em>
-
-
-    <form class="shorten-url-form">
-      <label>
-        <span class="visually-hidden">Long URL</span>
-        <input placeholder="https://enter.a.long/url" name="url">
-      </label>
-      <button type="submit">Shorten</button>
-    </form>
-
-    <em>5.3×10<sup>36</sup> (5.3 undecillion) Possible Links</em>
   </div>
-
-</div>
-
 
 @end

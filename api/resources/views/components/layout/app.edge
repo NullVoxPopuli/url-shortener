@@ -1,45 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <title>
-    @if (title)
-    {{ title }} |
+  <head>
+    <title>
+      @if (title)
+        {{ title }} |
+      @endif
+      nvp.gg | URL Shortener
+    </title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    @if ($slots.meta)
+      {{{ await $slots.meta() }}}
     @endif
+    <link href="/css/app.css" rel="stylesheet" />
+  </head>
 
-    nvp.gg | URL Shortener
-  </title>
-
-  <meta charset="utf-8">
-  @if ($slots.meta)
-  {{{ await $slots.meta() }}}
-  @endif
-
-
-  <link href="/css/app.css" rel="stylesheet" />
-</head>
-
-<body>
-  <div class="ember-primitives__sticky-footer__wrapper">
-    <div class="ember-primitives__sticky-footer__container">
-      <div class="ember-primitives__sticky-footer__content">
-        {{{ await $slots.main() }}}
-      </div>
-      <div class="ember-primitives__sticky-footer__footer">
-        <footer>
-          Coming from g.co?
+  <body>
+    <div class="ember-primitives__sticky-footer__wrapper">
+      <div class="ember-primitives__sticky-footer__container">
+        <div class="ember-primitives__sticky-footer__content">
+          {{{ await $slots.main() }}}
+        </div>
+        <div class="ember-primitives__sticky-footer__footer">
+          <footer>
+            Coming from g.co?
           (shutdown on <a
-            href="https://developers.googleblog.com/en/google-url-shortener-links-will-no-longer-be-available/">August
+              href="https://developers.googleblog.com/en/google-url-shortener-links-will-no-longer-be-available/"
+            >August
             25,
             2025</a>)?
 
-          <br>
-          (aka <a href="https://firebase.google.com/docs/dynamic-links/">Firebase Dynamic Links</a>)
-        </footer>
+          <br />
+            (aka <a href="https://firebase.google.com/docs/dynamic-links/">Firebase Dynamic Links</a>)
+          </footer>
+        </div>
       </div>
     </div>
-  </div>
 
-</body>
+  </body>
 
 </html>

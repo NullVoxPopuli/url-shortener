@@ -2,6 +2,7 @@
 
 module.exports = {
   printWidth: 100,
+  plugins: ['prettier-edgejs'],
   overrides: [
     {
       // Lol, JavaScript
