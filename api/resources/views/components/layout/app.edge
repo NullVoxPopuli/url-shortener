@@ -18,6 +18,7 @@
   </head>
 
   <body>
+    @!component('components/spritesheet')
     <div class="ember-primitives__sticky-footer__wrapper">
       <div class="ember-primitives__sticky-footer__container">
         <div class="ember-primitives__sticky-footer__content">
@@ -26,7 +27,7 @@
             <div class="left">
               <a href="https://docs.nvp.gg">API Documentation</a>
               |
-      <a href="://{{ rootHost }}/_/docs">Pricing</a>
+              <a href="://{{ rootHost }}/_/docs">Pricing</a>
             </div>
 
             <div class="right">
@@ -45,17 +46,8 @@
           {{{ await $slots.main() }}}
         </div>
         <div class="ember-primitives__sticky-footer__footer">
-          <footer>
-            Coming from g.co?
-          (shutdown on <a
-              href="https://developers.googleblog.com/en/google-url-shortener-links-will-no-longer-be-available/"
-            >August
-            25,
-            2025</a>)?
 
-          <br />
-            (aka <a href="https://firebase.google.com/docs/dynamic-links/">Firebase Dynamic Links</a>)
-          </footer>
+          @!component('components/footer')
         </div>
       </div>
     </div>
