@@ -21,6 +21,27 @@
     <div class="ember-primitives__sticky-footer__wrapper">
       <div class="ember-primitives__sticky-footer__container">
         <div class="ember-primitives__sticky-footer__content">
+
+          <header>
+            <div class="left">
+              <a href="https://docs.nvp.gg">API Documentation</a>
+              |
+      <a href="://{{ rootHost }}/_/docs">Pricing</a>
+            </div>
+
+            <div class="right">
+              @if(auth.isAuthenticated)
+                <a class="logout" href="://app.{{ rootHost }}/auth/logout">Logout</a>
+                <p>
+                  Hello {{ auth.user.name }}
+                </p>
+              @else
+                <a class="login" href="://app.{{ rootHost }}/auth/login">Login</a>
+                <a class="signup" href="://app.{{ rootHost }}/auth/signup">Signup</a>
+              @end
+            </div>
+          </header>
+
           {{{ await $slots.main() }}}
         </div>
         <div class="ember-primitives__sticky-footer__footer">
