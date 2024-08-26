@@ -8,14 +8,20 @@ export async function htmlAction(
 ) {
   let { response } = context;
 
+  response.header('content-type', 'text/html; charset=utf-8');
+
   try {
+    /**
+     * This could call auth,
+     * or any other method that _could_ throw an error.
+     */
     let result = await callback(context);
 
     response.safeStatus(jsonapi.statusFrom(result as any));
     return result;
   } catch (error) {
     // Uncomment for debugging
-    // console.log('catch: ', error.message, error.name);
+    // console.error('catch: ', error.message, error.name);
 
     if ('name' in error) {
       /**

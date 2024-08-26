@@ -14,12 +14,16 @@ export default class HomeController {
    */
   async createLink(context: HttpContext) {
     let response = await htmlAction(context, () => create(context));
+    let data = context.request.body();
+    let originalUrl = data.originalUrl;
 
     if ('errors' in response) {
-      context.view.render('error', { errors: response.errors });
-      return;
+      return context.view.render('error', {
+        originalUrl: originalUrl,
+        errors: response.errors,
+      });
     }
 
-    context.view.render('success', { data: response.data });
+    return context.view.render('success', { data: response.data });
   }
 }

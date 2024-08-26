@@ -1,4 +1,31 @@
-Yay
-<pre>
-  {{ JSON.stringify(data, null, 3) }}
-</pre>
+@layout.home({ originalUrl })
+  @slot('success')
+
+    <span class="congrats">Congratulations, you have a short URL!</span>
+    <span class="short-url-with-copy">
+      <span class="short-url-content">{{ data.attributes.shortUrl }}</span>
+      <button class="copy-shortUrl">Copy</button>
+    </span>
+
+    <script>
+      const button = document.querySelector(".short-url-with-copy button.copy-shortUrl");
+
+      if ("ClipboardItem" in globalThis) {
+        button.addEventListener("click", () => setClipboard("{{ data.attributes.shortUrl }}"));
+        async function setClipboard(text) {
+          const type = "text/plain";
+          const blob = new Blob([ text ], {
+            type: type
+          });
+          const data = [ new ClipboardItem({
+            [type]: blob
+          }) ];
+          await navigator.clipboard.write(data);
+        }
+      } else {
+        button.remove();
+      }
+    </script>
+
+  @endslot
+@end

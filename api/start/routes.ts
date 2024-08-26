@@ -29,6 +29,7 @@ router
     // some unauthenticated usage on select domains.
     // .use([middleware.auth()]);
   })
+  .use([() => import('#middleware/force_json_response_middleware')])
   .domain('api');
 
 /**
