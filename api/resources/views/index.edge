@@ -12,10 +12,10 @@
       </h1>
       <em>The professional, API-first, user-friendly, URL shortener</em>
 
-      <form class="shorten-url-form">
+      <form class="shorten-url-form" method="POST" action="/">
         <label>
           <span class="visually-hidden">Long URL</span>
-          <input placeholder="https://enter.a.long/url" name="url" />
+          <input name="originalUrl" placeholder="https://enter.a.long/url" name="url" />
         </label>
         <button type="submit">Shorten</button>
       </form>

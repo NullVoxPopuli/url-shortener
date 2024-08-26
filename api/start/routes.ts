@@ -61,24 +61,6 @@ router
           .where('provider', /github|google|twitter/);
       })
       .prefix('/auth');
-
-    /**
-     * Mostly dev testing as I figure out Adonis
-     */
-    router
-      .group(() => {
-        let lofi = () => import('#controllers/lo-fi');
-
-        router.get('/', [lofi, 'index']);
-
-        router
-          .group(() => {
-            router.get('/create', [lofi, 'create']);
-            router.post('/create', [lofi, 'createLink']);
-          })
-          .use([middleware.auth()]);
-      })
-      .prefix('/lo-fi');
   })
   .domain('app');
 
@@ -87,8 +69,7 @@ router
  * Only two pages:
  * - the redirect
  * - home
- *
- * Everything else will be SPA, as it's guarded by auth
  */
 router.get(':id', [() => import('#controllers/redirect'), 'findLink']);
 router.get('/', [() => import('#controllers/home'), 'index']);
+router.post('/', [() => import('#controllers/home'), 'createLink']);

@@ -2,7 +2,7 @@ import { jsonapi } from '#jsonapi';
 import type { HttpContext } from '@adonisjs/core/http';
 import type { Response } from '#jsonapi';
 
-export async function action(
+export async function htmlAction(
   context: HttpContext,
   callback: (context: HttpContext) => Promise<Response>
 ) {
