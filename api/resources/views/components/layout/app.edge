@@ -42,6 +42,24 @@
               @end
             </div>
           </header>
+          <script>
+            const header = document.querySelector("header");
+
+            function onScroll() {
+              if (window.scrollY > 0) {
+                header.classList.add("did-scroll");
+              } else {
+                header.classList.remove("did-scroll");
+              }
+            }
+            // Initial, in case we load at a #target
+
+            onScroll();
+
+            window.addEventListener("scroll", onScroll, {
+              passive: true
+            });
+          </script>
 
           {{{ await $slots.main() }}}
         </div>
