@@ -4,9 +4,12 @@
     <meta name="description" content="Easy tiny URLs" />
   @endslot
   <div class="ember-primitives__hero__wrapper">
-
+    @if ($slots.success)
+      <div class="header-spacer">
+        &nbsp;
+      </div>
+    @endif
     <div class="hero-content">
-
       <h1>
         nvp.gg
       </h1>
@@ -24,15 +27,20 @@
           </p>
         @endif
         <label>
-          <span class="visually-hidden">Long URL</span>
+          @if ($slots.success)
+            <span class="shorten-again">Shorten another long URL</span>
+          @else
+            <span class="visually-hidden">Long URL</span>
+          @endif
           <input name="originalUrl" value="{{ originalUrl || '' }}" placeholder="https://enter.a.long/url" />
         </label>
         <button type="submit">Shorten</button>
       </form>
 
-      <em>5.3×10<sup>36</sup>(5.3 undecillion) Possible Links</em>
+      <em>5.3×10<sup>36</sup>&nbsp;(5.3 undecillion) Possible Links</em>
     </div>
 
   </div>
 
+  {{{ await $slots.main() }}}
 @end
