@@ -13,7 +13,7 @@
 
     <script>
       const button = document.querySelector(".short-url-with-copy button.copy-shortUrl");
-
+      
       if ("ClipboardItem" in globalThis) {
         button.addEventListener("click", () => setClipboard("https://{{ data.attributes.shortUrl }}"));
         async function setClipboard(text) {

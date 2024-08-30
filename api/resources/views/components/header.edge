@@ -19,7 +19,7 @@
 </header>
 <script>
   const header = document.querySelector("header");
-
+  
   function onScroll() {
     if (window.scrollY > 0) {
       header.classList.add("did-scroll");
@@ -27,9 +27,9 @@
       header.classList.remove("did-scroll");
     }
   }
-
+  
   onScroll();
-
+  
   window.addEventListener("scroll", onScroll, {
     passive: true
   });
