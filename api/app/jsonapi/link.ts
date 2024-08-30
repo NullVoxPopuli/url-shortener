@@ -1,10 +1,9 @@
 import { DataResponse } from '#jsonapi';
 import Link from '#models/link';
 import { compressedUUID } from '@nullvoxpopuli/url-compression';
-import type { Request } from '@adonisjs/core/http';
 import { HOST } from '#start/env';
 
-export function link(_request: Request, link: Link): DataResponse {
+export function link(link: Link): DataResponse {
   let shorter = compressedUUID.encode(link.id);
   let shortUrl = `https://${HOST}/${shorter}`;
 

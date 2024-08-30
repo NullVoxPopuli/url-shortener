@@ -24,7 +24,10 @@ router
       let links = () => import('#controllers/api/v1/links');
 
       router.get('links', [links, 'index']);
-      router.post('links', [links, 'store']);
+      router.post('links', [links, 'create']);
+      // Links are not updatable (for now?)
+      router.get('links/:id', [links, 'show']);
+      router.delete('links/:id', [links, 'delete']);
     });
   })
   .domain(`api.${HOST}`);
