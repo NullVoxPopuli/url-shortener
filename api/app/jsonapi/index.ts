@@ -33,6 +33,8 @@ export function error({ title, status, detail }: Error) {
 export function errors() {}
 
 export const jsonapi = {
+  empty: (): Response => ({ data: {} }),
+
   // https://jsonapi.org/examples/#error-objects
   errors: (builder: (builder: typeof createError) => void) => {
     let result: ErrorResponse = {
