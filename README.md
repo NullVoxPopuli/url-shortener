@@ -19,3 +19,5 @@ This sets up some VirtualHosts that require:
 - the API to run on port 5001
 - the SPA to run on part 5002
 
+
+Note that because the router has some subdomain routing, we can't use localhost for dev,test,or prod 

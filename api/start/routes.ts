@@ -6,64 +6,34 @@
 | The routes file is used for defining the HTTP routes.
 |
 */
-import { middleware } from '#start/kernel';
+import env from '#start/env';
 import router from '@adonisjs/core/services/router';
 
-const GH = () => import('#controllers/auth/github');
+function version(name: string, callback: () => unknown) {
+  return router.group(() => callback()).prefix(`/${name}`);
+}
+
+const HOST = env.get('HOST');
 
 /**
  * API Routes
  */
 router
   .group(() => {
-    router
-      .group(() => {
-        let links = () => import('#controllers/api/v1/links');
+    version('v1', () => {
+      let links = () => import('#controllers/api/v1/links');
 
-        router.get('links', [links, 'index']);
-        router.post('links', [links, 'store']);
-      })
-      .prefix('/v1');
-    // The auth middleware requires that auth be present.
-    // Our links endpoint has optional auth, because we allow
-    // some unauthenticated usage on select domains.
-    // .use([middleware.auth()]);
+      router.get('links', [links, 'index']);
+      router.post('links', [links, 'store']);
+    });
   })
-  .use([() => import('#middleware/force_json_response_middleware')])
-  .domain('api');
+  .domain(`api.${HOST}`);
 
-/**
- * Prefix so that we are more likely to avoid collisions with custom URLs
- * (and custom URLS will require that they be at least so many characters)
- */
 router
   .group(() => {
-    /**
-     * Auth
-     */
-    router
-      .group(() => {
-        router.get('logout', [() => import('#controllers/auth'), 'logout']);
-        router.get('callback/github', [GH, 'callback']);
-        //router.get('callback/google', [GH, 'callback']);
-        //router.get('callback/twitter', [GH, 'callback']);
-        router
-          .get('/:provider/redirect', ({ ally, params }) => {
-            //switch (params.provider) {
-            //  case 'github':
-            //    return ally.use('github').redirect((request) => {
-            //      request.scopes(['user:email']);
-            //    });
-            //  default:
-            const driverInstance = ally.use(params.provider);
-            return driverInstance.redirect();
-            //}
-          })
-          .where('provider', /github|google|twitter/);
-      })
-      .prefix('/auth');
+    // TODO: docs subdomain for generated API documentation
   })
-  .domain('app');
+  .domain(`docs.${HOST}`);
 
 /**
  * "SSR" / Traditional
@@ -71,6 +41,10 @@ router
  * - the redirect
  * - home
  */
-router.get(':id', [() => import('#controllers/redirect'), 'findLink']);
-router.get('/', [() => import('#controllers/home'), 'index']);
-router.post('/', [() => import('#controllers/home'), 'createLink']);
+router
+  .group(() => {
+    router.get(':id', [() => import('#controllers/redirect'), 'findLink']);
+    router.get('/', [() => import('#controllers/home'), 'index']);
+    router.post('/', [() => import('#controllers/home'), 'createLink']);
+  })
+  .domain(HOST);

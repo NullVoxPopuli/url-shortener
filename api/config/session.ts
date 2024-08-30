@@ -2,6 +2,8 @@ import env from '#start/env';
 import app from '@adonisjs/core/services/app';
 import { defineConfig, stores } from '@adonisjs/session';
 
+const HOST = env.get('HOST');
+
 const sessionConfig = defineConfig({
   enabled: true,
   cookieName: 'nvp.gg-session',
@@ -16,7 +18,7 @@ const sessionConfig = defineConfig({
    * Define how long to keep the session data alive without
    * any activity.
    */
-  age: '2h',
+  age: '8h',
 
   /**
    * Configuration for session cookie and the
@@ -27,6 +29,9 @@ const sessionConfig = defineConfig({
     httpOnly: true,
     secure: app.inProduction,
     sameSite: 'lax',
+    // How do you set multiple domains?
+    // domain: '*',
+    domain: `api.${HOST}`,
   },
 
   /**

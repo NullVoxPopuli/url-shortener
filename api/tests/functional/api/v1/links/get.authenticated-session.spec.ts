@@ -4,7 +4,7 @@ import User from '#models/user';
 import { createLink, createNewAccount } from '#tests/db';
 
 const get = (user: User, client: ApiClient) =>
-  client.get(`_/api/v1/links`).header('Accept', 'application/vnd.api+json').loginAs(user);
+  client.get(`/v1/links`).header('Accept', 'application/vnd.api+json').loginAs(user);
 
 test.group('GET [authenticated session]', () => {
   test('default endpoint returns a list (which is empty because there are no links)', async ({
