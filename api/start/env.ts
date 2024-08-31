@@ -51,6 +51,9 @@ export default env;
 export const HOST = env.get('HOST');
 export const isPG = env.get('DB_CONNECTION') === 'postgres';
 
+// Probably just for testing
+export const API_HOST = `api.${HOST}:${env.get('PORT')}`;
+
 console.log(`
   NODE_ENV: ${env.get('NODE_ENV')}
   HOST: ${env.get('HOST')}

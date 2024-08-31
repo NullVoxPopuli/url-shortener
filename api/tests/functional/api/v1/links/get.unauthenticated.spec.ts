@@ -1,8 +1,9 @@
 import { test } from '@japa/runner';
 import { ApiClient } from '@japa/api-client';
+import { API_HOST } from '#start/env';
 
 const get = (client: ApiClient) =>
-  client.get(`/v1/links`).header('Accept', 'application/vnd.api+json');
+  client.get(`http://${API_HOST}/v1/links`).header('Accept', 'application/vnd.api+json');
 
 test.group('GET [unauthenticated]', () => {
   test('must be logged in', async ({ client }) => {

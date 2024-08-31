@@ -4,12 +4,12 @@ import { ApiClient } from '@japa/api-client';
 import Link from '#models/link';
 import { test } from '@japa/runner';
 import User from '#models/user';
-import { HOST } from '#start/env';
+import { API_HOST, HOST } from '#start/env';
 
 test.group('POST [authenticated session]', () => {
   const post = (user: User, client: ApiClient, body = {}) =>
     client
-      .post('/v1/links')
+      .post(`http://${API_HOST}/v1/links`)
       .json(body)
       .header('Accept', 'application/vnd.api+json')
       .withGuard('web')

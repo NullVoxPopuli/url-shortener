@@ -1,9 +1,10 @@
 import { test } from '@japa/runner';
 import { ApiClient } from '@japa/api-client';
 import { createLink, createNewAccount } from '#tests/db';
+import { API_HOST } from '#start/env';
 
 const show = (client: ApiClient, id: string) =>
-  client.get(`/v1/links/${id}`).header('Accept', 'application/vnd.api+json');
+  client.get(`http://${API_HOST}/v1/links/${id}`).header('Accept', 'application/vnd.api+json');
 
 test.group('SHOW [unauthenticated]', () => {
   test('tries to show a real link', async ({ client }) => {
