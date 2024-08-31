@@ -1,11 +1,4 @@
-import {
-  hasUUID,
-  hasRelationship,
-  attr,
-  hasAttr,
-  relationship,
-  assertWellFormedLinkData,
-} from '#tests/jsonapi';
+import { hasUUID, attr, hasAttr, relationship, assertWellFormedLinkData } from '#tests/jsonapi';
 import { changedRecords, createNewAccount } from '#tests/db';
 import { ApiClient } from '@japa/api-client';
 import Link from '#models/link';
