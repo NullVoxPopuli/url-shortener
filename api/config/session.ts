@@ -29,9 +29,7 @@ const sessionConfig = defineConfig({
     httpOnly: true,
     secure: app.inProduction,
     sameSite: 'lax',
-    // How do you set multiple domains?
-    // domain: '*',
-    domain: HOST,
+    domain: `.${HOST}`,
   },
 
   /**

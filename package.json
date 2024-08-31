@@ -30,6 +30,12 @@
       "@adonisjs/lucid": "patches/@adonisjs__lucid@20.6.0.patch"
     }
   },
+  "cacheDirectories": [
+    "node_modules",
+    "api/node_modules",
+    "web-client/node_modules",
+    "packages/url-compression/node_modules"
+  ],
   "packageManager": "pnpm@9.9.0",
   "engines": {
     "node": ">= 22"
