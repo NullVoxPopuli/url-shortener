@@ -6,14 +6,12 @@
 | The routes file is used for defining the HTTP routes.
 |
 */
-import env from '#start/env';
+import { HOST } from '#start/env';
 import router from '@adonisjs/core/services/router';
 
 function version(name: string, callback: () => unknown) {
   return router.group(() => callback()).prefix(`/${name}`);
 }
-
-const HOST = env.get('HOST');
 
 /**
  * API Routes
