@@ -1,5 +1,6 @@
-import { link } from './link.js';
+import { link, links } from './link.js';
 
 export const render = {
   link,
+  links,
 };

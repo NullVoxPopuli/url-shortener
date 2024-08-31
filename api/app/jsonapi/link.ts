@@ -23,3 +23,11 @@ export function link(link: Link): DataResponse {
     },
   };
 }
+
+export function links(links: Link[]) {
+  return {
+    included: [],
+    links: [],
+    data: links.map(link).map((x) => x.data),
+  };
+}

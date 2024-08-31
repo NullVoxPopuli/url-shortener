@@ -1,9 +1,9 @@
-import Link from '#models/link';
 import type { HttpContext } from '@adonisjs/core/http';
 import { action } from '../base.js';
 import { createLink } from './actions/create.js';
 import { deleteLink } from './actions/delete.js';
 import { showLink } from './actions/show.js';
+import { listLinks } from './actions/list.js';
 
 export default class LinksController {
   async create(context: HttpContext) {
@@ -25,10 +25,6 @@ export default class LinksController {
   async index(context: HttpContext) {
     await context.auth.authenticate();
 
-    return {
-      included: [],
-      links: [],
-      data: await Link.query(),
-    };
+    return action(context, listLinks);
   }
 }

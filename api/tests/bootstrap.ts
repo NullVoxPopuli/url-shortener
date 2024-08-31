@@ -38,6 +38,7 @@ export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
   setup: [
     () => testUtils.db().migrate(),
     () => testUtils.db().seed(),
+    () => testUtils.db().withGlobalTransaction(),
     // () => testUtils.db().truncate(),
   ],
   teardown: [],

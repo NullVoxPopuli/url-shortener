@@ -3,7 +3,7 @@
 Add to your `/etc/hosts` file
 
 ```bash
-127.0.0.1 nvp.gg
+127.0.0.1 nvp.local
 127.0.0.1 docs.nvp.local
 127.0.0.1 app.nvp.local
 127.0.0.1 api.nvp.local
