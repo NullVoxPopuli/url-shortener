@@ -30,7 +30,7 @@
       "@adonisjs/lucid": "patches/@adonisjs__lucid@20.6.0.patch"
     }
   },
-  "packageManager": "pnpm@9.3.0",
+  "packageManager": "pnpm@9.9.0",
   "engines": {
     "node": ">= 22"
   },
