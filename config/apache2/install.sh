@@ -26,23 +26,8 @@ sudo systemctl reload apache2
 
 echo -e "\nView the logs with 'systtemctl status apache2.service'\n"
 
-function hasHostsEntry() {
-  grep -n $1 /etc/hosts
-}
 
-function ensureHostsEntry() {
-  local has_entry=$(hasHostsEntry $1)
+setup_hosts="$(dirname "${BASH_SOURCE[0]}")/../hosts.sh"
 
-  if [ -z "$has_entry" ]; then
-    local fullEntry="127.0.0.1 $1"
-    echo "Adding '$fullEntry' to /etc/hosts"
+source $setup_hosts
 
-    echo "$fullEntry" | sudo tee -a /etc/hosts
-  fi
-}
-
-
-ensureHostsEntry "nvp.local"
-ensureHostsEntry "docs.nvp.local"
-ensureHostsEntry "api.nvp.local"
-ensureHostsEntry "app.nvp.local"

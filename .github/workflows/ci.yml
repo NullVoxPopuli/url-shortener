@@ -40,6 +40,7 @@ jobs:
       - uses: wyvox/action-setup-pnpm@v3
       # bug with ignore-scripts=true?
       # - run: pnpm rebuild
+      - run: ./config/hosts.sh
       - run: pnpm test
         working-directory: api
 
