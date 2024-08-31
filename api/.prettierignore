@@ -1,0 +1,5 @@
+*.yaml
+*.md
+
+# prettier-edge breaks on this file
+resources/views/components/spritesheet.edge

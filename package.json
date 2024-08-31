@@ -27,7 +27,7 @@
       "better-sqlite3"
     ],
     "patchedDependencies": {
-      "@adonisjs/lucid@20.6.0": "patches/@adonisjs__lucid@20.6.0.patch"
+      "@adonisjs/lucid": "patches/@adonisjs__lucid@20.6.0.patch"
     }
   },
   "packageManager": "pnpm@9.3.0",
@@ -35,7 +35,7 @@
     "node": ">= 22"
   },
   "volta": {
-    "node": "22.3.0",
-    "pnpm": "9.3.0"
+    "node": "22.6.0",
+    "pnpm": "9.9.0"
   }
 }

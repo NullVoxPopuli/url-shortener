@@ -46,7 +46,7 @@
     "@warp-drive/build-config": "0.0.0-alpha.35",
     "concurrently": "^8.2.2",
     "ember-auto-import": "^2.7.3",
-    "ember-cli": "~5.10.0",
+    "ember-cli": "~5.11.0",
     "ember-cli-babel": "^8.2.0",
     "ember-cli-htmlbars": "^6.3.0",
     "ember-cli-inject-live-reload": "^2.1.0",
@@ -55,17 +55,17 @@
     "ember-template-lint": "^6.0.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-ember": "^12.1.1",
+    "eslint-plugin-ember": "^12.2.0",
     "eslint-plugin-n": "^17.10.2",
     "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-qunit": "^8.1.1",
+    "eslint-plugin-qunit": "^8.1.2",
     "loader.js": "^4.7.0",
     "prettier": "^3.3.3",
     "qunit": "^2.21.1",
     "qunit-dom": "^3.2.0",
     "typescript": "^5.5.4",
-    "vite": "^5.4.0",
-    "webpack": "^5.93.0"
+    "vite": "^5.4.2",
+    "webpack": "^5.94.0"
   },
   "ember": {
     "edition": "octane"
