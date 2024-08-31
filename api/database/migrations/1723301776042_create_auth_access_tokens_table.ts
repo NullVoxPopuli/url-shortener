@@ -1,3 +1,4 @@
+import { isPG } from '#start/env';
 import { BaseSchema } from '@adonisjs/lucid/schema';
 
 /**
@@ -12,13 +13,24 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id');
-      table
-        .string('tokenable_id')
-        .notNullable()
-        .unsigned()
-        .references('id')
-        .inTable('users')
-        .onDelete('CASCADE');
+
+      if (isPG) {
+        table
+          .uuid('tokenable_id')
+          .notNullable()
+          .unsigned()
+          .references('id')
+          .inTable('users')
+          .onDelete('CASCADE');
+      } else {
+        table
+          .string('tokenable_id')
+          .notNullable()
+          .unsigned()
+          .references('id')
+          .inTable('users')
+          .onDelete('CASCADE');
+      }
 
       table.string('type').notNullable();
       table.string('name').nullable();

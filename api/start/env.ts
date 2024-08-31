@@ -49,6 +49,7 @@ const env = await Env.create(new URL('../', import.meta.url), {
 export default env;
 
 export const HOST = env.get('HOST');
+export const isPG = env.get('DB_CONNECTION') === 'postgres';
 
 console.log(`
   NODE_ENV: ${env.get('NODE_ENV')}
