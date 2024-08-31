@@ -1,20 +1,38 @@
-@layout.app({ title: "Create" })
+@layout.home()
 
-@slot('meta')
-<meta name="description" content="Easy tiny URLs">
-@endslot
+  <!-- WIP marketing mumbo jumbo -->
+  <div style="display:none;">
+    Features
+    <ul>
+      <li>
+        API First
+      </li>
+      <li>
+        Fast URL Shortening
+      </li>
+      <li>
+        Fast Redirects
+      </li>
+      <li>
+        Custom Domains
+      </li>
+      <li>
+        Custom URL Segments
+      </li>
+      <li>
+        User / Access Management
+      </li>
+    </ul>
 
-@if (isLocal || isDev)
+    Support
+    <ul>
+      <li>
+        Via Discord
+      </li>
+      <li>
+        Via Email
+      </li>
+    </ul>
 
-<fieldset style="padding:1rem;border:1px solid">
-  <legend>lo-fi</legend>
-  <a href="/_/lo-fi/">lo-fi testing</a>
-</fieldset>
-
-@endif
-
-TODO: write this page
-
-
-
+  </div>
 @end

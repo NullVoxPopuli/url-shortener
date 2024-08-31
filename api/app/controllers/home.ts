@@ -1,15 +1,29 @@
 import type { HttpContext } from '@adonisjs/core/http';
-import env from '#start/env';
+import { createLink as create } from './api/v1/actions/create.js';
+import { htmlAction } from './base.js';
 
-export default class LinksController {
-  async index({ request, view }: HttpContext) {
-    let host = request.host();
-    let isLocal = host?.includes('localhost');
-    let isDev = env.get('NODE_ENV') === 'development';
+export default class HomeController {
+  async index({ view }: HttpContext) {
+    return view.render('index');
+  }
 
-    return view.render('index', {
-      isLocal,
-      isDev,
-    });
+  /**
+   * This should work with:
+   *  - free URLs
+   *  - any URL, when logged in
+   */
+  async createLink(context: HttpContext) {
+    let response = await htmlAction(context, () => create(context));
+    let data = context.request.body();
+    let originalUrl = data.originalUrl;
+
+    if ('errors' in response) {
+      return context.view.render('error', {
+        originalUrl: originalUrl,
+        errors: response.errors,
+      });
+    }
+
+    return context.view.render('success', { data: response.data });
   }
 }

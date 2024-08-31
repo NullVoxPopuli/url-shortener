@@ -1,3 +1,4 @@
+import { test } from '@japa/runner';
 import { assert } from 'chai';
 import { BaseModel } from '@adonisjs/lucid/orm';
 import db from '@adonisjs/lucid/services/db';
@@ -45,7 +46,7 @@ export async function createNewAccount() {
   return { user, account };
 }
 
-export async function createLink(user, account) {
+export async function createLink(user: User, account: Account) {
   let link = new Link();
   link.original = faker.internet.url();
   link.owned_by = account.id;
@@ -53,4 +54,21 @@ export async function createLink(user, account) {
   await link.save();
 
   return link;
+}
+
+/**
+ * Could be useful if we remove bootstrap.ts' withGlobalTransaction
+ */
+export async function inTransaction(
+  name: string,
+  callback: NonNullable<Parameters<typeof test>[1]>
+) {
+  return test(name, async (...args) => {
+    try {
+      await db.beginGlobalTransaction();
+      await callback(...args);
+    } finally {
+      await db.rollbackGlobalTransaction();
+    }
+  });
 }

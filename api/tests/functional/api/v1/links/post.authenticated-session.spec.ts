@@ -1,14 +1,15 @@
-import { hasUUID, hasRelationship, attr, hasAttr, relationship } from '#tests/jsonapi';
+import { hasUUID, attr, hasAttr, relationship, assertWellFormedLinkData } from '#tests/jsonapi';
 import { changedRecords, createNewAccount } from '#tests/db';
 import { ApiClient } from '@japa/api-client';
 import Link from '#models/link';
 import { test } from '@japa/runner';
 import User from '#models/user';
+import { HOST } from '#start/env';
 
 test.group('POST [authenticated session]', () => {
   const post = (user: User, client: ApiClient, body = {}) =>
     client
-      .post('_/api/v1/links')
+      .post('/v1/links')
       .json(body)
       .header('Accept', 'application/vnd.api+json')
       .withGuard('web')
@@ -69,13 +70,14 @@ test.group('POST [authenticated session]', () => {
       data = response.body().data;
     });
 
+    assertWellFormedLinkData(data);
     hasUUID(data);
     hasAttr(data, 'createdAt');
     hasAttr(data, 'updatedAt');
-    assert.ok(attr(data, 'shortUrl').startsWith('localhost'));
+    assert.include(attr(data, 'shortUrl'), `https://${HOST}`);
+    assert.ok(attr(data, 'shortUrl').startsWith(`https://${HOST}`));
 
-    hasRelationship(data, 'createdBy', 'user');
-    hasRelationship(data, 'ownedBy', 'account');
+    assertWellFormedLinkData(data);
 
     relationship(data, 'createdBy');
   });
@@ -95,13 +97,7 @@ test.group('POST [authenticated session]', () => {
       data = response.body().data;
     });
 
-    hasUUID(data);
-    hasAttr(data, 'createdAt');
-    hasAttr(data, 'updatedAt');
-    assert.ok(attr(data, 'shortUrl').startsWith('localhost'));
-
-    hasRelationship(data, 'createdBy', 'user');
-    hasRelationship(data, 'ownedBy', 'account');
+    assertWellFormedLinkData(data);
 
     assert.strictEqual(data.relationships.createdBy.id, user.id);
     assert.strictEqual(data.relationships.ownedBy.id, account.id);

@@ -1,31 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <title>
-    @if (title)
-    {{ title }} |
+  <head>
+    <title>
+      @if (title)
+        {{ title }} |
+      @endif
+      nvp.gg | URL Shortener
+    </title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    @if ($slots.meta)
+      {{{ await $slots.meta() }}}
     @endif
+    <link href="/css/app.css" rel="stylesheet" />
+  </head>
 
-    nvp.gg | URL Shortener
-  </title>
+  <body>
+    @!component('components/spritesheet')
+    <div class="ember-primitives__sticky-footer__wrapper">
+      <div class="ember-primitives__sticky-footer__container">
+        <div class="ember-primitives__sticky-footer__content">
+          @!component('components/header')
 
-  <meta charset="utf-8">
-  @if ($slots.meta)
-  {{{ await $slots.meta() }}}
-  @endif
-</head>
+          {{{ await $slots.main() }}}
+        </div>
+        <div class="ember-primitives__sticky-footer__footer">
 
-<body>
-  <header>
-    <h1>nvp.gg</h1>
+          @!component('components/footer')
+        </div>
+      </div>
+    </div>
 
-    <hr />
-    <a href="/">home</a>
-    <hr />
-  </header>
-
-  {{{ await $slots.main() }}}
-</body>
+  </body>
 
 </html>

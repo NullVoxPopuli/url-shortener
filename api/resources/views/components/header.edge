@@ -1,0 +1,37 @@
+<header>
+  <div class="left">
+    <a href="https://docs.nvp.gg">API Documentation</a>
+    <span aria-hidden>|</span>
+    <a href="://{{ rootHost }}/_/docs">Pricing</a>
+  </div>
+
+  <div class="right">
+    @if(auth.isAuthenticated)
+      <a class="logout" href="://app.{{ rootHost }}/auth/logout">Logout</a>
+      <p>
+        Hello {{ auth.user.name }}
+      </p>
+    @else
+      <a class="login" href="://app.{{ rootHost }}/auth/login">Login</a>
+      <a class="signup" href="://app.{{ rootHost }}/auth/signup">Signup</a>
+    @end
+  </div>
+</header>
+<script>
+  const header = document.querySelector("header");
+  
+  function onScroll() {
+    if (window.scrollY > 0) {
+      header.classList.add("did-scroll");
+    } else {
+      header.classList.remove("did-scroll");
+    }
+  }
+  
+  onScroll();
+  
+  window.addEventListener("scroll", onScroll, {
+    passive: true
+  });
+</script>
+

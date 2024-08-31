@@ -1,0 +1,14 @@
+@layout.home({ originalUrl })
+  @slot('errors')
+
+    @each((error) in errors)
+      <span class="error">
+        @if(error.title === "Authentication required")
+          Shortening that URL requires an account. Please login.
+        @else
+          {{ error.title }}
+        @endif
+      </span>
+    @endeach
+  @endslot
+@end

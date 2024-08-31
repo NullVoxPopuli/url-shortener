@@ -2,6 +2,7 @@
 
 module.exports = {
   printWidth: 100,
+  plugins: ['prettier-edgejs'],
   overrides: [
     {
       // Lol, JavaScript
@@ -30,6 +31,17 @@ module.exports = {
         singleQuote: true,
         templateSingleQuote: false,
         trailingComma: 'es5',
+      },
+    },
+    {
+      files: ['*.edge'],
+      options: {
+        singleQuote: true,
+        useTabs: false,
+        quoteProps: 'consistent',
+        bracketSpacing: true,
+        arrowParens: 'always',
+        plugins: ['prettier-edgejs'],
       },
     },
   ],

@@ -1,5 +1,6 @@
 import { jsonapi } from '#jsonapi';
 import type { HttpContext } from '@adonisjs/core/http';
+import type { Response } from '#jsonapi';
 
 export async function action(
   context: HttpContext,
@@ -10,7 +11,8 @@ export async function action(
   try {
     let result = await callback(context);
 
-    response.safeStatus(jsonapi.statusFrom(result as any));
+    let fallbackStatus = jsonapi.statusFrom(result as any);
+    response.safeStatus(fallbackStatus);
     return result;
   } catch (error) {
     // Uncomment for debugging

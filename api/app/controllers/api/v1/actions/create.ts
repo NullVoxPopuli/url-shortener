@@ -48,13 +48,13 @@ export async function createLink(context: HttpContext) {
     let link = await createMeteredLink(user, parsed);
 
     response.status(201);
-    return render.link(request, link);
+    return render.link(link);
   }
 
   let link = await createUnmeteredLink(parsed);
 
   response.status(201);
-  return render.link(request, link);
+  return render.link(link);
 }
 
 async function createUnmeteredLink(url: URL): Promise<Link> {

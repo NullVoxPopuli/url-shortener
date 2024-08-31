@@ -33,6 +33,8 @@ export function error({ title, status, detail }: Error) {
 export function errors() {}
 
 export const jsonapi = {
+  empty: (): Response => ({ data: {} }),
+
   // https://jsonapi.org/examples/#error-objects
   errors: (builder: (builder: typeof createError) => void) => {
     let result: ErrorResponse = {
@@ -80,6 +82,15 @@ export const jsonapi = {
         status: 403,
         title: 'Not Authorized',
         detail: e.stack,
+      });
+    });
+  },
+  notFound: ({ kind, id }: { kind: string; id: string }) => {
+    return jsonapi.errors((error) => {
+      error({
+        status: 404,
+        title: `${kind} was not found`,
+        detail: `Tried to find a ${kind} via ${id}, but could not find anything.`,
       });
     });
   },

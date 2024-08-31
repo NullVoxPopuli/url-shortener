@@ -1,10 +1,10 @@
-import { hasUUID, hasRelationship, attr, hasAttr, relationship } from '#tests/jsonapi';
+import { relationship, assertWellFormedLinkData } from '#tests/jsonapi';
 import { changedRecords } from '#tests/db';
 import { ApiClient } from '@japa/api-client';
 import Link from '#models/link';
 import { test } from '@japa/runner';
 
-const post = (client: ApiClient, body = {}) => client.post('_/api/v1/links').json(body);
+const post = (client: ApiClient, body = {}) => client.post('/v1/links').json(body);
 
 test.group('POST [unauthenticated]', () => {
   test('Error: no url', async ({ client }) => {
@@ -64,7 +64,7 @@ test.group('POST [unauthenticated]', () => {
     });
   });
 
-  test('Success: URLs from glimdown.com are always allowed', async ({ client, assert }) => {
+  test('Success: URLs from glimdown.com are always allowed', async ({ client }) => {
     let data: any;
     await changedRecords(Link, async () => {
       let response = await post(client, { originalUrl: 'https://glimdown.com' });
@@ -74,13 +74,7 @@ test.group('POST [unauthenticated]', () => {
       data = response.body().data;
     });
 
-    hasUUID(data);
-    hasAttr(data, 'createdAt');
-    hasAttr(data, 'updatedAt');
-    assert.ok(attr(data, 'shortUrl').startsWith('localhost'));
-
-    hasRelationship(data, 'createdBy', 'user');
-    hasRelationship(data, 'ownedBy', 'account');
+    assertWellFormedLinkData(data);
 
     relationship(data, 'createdBy');
   });

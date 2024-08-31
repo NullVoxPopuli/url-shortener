@@ -19,7 +19,8 @@ import env from '#start/env';
 export const plugins: Config['plugins'] = [
   assert(),
   apiClient({
-    baseURL: `http://${env.get('HOST')}:${env.get('PORT')}`,
+    // baseURL: `http://${env.get('HOST')}:${env.get('PORT')}`,
+    baseURL: `http://api.${env.get('HOST')}:${env.get('PORT')}`,
   }),
   pluginAdonisJS(app),
   authApiClient(app),
@@ -37,7 +38,8 @@ export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
   setup: [
     () => testUtils.db().migrate(),
     () => testUtils.db().seed(),
-    () => testUtils.db().truncate(),
+    () => testUtils.db().withGlobalTransaction(),
+    // () => testUtils.db().truncate(),
   ],
   teardown: [],
 };

@@ -1,11 +1,11 @@
 import { DataResponse } from '#jsonapi';
 import Link from '#models/link';
 import { compressedUUID } from '@nullvoxpopuli/url-compression';
-import type { Request } from '@adonisjs/core/http';
+import { HOST } from '#start/env';
 
-export function link(request: Request, link: Link): DataResponse {
+export function link(link: Link): DataResponse {
   let shorter = compressedUUID.encode(link.id);
-  let shortUrl = `${request.host()}/${shorter}`;
+  let shortUrl = `https://${HOST}/${shorter}`;
 
   return {
     data: {
@@ -21,5 +21,13 @@ export function link(request: Request, link: Link): DataResponse {
         createdBy: { type: 'user', id: link.created_by },
       },
     },
+  };
+}
+
+export function links(links: Link[]) {
+  return {
+    included: [],
+    links: [],
+    data: links.map(link).map((x) => x.data),
   };
 }

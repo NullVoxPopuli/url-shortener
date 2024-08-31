@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { BaseModel, column, belongsTo, beforeCreate } from '@adonisjs/lucid/orm';
+import { BaseModel, column, belongsTo, beforeCreate, scope } from '@adonisjs/lucid/orm';
 import Account from './account.js';
 import type { BelongsTo } from '@adonisjs/lucid/types/relations';
 import User from './user.js';
@@ -39,4 +39,8 @@ export default class Link extends BaseModel {
   static assignUuid(link: Link) {
     link.id = randomUUID();
   }
+
+  static visibleTo = scope((query, user: User) => {
+    query.where('owned_by', user.account_id);
+  });
 }
