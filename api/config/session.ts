@@ -31,7 +31,7 @@ const sessionConfig = defineConfig({
     sameSite: 'lax',
     // How do you set multiple domains?
     // domain: '*',
-    domain: `api.${HOST}`,
+    domain: HOST,
   },
 
   /**
