@@ -3,6 +3,8 @@ import env from '#start/env';
 import { defineConfig } from '@adonisjs/lucid';
 import { findUp } from 'find-up';
 
+const NODE_ENV = env.get('NODE_ENV');
+
 // Adonis builds the whole app into a `build` directory
 // so all our paths end up being incorrect.
 // We need to manually construct a location for the sqlite3 file.
@@ -14,7 +16,7 @@ if (!pJsonPath) {
   throw new Error('Could not  determine project path');
 }
 const project = path.dirname(pJsonPath);
-const sqlitePath = path.join(project, 'db.sqlite3');
+const sqlitePath = path.join(project, `db.${NODE_ENV}.sqlite3`);
 
 const dbConfig = defineConfig({
   connection: env.get('DB_CONNECTION'),

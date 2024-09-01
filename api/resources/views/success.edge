@@ -4,8 +4,8 @@
     <span class="congrats">Congratulations, you have a short URL!</span>
     <span class="short-url-with-copy">
       <span class="short-url-content">
-        <a href="https://{{ data.attributes.shortUrl }}" target="_blank">
-          {{ data.attributes.shortUrl }}
+        <a href="{{ data.attributes.shortUrl }}" target="_blank">
+          {{ data.attributes.shortUrl.replace('https://', '') }}
         </a>
       </span>
       <button class="copy-shortUrl">Copy</button>
