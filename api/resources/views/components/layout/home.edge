@@ -40,6 +40,11 @@
       <em>5.3×10<sup>36</sup>&nbsp;(5.3 undecillion) Possible Links</em>
     </div>
 
+    @if ($slots.success)
+      <div class="header-spacer">
+        &nbsp;
+      </div>
+    @endif
   </div>
 
   {{{ await $slots.main() }}}
