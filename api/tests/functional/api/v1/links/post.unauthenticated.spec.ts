@@ -51,7 +51,7 @@ test.group('POST [unauthenticated]', () => {
     });
   });
 
-  test('Success: any non-glimdown.com URL requires authentication', async ({ client }) => {
+  test('Error: any non-glimdown.com URL requires authentication', async ({ client }) => {
     let response = await post(client, { originalUrl: 'https://google.com' });
 
     response.assertStatus(401);
@@ -70,6 +70,21 @@ test.group('POST [unauthenticated]', () => {
     let data: any;
     await changedRecords(Link, async () => {
       let response = await post(client, { originalUrl: 'https://glimdown.com' });
+
+      response.assertStatus(201);
+
+      data = response.body().data;
+    });
+
+    assertWellFormedLinkData(data);
+
+    relationship(data, 'createdBy');
+  });
+
+  test('Success: URLs from limber.glimdown.com are always allowed', async ({ client }) => {
+    let data: any;
+    await changedRecords(Link, async () => {
+      let response = await post(client, { originalUrl: 'https://limber.glimdown.com' });
 
       response.assertStatus(201);
 

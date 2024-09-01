@@ -29,7 +29,7 @@ export async function createLink(context: HttpContext) {
   }
 
   let parsed = new URL(originalUrl);
-  let isGlimdown = parsed.host === 'glimdown.com';
+  let isGlimdown = parsed.host.endsWith('glimdown.com');
 
   await context.auth.check();
   let user = context.auth.user;
