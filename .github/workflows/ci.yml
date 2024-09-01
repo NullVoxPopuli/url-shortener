@@ -41,7 +41,9 @@ jobs:
       # bug with ignore-scripts=true?
       # - run: pnpm rebuild
       - run: ./config/hosts.sh
-      - run: pnpm test
+      - run: |
+          pnpm rebuild
+          pnpm test
         working-directory: api
 
   tests_spa:
