@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { HOST } from '#start/env';
+import { DOMAIN } from '#start/env';
 
 export function hasRelationship(resource: any, name: string, type: string) {
   let r = relationship(resource, name);
@@ -37,8 +37,8 @@ export function assertWellFormedLinkData(data: any) {
   hasUUID(data);
   hasAttr(data, 'createdAt');
   hasAttr(data, 'updatedAt');
-  assert.include(attr(data, 'shortUrl'), `https://${HOST}`);
-  assert.ok(attr(data, 'shortUrl').startsWith(`https://${HOST}`));
+  assert.include(attr(data, 'shortUrl'), `https://${DOMAIN}`);
+  assert.ok(attr(data, 'shortUrl').startsWith(`https://${DOMAIN}`));
 
   hasRelationship(data, 'createdBy', 'user');
   hasRelationship(data, 'ownedBy', 'account');

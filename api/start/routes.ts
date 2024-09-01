@@ -6,7 +6,7 @@
 | The routes file is used for defining the HTTP routes.
 |
 */
-import { HOST } from '#start/env';
+import { DOMAIN } from '#start/env';
 import router from '@adonisjs/core/services/router';
 
 function version(name: string, callback: () => unknown) {
@@ -28,13 +28,13 @@ router
       router.delete('links/:id', [links, 'delete']);
     });
   })
-  .domain(`api.${HOST}`);
+  .domain(`api.${DOMAIN}`);
 
 router
   .group(() => {
     // TODO: docs subdomain for generated API documentation
   })
-  .domain(`docs.${HOST}`);
+  .domain(`docs.${DOMAIN}`);
 
 /**
  * "SSR" / Traditional
@@ -48,4 +48,4 @@ router
     router.get('/', [() => import('#controllers/home'), 'index']);
     router.post('/', [() => import('#controllers/home'), 'createLink']);
   })
-  .domain(HOST);
+  .domain(DOMAIN);

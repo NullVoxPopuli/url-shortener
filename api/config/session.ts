@@ -1,8 +1,6 @@
-import env from '#start/env';
+import env, { DOMAIN } from '#start/env';
 import app from '@adonisjs/core/services/app';
 import { defineConfig, stores } from '@adonisjs/session';
-
-const HOST = env.get('HOST');
 
 const sessionConfig = defineConfig({
   enabled: true,
@@ -29,7 +27,7 @@ const sessionConfig = defineConfig({
     httpOnly: true,
     secure: app.inProduction,
     sameSite: 'lax',
-    domain: `.${HOST}`,
+    domain: `.${DOMAIN}`,
   },
 
   /**

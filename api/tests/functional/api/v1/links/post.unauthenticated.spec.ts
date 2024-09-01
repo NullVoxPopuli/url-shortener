@@ -3,10 +3,10 @@ import { changedRecords } from '#tests/db';
 import { ApiClient } from '@japa/api-client';
 import Link from '#models/link';
 import { test } from '@japa/runner';
-import { API_HOST } from '#start/env';
+import { API_DOMAIN } from '#start/env';
 
 const post = (client: ApiClient, body = {}) =>
-  client.post(`http://${API_HOST}/v1/links`).json(body);
+  client.post(`http://${API_DOMAIN}/v1/links`).json(body);
 
 test.group('POST [unauthenticated]', () => {
   test('Error: no url', async ({ client }) => {
