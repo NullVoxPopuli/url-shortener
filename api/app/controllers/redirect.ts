@@ -4,7 +4,10 @@ import { compressedUUID } from '@nullvoxpopuli/url-compression';
 import CustomLink from '#models/custom_link';
 
 export default class LinksController {
-  async findLink({ request, response }: HttpContext) {
+  /**
+   * TODO: scope to domain
+   */
+  async findLink({ view, request, response }: HttpContext) {
     const { id } = request.params();
 
     let url: undefined | string;
@@ -26,12 +29,18 @@ export default class LinksController {
       }
 
       if (uuid) {
+        /**
+         * TODO: findAll / query because there can be duplicates
+         */
         let link = await Link.find(uuid);
         url = link?.original;
       }
     }
 
     if (!url) {
+      /**
+       * Custom links may or may not be on a custom domain
+       */
       let custom = await CustomLink.findBy({ name: id });
       await custom?.load('link');
 
@@ -39,7 +48,10 @@ export default class LinksController {
     }
 
     if (!url) {
-      return response.redirect().status(404).toRoute('links.notFound', { id });
+      return view.render('redirect/error', {
+        id,
+        host: request.host(),
+      });
     }
 
     response.redirect(url);

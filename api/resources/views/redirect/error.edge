@@ -1,0 +1,45 @@
+@layout.app()
+  @slot('meta')
+    <meta name="description" content="404, not found" />
+  @endslot
+  <div class="ember-primitives__hero__wrapper">
+    <div class="hero-content">
+
+      <h1 class="soft small">
+        I could not expand that URL
+      </h1>
+
+      <div class="error-page-explanation">
+        <div class="error-page-detail">
+          Attempted to expand<br />
+          <span class="error-url-id">
+            https://{{host}}/<strong>{{ id }}</strong>
+          </span>
+        </div>
+
+        <div class="error-page-reasons">
+          Please check if you have a typo and try again.
+          <br />
+          <br />
+
+          Possible reasons you ended up here:
+          <ul>
+            <li>
+              Short URL doesn't exist
+            </li>
+            <li>
+              Short URL has expired
+            </li>
+            <li>
+              Short URL belongs to an account that canceled their subscription
+            </li>
+          </ul>
+
+          <br />
+          If someone sent you this link, check with them to see if it was sent correctly.
+        </div>
+      </div>
+    </div>
+  </div>
+
+@end
