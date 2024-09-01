@@ -1,16 +1,17 @@
-import { defineConfig } from "vite";
 import {
-  resolver,
+  assets,
+  compatPrebuild,
+  contentFor,
   hbs,
+  optimizeDeps,
+  resolver,
   scripts,
   templateTag,
-  optimizeDeps,
-  compatPrebuild,
-  assets,
-  contentFor,
 } from "@embroider/vite";
-import { resolve } from "path";
+
 import { babel } from "@rollup/plugin-babel";
+import { resolve } from "path";
+import { defineConfig } from "vite";
 
 const root = "tmp/rewritten-app";
 const extensions = [

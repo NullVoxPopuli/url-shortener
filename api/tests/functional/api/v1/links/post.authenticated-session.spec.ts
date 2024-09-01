@@ -4,12 +4,12 @@ import { ApiClient } from '@japa/api-client';
 import Link from '#models/link';
 import { test } from '@japa/runner';
 import User from '#models/user';
-import { API_HOST, HOST } from '#start/env';
+import { API_DOMAIN, DOMAIN } from '#start/env';
 
 test.group('POST [authenticated session]', () => {
   const post = (user: User, client: ApiClient, body = {}) =>
     client
-      .post(`http://${API_HOST}/v1/links`)
+      .post(`http://${API_DOMAIN}/v1/links`)
       .json(body)
       .header('Accept', 'application/vnd.api+json')
       .withGuard('web')
@@ -74,8 +74,8 @@ test.group('POST [authenticated session]', () => {
     hasUUID(data);
     hasAttr(data, 'createdAt');
     hasAttr(data, 'updatedAt');
-    assert.include(attr(data, 'shortUrl'), `https://${HOST}`);
-    assert.ok(attr(data, 'shortUrl').startsWith(`https://${HOST}`));
+    assert.include(attr(data, 'shortUrl'), `https://${DOMAIN}`);
+    assert.ok(attr(data, 'shortUrl').startsWith(`https://${DOMAIN}`));
 
     assertWellFormedLinkData(data);
 

@@ -16,6 +16,7 @@ const env = await Env.create(new URL('../', import.meta.url), {
   PORT: Env.schema.number(),
   APP_KEY: Env.schema.string(),
   HOST: Env.schema.string({ format: 'host' }),
+  DOMAIN: Env.schema.string({ format: 'host' }),
   LOG_LEVEL: Env.schema.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']),
 
   /*
@@ -49,14 +50,16 @@ const env = await Env.create(new URL('../', import.meta.url), {
 export default env;
 
 export const HOST = env.get('HOST');
+export const DOMAIN = env.get('DOMAIN');
 export const isPG = env.get('DB_CONNECTION') === 'postgres';
 
 // Probably just for testing
-export const API_HOST = `api.${HOST}:${env.get('PORT')}`;
+export const API_DOMAIN = `api.${DOMAIN}:${env.get('PORT')}`;
 
 console.log(`
   NODE_ENV: ${env.get('NODE_ENV')}
   HOST: ${env.get('HOST')}
   PORT: ${env.get('PORT')}
+  DOMAIN: ${env.get('DOMAIN')}
   DB_CONNECTION: ${env.get('DB_CONNECTION')}
 `);

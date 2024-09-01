@@ -2,11 +2,11 @@ import { test } from '@japa/runner';
 import { ApiClient } from '@japa/api-client';
 import User from '#models/user';
 import { createLink, createNewAccount } from '#tests/db';
-import { API_HOST } from '#start/env';
+import { API_DOMAIN } from '#start/env';
 
 const get = (user: User, client: ApiClient) =>
   client
-    .get(`http://${API_HOST}/v1/links`)
+    .get(`http://${API_DOMAIN}/v1/links`)
     .header('Accept', 'application/vnd.api+json')
     .loginAs(user);
 

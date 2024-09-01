@@ -3,11 +3,11 @@ import { ApiClient } from '@japa/api-client';
 import { createLink, createNewAccount } from '#tests/db';
 import User from '#models/user';
 import { assertWellFormedLinkData } from '#tests/jsonapi';
-import { API_HOST } from '#start/env';
+import { API_DOMAIN } from '#start/env';
 
 const show = (user: User, client: ApiClient, id: string) =>
   client
-    .get(`http://${API_HOST}/v1/links/${id}`)
+    .get(`http://${API_DOMAIN}/v1/links/${id}`)
     .header('Accept', 'application/vnd.api+json')
     .withGuard('web')
     .loginAs(user);

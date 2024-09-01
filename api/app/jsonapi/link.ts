@@ -1,11 +1,11 @@
 import { DataResponse } from '#jsonapi';
 import Link from '#models/link';
 import { compressedUUID } from '@nullvoxpopuli/url-compression';
-import { HOST } from '#start/env';
+import { DOMAIN } from '#start/env';
 
 export function link(link: Link): DataResponse {
   let shorter = compressedUUID.encode(link.id);
-  let shortUrl = `https://${HOST}/${shorter}`;
+  let shortUrl = `https://${DOMAIN}/${shorter}`;
 
   return {
     data: {
