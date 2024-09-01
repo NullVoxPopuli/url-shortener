@@ -21,17 +21,19 @@ export async function htmlAction(
     return result;
   } catch (error) {
     // Uncomment for debugging
-    // console.error('catch: ', error.message, error.name);
+    console.error('catch: ', error.message, error.name);
 
     if ('name' in error) {
-      /**
-       * Thrown from
-       *   context.auth.authenticateUsing(...)
-       */
-      if (error.name === 'E_UNAUTHORIZED_ACCESS') {
-        response.status(401);
+      switch (error.name) {
+        /**
+         * Thrown from
+         *   context.auth.authenticateUsing(...)
+         */
+        case 'E_UNAUTHORIZED_ACCESS': {
+          response.status(401);
 
-        return jsonapi.notAuthenticated(error);
+          return jsonapi.notAuthenticated(error);
+        }
       }
     }
 
