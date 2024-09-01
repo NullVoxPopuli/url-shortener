@@ -38,11 +38,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
-      # bug with ignore-scripts=true?
-      # - run: pnpm rebuild
       - run: ./config/hosts.sh
       - run: |
-          pnpm rebuild
+          pnpm run rebuild
           pnpm test
         working-directory: api
 
@@ -59,7 +57,7 @@ jobs:
         working-directory: web-client
 
   build:
-    name: Build 
+    name: Build
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
@@ -68,7 +66,7 @@ jobs:
       # bug with ignore-scripts=true?
       # - run: pnpm rebuild
       - run: pnpm build
-        working-directory: api 
+        working-directory: api
 
   # build_api_image:
   #   name: "Build API Image"
