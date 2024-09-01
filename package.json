@@ -33,11 +33,6 @@
     "web-client/node_modules",
     "packages/url-compression/node_modules"
   ],
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "better-sqlite3"
-    ]
-  },
   "packageManager": "pnpm@9.9.0",
   "engines": {
     "node": ">= 22"
