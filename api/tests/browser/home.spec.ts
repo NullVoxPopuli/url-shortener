@@ -1,9 +1,9 @@
 import { test } from '@japa/runner';
 import { compressedUUID } from '@nullvoxpopuli/url-compression';
 import { createLink, createNewAccount } from '#tests/db';
-import env, { DOMAIN } from '#start/env';
+import { DOMAIN } from '#start/env';
 
-const PORT = env.get('PORT');
+// `http://${env.get('DOMAIN')}:${env.get('PORT')}`;
 
 /**
  * There is no other public type for this function,
@@ -12,7 +12,7 @@ const PORT = env.get('PORT');
 type Visit = Parameters<NonNullable<Parameters<typeof test>[1]>>[0]['visit'];
 
 async function goHome(visit: Visit) {
-  const page = await visit(`http://${DOMAIN}:${PORT}/`);
+  const page = await visit('/');
   await page.assertTextContains('h1', 'nvp.gg');
 
   return {
@@ -53,15 +53,16 @@ test.group('Creating a link', () => {
 
 test.group('vistiing a short link', () => {
   test('Link does not exist', async ({ assert, visit }) => {
-    let page = await visit(`http://${DOMAIN}:${PORT}/does-not-exist`);
+    let page = await visit(`/does-not-exist`);
     await page.assertTextContains('h1', `could not expand that URL`);
   });
 
-  test('Link exists via id', async ({ assert, visit }) => {
+  test('Link exists via id', async ({ assert, visit, browser }) => {
     let { user, account } = await createNewAccount();
     let link = await createLink(user, account);
-    let page = await visit(`http://${DOMAIN}:${PORT}/${link.id}`);
+    let page = await visit(`/${link.id}`);
     console.log(await page.innerText('body'));
+    await page.waitForURL('https://playwrightsolutions.com/');
     await page.assertUrl(`Original URL`);
   });
 
@@ -69,13 +70,13 @@ test.group('vistiing a short link', () => {
     let { user, account } = await createNewAccount();
     let link = await createLink(user, account);
     let shorter = compressedUUID.encode(link.id);
-    let page = await visit(`http://${DOMAIN}:${PORT}/${shorter}`);
+    let page = await visit(`/${shorter}`);
 
     await page.assertUrl(`Original URL`);
   });
 
   test('Link exists, but the owning account is unpaid', async ({ assert, visit }) => {
-    let page = await visit(`http://${DOMAIN}:${PORT}/does-not-exist`);
+    let page = await visit(`/does-not-exist`);
     /**
      * We don't reveal that an account is unpaid, could be rude
      */
@@ -83,33 +84,33 @@ test.group('vistiing a short link', () => {
   });
 
   test('Link exists, but is expired', async ({ assert, visit }) => {
-    let page = await visit(`http://${DOMAIN}:${PORT}/does-not-exist`);
+    let page = await visit(`/does-not-exist`);
     await page.assertTextContains('h1', `could not expand that URL`);
   });
 
   test('Link is from a free account', async ({ assert, visit }) => {
-    let page = await visit(`http://${DOMAIN}:${PORT}/does-not-exist`);
-    await page.assertTextContains(404);
+    let page = await visit(`/does-not-exist`);
+    await page.assertUrlContains('boop boop');
   }).skip(true, 'Free accounts not implemented yet');
 
   test('Link exists twice from different accounts', async ({ assert, visit }) => {
-    let page = await visit(`http://${DOMAIN}:${PORT}/does-not-exist`);
-    await page.assertTextContains(404);
+    let page = await visit(`/does-not-exist`);
+    await page.assertUrlContains('boop boop');
   });
 
   test('Link exists twice from different accounts and one is expired', async ({
     assert,
     visit,
   }) => {
-    let page = await visit(`http://${DOMAIN}:${PORT}/does-not-exist`);
-    await page.assertTextContains(404);
+    let page = await visit(`/does-not-exist`);
+    await page.assertUrlContains('boop boop');
   });
 
   test('Link exists twice from different accounts and they are all expired', async ({
     assert,
     visit,
   }) => {
-    let page = await visit(`http://${DOMAIN}:${PORT}/does-not-exist`);
+    let page = await visit(`/does-not-exist`);
     await page.assertTextContains('h1', `could not expand that URL`);
   });
 
@@ -117,8 +118,7 @@ test.group('vistiing a short link', () => {
     assert,
     visit,
   }) => {
-    let page = await visit(`http://${DOMAIN}:${PORT}/does-not-exist`);
-    await page.assertTextContains(404);
+    let page = await visit(`/does-not-exist`);
+    await page.assertUrlContains('boop boop');
   }).skip(true, `We don't have account paid/unpaid status yet.`);
 });
-
