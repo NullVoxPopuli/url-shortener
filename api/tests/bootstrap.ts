@@ -26,25 +26,36 @@ export const plugins: Config['plugins'] = [
   browserClient({
     runInSuites: ['browser'],
 
-    async launcher(options) {
-      return chromium.launch({
-        ...options,
-
-        args: [
-          '--headless=new',
-          '--no-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-software-rasterizer',
-          '--mute-audio',
-          // '--remote-debugging-port=9222',
-          '--host-rules="MAP 127.0.0.1 nvp.local',
-          '--host-rules="MAP 127.0.0.1 localhost',
-        ],
-      });
-    },
+    // async launcher(options) {
+    //   console.log(options);
+    //   // return firefox.launch({
+    //   //   ...options,
+    //   //   headless: false,
+    //   // });
+    //   return chromium.launch({
+    //     ...options,
+    //     headless: false,
+    //     devtools: true,
+    //
+    //     args: [
+    //       '--auto-open-devtools-for-tabs',
+    //       '--headless=new',
+    //       '--no-sandbox',
+    //       '--ignore-certificate-errors',
+    //       '--allow-insecure-localhost',
+    //       '--disable-dev-shm-usage',
+    //       '--disable-software-rasterizer',
+    //       '--mute-audio',
+    //       '--remote-debugging-port=9222',
+    //       //   '--host-rules="MAP 127.0.0.1 nvp.local',
+    //       //   '--host-rules="MAP 127.0.0.1 localhost',
+    //     ],
+    //   });
+    // },
     contextOptions: {
       ignoreHTTPSErrors: true,
       acceptDownloads: false,
+
       // baseURL: 'http://nvp.local',
     },
   }),
