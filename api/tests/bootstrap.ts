@@ -7,7 +7,6 @@ import { pluginAdonisJS } from '@japa/plugin-adonisjs';
 import { authApiClient } from '@adonisjs/auth/plugins/api_client';
 import { sessionApiClient } from '@adonisjs/session/plugins/api_client';
 import testUtils from '@adonisjs/core/services/test_utils';
-import { chromium, firefox } from 'playwright';
 
 /**
  * This file is imported by the "bin/test.ts" entrypoint file
@@ -26,37 +25,9 @@ export const plugins: Config['plugins'] = [
   browserClient({
     runInSuites: ['browser'],
 
-    // async launcher(options) {
-    //   console.log(options);
-    //   // return firefox.launch({
-    //   //   ...options,
-    //   //   headless: false,
-    //   // });
-    //   return chromium.launch({
-    //     ...options,
-    //     headless: false,
-    //     devtools: true,
-    //
-    //     args: [
-    //       '--auto-open-devtools-for-tabs',
-    //       '--headless=new',
-    //       '--no-sandbox',
-    //       '--ignore-certificate-errors',
-    //       '--allow-insecure-localhost',
-    //       '--disable-dev-shm-usage',
-    //       '--disable-software-rasterizer',
-    //       '--mute-audio',
-    //       '--remote-debugging-port=9222',
-    //       //   '--host-rules="MAP 127.0.0.1 nvp.local',
-    //       //   '--host-rules="MAP 127.0.0.1 localhost',
-    //     ],
-    //   });
-    // },
     contextOptions: {
       ignoreHTTPSErrors: true,
       acceptDownloads: false,
-
-      // baseURL: 'http://nvp.local',
     },
   }),
 ];
