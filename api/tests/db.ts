@@ -61,7 +61,8 @@ const nonFreeURLs = [
   `https://www.google.com/maps`,
   `https://news.ycombinator.com/`,
   `https://lite.duckduckgo.com/lite`,
-  `https://www.google.com/maps/place/South+Pole,+Antarctica/@-84.9999869,44.9985584,21z/data=!3m1!4b1!4m6!3m5!1s0xb165fce02a3d7ef5:0x142d0eddfdb57ff4!8m2!3d-89.9999999!4d45!16zL20vMDcyX20?entry=ttu&g_ep=EgoyMDI0MDgyOC4wIKXMDSoASAFQAw%3D%3D`,
+  `https://www.google.com/maps/place/South+Pole,+Antarctica/@-84.9999869,44.9985584,21z/data=!3m1!4b1!4m6!3m5!1s0xb165fce02a3d7ef5:0x142d0eddfdb57ff4!8m2!3d-89.9999999!4d45!16zL20vMDcyX20`,
+  `https://www.google.com/maps/place/South+Pole,+Antarctica/@-73.1061568,-13.7791245,3z/data=!4m6!3m5!1s0xb165fce02a3d7ef5:0x142d0eddfdb57ff4!8m2!3d-89.9999999!4d45!16zL20vMDcyX20`,
 ];
 
 /**

@@ -126,7 +126,8 @@ h1 {
   display: grid;
   gap: 1rem;
 
-  .error-page-reasons {}
+  .error-page-reasons {
+  }
 
   .error-page-detail {
     padding: 1rem;
