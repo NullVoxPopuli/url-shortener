@@ -20,13 +20,13 @@ test.group('vistiing a short link', () => {
     await page.assertUrl(`Original URL`);
   });
 
-  test('Link exists via compressedUUID', async ({ assert, visit }) => {
+  test('Link exists via compressedUUID', async ({ assert, visit, browserContext }) => {
     let { user, account } = await createNewAccount();
     let link = await createLink(user, account);
     let shorter = compressedUUID.encode(link.id);
     let page = await visit(`/${shorter}`);
 
-    await page.assertUrl(`Original URL`);
+    await page.assertUrl(link.original);
   });
 
   test('Link exists, but the owning account is unpaid', async ({ assert, visit }) => {
@@ -49,7 +49,7 @@ test.group('vistiing a short link', () => {
 
   test('Link exists twice from different accounts', async ({ assert, visit }) => {
     let page = await visit(`/does-not-exist`);
-    await page.assertUrlContains('boop boop');
+    await page.assertUrlContains('google.com');
   });
 
   test('Link exists twice from different accounts and one is expired', async ({
@@ -57,7 +57,7 @@ test.group('vistiing a short link', () => {
     visit,
   }) => {
     let page = await visit(`/does-not-exist`);
-    await page.assertUrlContains('boop boop');
+    await page.assertUrlContains('google.com');
   });
 
   test('Link exists twice from different accounts and they are all expired', async ({
@@ -72,7 +72,7 @@ test.group('vistiing a short link', () => {
     assert,
     visit,
   }) => {
-    let page = await visit(`/does-not-exist`);
-    await page.assertUrlContains('boop boop');
+    let page = await visit(`/google`);
+    await page.assertUrlContains('google.com');
   }).skip(true, `We don't have account paid/unpaid status yet.`);
 });

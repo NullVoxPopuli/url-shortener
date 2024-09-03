@@ -12,8 +12,16 @@
     </span>
 
     <script>
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: {
+          y: .6
+        }
+      });
+
       const button = document.querySelector(".short-url-with-copy button.copy-shortUrl");
-      
+
       if ("ClipboardItem" in globalThis) {
         button.addEventListener("click", () => setClipboard("https://{{ data.attributes.shortUrl }}"));
         async function setClipboard(text) {

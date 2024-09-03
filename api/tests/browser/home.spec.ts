@@ -1,7 +1,5 @@
 import { test } from '@japa/runner';
-import { compressedUUID } from '@nullvoxpopuli/url-compression';
-import { createLink, createNewAccount } from '#tests/db';
-import env, { DOMAIN } from '#start/env';
+import { DOMAIN } from '#start/env';
 
 // `http://${env.get('DOMAIN')}:${env.get('PORT')}`;
 

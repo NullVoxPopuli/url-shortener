@@ -46,9 +46,9 @@ export async function createNewAccount() {
   return { user, account };
 }
 
-export async function createLink(user: User, account: Account) {
+export async function createLink(user: User, account: Account, url?: string) {
   let link = new Link();
-  link.original = faker.internet.url();
+  link.original = url ?? faker.internet.url();
   link.owned_by = account.id;
   link.created_by = user.id;
   await link.save();
