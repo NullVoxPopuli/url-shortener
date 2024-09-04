@@ -6,7 +6,10 @@ export async function listLinks(context: HttpContext) {
   let { auth, response } = context;
 
   let user = await auth.authenticate();
-  let links = await Link.query().withScopes((scopes) => scopes.visibleTo(user));
+  let links = await Link.query().withScopes((scopes) => {
+    scopes.visibleTo(user);
+    scopes.notExpired();
+  });
 
   response.status(200);
   return render.links(links);

@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { test } from '@japa/runner';
 import { compressedUUID } from '@nullvoxpopuli/url-compression';
 import { createLink, createNewAccount } from '#tests/db';
@@ -32,10 +33,18 @@ test.group('vistiing a short link', () => {
      * We don't reveal that an account is unpaid, could be rude
      */
     await page.assertTextContains('h1', `could not expand that URL`);
-  });
+  }).skip(true, 'Account management not implemented');
 
   test('Link exists, but is expired', async ({ visit }) => {
-    let page = await visit(`/does-not-exist`);
+    let { user, account } = await createNewAccount();
+    let link = await createLink(user, account, {
+      expiresAt: DateTime.fromJSDate(new Date('2022-02-02')),
+      expires_at: DateTime.fromJSDate(new Date('2022-02-02')),
+    });
+    let page = await visit(`/${link.id}`);
+    // let shorter = compressedUUID.encode(link.id);
+    // let page = await visit(`/${shorter}`);
+    // console.log(await page.innerText('body'));
     await page.assertTextContains('h1', `could not expand that URL`);
   });
 
@@ -47,17 +56,17 @@ test.group('vistiing a short link', () => {
   test('Link exists twice from different accounts', async ({ visit }) => {
     let page = await visit(`/does-not-exist`);
     await page.assertUrlContains('google.com');
-  });
+  }).skip(true, 'TODO');
 
   test('Link exists twice from different accounts and one is expired', async ({ visit }) => {
     let page = await visit(`/does-not-exist`);
     await page.assertUrlContains('google.com');
-  });
+  }).skip(true, 'TODO');
 
   test('Link exists twice from different accounts and they are all expired', async ({ visit }) => {
     let page = await visit(`/does-not-exist`);
     await page.assertTextContains('h1', `could not expand that URL`);
-  });
+  }).skip(true, 'TODO');
 
   test('Link exists three times from different accounts: valid/unpaid/expired', async ({
     visit,

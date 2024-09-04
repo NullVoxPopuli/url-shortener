@@ -21,6 +21,9 @@ export default class Link extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime;
 
+  @column.dateTime()
+  declare expiresAt: DateTime;
+
   @column()
   declare owned_by: string;
 
@@ -42,5 +45,13 @@ export default class Link extends BaseModel {
 
   static visibleTo = scope((query, user: User) => {
     query.where('owned_by', user.account_id);
+  });
+
+  static notExpired = scope((query) => {
+    query.whereNull('expiresAt').orWhereNot('expiresAt', '<', DateTime.utc().toSQLDate());
+  });
+
+  static expired = scope((query) => {
+    query.where('expires_at', '<=', DateTime.utc().toSQLDate());
   });
 }

@@ -46,9 +46,21 @@ export async function createNewAccount() {
   return { user, account };
 }
 
-export async function createLink(user: User, account: Account, url?: string) {
+export async function createLink(
+  user: User,
+  account: Account,
+  urlOrOptions?: string | Partial<typeof Link>
+) {
   let link = new Link();
-  link.original = url ?? faker.helpers.arrayElement(nonFreeURLs);
+
+  let options =
+    typeof urlOrOptions === 'string'
+      ? { original: urlOrOptions }
+      : urlOrOptions || ({} as Partial<InstanceType<typeof Link>>);
+
+  Object.assign(link, options);
+  link.original =
+    'original' in options ? options.original : faker.helpers.arrayElement(nonFreeURLs);
   link.owned_by = account.id;
   link.created_by = user.id;
   await link.save();
@@ -61,8 +73,6 @@ const nonFreeURLs = [
   `https://www.google.com/maps`,
   `https://news.ycombinator.com/`,
   `https://lite.duckduckgo.com/lite`,
-  `https://www.google.com/maps/place/South+Pole,+Antarctica/@-84.9999869,44.9985584,21z/data=!3m1!4b1!4m6!3m5!1s0xb165fce02a3d7ef5:0x142d0eddfdb57ff4!8m2!3d-89.9999999!4d45!16zL20vMDcyX20`,
-  `https://www.google.com/maps/place/South+Pole,+Antarctica/@-73.1061568,-13.7791245,3z/data=!4m6!3m5!1s0xb165fce02a3d7ef5:0x142d0eddfdb57ff4!8m2!3d-89.9999999!4d45!16zL20vMDcyX20`,
 ];
 
 /**

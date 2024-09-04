@@ -32,7 +32,9 @@ export default class LinksController {
         /**
          * TODO: findAll / query because there can be duplicates
          */
-        let link = await Link.find(uuid);
+        let link = await Link.query()
+          .withScopes((scopes) => scopes.notExpired())
+          .first();
         url = link?.original;
       }
     }

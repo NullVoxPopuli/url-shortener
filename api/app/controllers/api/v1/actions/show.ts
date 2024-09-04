@@ -9,7 +9,10 @@ export async function showLink(context: HttpContext) {
 
   let user = await auth.authenticate();
   let link = await Link.query()
-    .withScopes((scopes) => scopes.visibleTo(user))
+    .withScopes((scopes) => {
+      scopes.visibleTo(user);
+      scopes.notExpired();
+    })
     .where('id', id)
     .first();
 
