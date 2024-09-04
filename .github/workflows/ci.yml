@@ -42,6 +42,7 @@ jobs:
     # You could use docker, but docker is also a bit invasive.
     services:
       postgres:
+        # name of dockerhub image
         image: postgres
         env:
           POSTGRES_USER: postgres
@@ -66,10 +67,12 @@ jobs:
           source .env.test
           export DB_CONNECTION=postgres
           # This looks ridiculous lol
-          export DATABASE_URL="postgres://postgres:postgres@127.0.0.1:5432/postgres_db?sslmode=no-verify"
+          export DATABASE_URL="postgres://postgres:postgres@127.0.0.1:5432/postgres_db"
           node ace migration:fresh
           node ace test
         working-directory: api
+        env:
+          PGSSLMODE: disable
 
   tests_spa:
     name: SPA Tests
