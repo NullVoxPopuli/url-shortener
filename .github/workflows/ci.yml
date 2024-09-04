@@ -61,6 +61,7 @@ jobs:
       - run: ./config/hosts.sh
       - run: |
           pnpm run rebuild
+          pnpm playwright install --with-deps
           node ace migration:fresh
           set -a
           source .env.test
