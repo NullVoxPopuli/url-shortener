@@ -59,8 +59,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
-      - run: ./config/hosts.sh
       - run: |
+          echo "Running Tests Here"
           # pnpm run rebuild
           # pnpm playwright install --with-deps
           set -a
@@ -69,6 +69,7 @@ jobs:
           # This looks ridiculous lol
           export DATABASE_URL="postgres://postgres:postgres@127.0.0.1:5432/postgres_db"
           node ace migration:fresh
+          ./config/hosts.sh
           node ace test
         working-directory: api
         env:
