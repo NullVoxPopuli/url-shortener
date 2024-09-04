@@ -62,4 +62,5 @@ console.log(`
   PORT: ${env.get('PORT')}
   DOMAIN: ${env.get('DOMAIN')}
   DB_CONNECTION: ${env.get('DB_CONNECTION')}
+  DATABASE_URL: ${env.get('DATABASE_URL')}
 `);
