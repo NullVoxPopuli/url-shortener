@@ -60,8 +60,8 @@ jobs:
       - uses: wyvox/action-setup-pnpm@v3
       - run: ./config/hosts.sh
       - run: |
-          pnpm run rebuild
-          pnpm playwright install --with-deps
+          # pnpm run rebuild
+          # pnpm playwright install --with-deps
           set -a
           source .env.test
           export DB_CONNECTION=postgres
