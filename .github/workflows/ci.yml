@@ -67,7 +67,7 @@ jobs:
           source .env.test
           export DB_CONNECTION=postgres
           # This looks ridiculous lol
-          export DATABASE_URL="postgres://postgres:postgres@127.0.0.1:5432/postgres_db?sslrootcert=/$PWD/tests/privkey.pem"
+          export DATABASE_URL="postgres://postgres:postgres@127.0.0.1:5432/postgres_db"
           node ace migration:fresh
           node ace test
         working-directory: api
