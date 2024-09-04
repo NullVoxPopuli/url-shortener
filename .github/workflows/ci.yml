@@ -40,26 +40,35 @@ jobs:
     # We use sqlite locally, because postgres
     # is _very_ invasive on a system.
     # You could use docker, but docker is also a bit invasive.
-    services:
-      postgres:
-        # name of dockerhub image
-        image: postgres
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres_db
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Exposes this port to the host
-          - 5432:5432
+    # services:
+    #   postgres:
+    #     # name of dockerhub image
+    #     image: postgres
+    #     env:
+    #       POSTGRES_USER: postgres
+    #       POSTGRES_PASSWORD: postgres
+    #       POSTGRES_DB: postgres_db
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
+    #     ports:
+    #       # Exposes this port to the host
+    #       - 5432:5432
     steps:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
       - run: ./config/hosts.sh
+      - uses: ikalnytskyi/action-setup-postgres@v6
+        with:
+          username: postgres
+          password: postgres
+          database: postgres
+          port: 34837
+          postgres-version: "14"
+          ssl: "on"
+        id: postgres
       - run: |
           # pnpm run rebuild
           # pnpm playwright install --with-deps
@@ -67,7 +76,7 @@ jobs:
           source .env.test
           export DB_CONNECTION=postgres
           # This looks ridiculous lol
-          export DATABASE_URL="postgres://postgres:postgres@127.0.0.1:5432/postgres_db"
+          export DATABASE_URL="${{ steps.postgres.outputs.connection-uri }}"
           node ace migration:fresh
           node ace test
         working-directory: api
