@@ -67,7 +67,7 @@ jobs:
           export DB_CONNECTION=postgres
           # This looks ridiculous lol
           export DATABASE_URL="postgres://postgres:postgres@127.0.0.1:5432/postgres_db"
-          node ace test
+          pnpm test
         working-directory: api
 
   tests_spa:
