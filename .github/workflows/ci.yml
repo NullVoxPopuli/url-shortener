@@ -62,9 +62,9 @@ jobs:
       - run: ./config/hosts.sh
       - uses: ikalnytskyi/action-setup-postgres@v6
         with:
-          username: postgres
-          password: postgres
-          database: postgres
+          username: postgres_u
+          password: postgres_pw
+          database: postgres_db
           port: 34837
           ssl: "on"
         id: postgres
