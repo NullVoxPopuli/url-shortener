@@ -1,30 +1,16 @@
 import { DateTime } from 'luxon';
 import { test } from '@japa/runner';
-import { compressedUUID } from '@nullvoxpopuli/url-compression';
 import { createLink, createNewAccount } from '#tests/db';
 
+/**
+ * Only failure cases are tested here, because
+ * playwright acts like a user, and doesn't have a way to
+ * halt redirects from happening.
+ */
 test.group('vistiing a short link', () => {
   test('Link does not exist', async ({ visit }) => {
     let page = await visit(`/does-not-exist`);
     await page.assertTextContains('h1', `could not expand that URL`);
-  });
-
-  test('Link exists via id', async ({ visit }) => {
-    let { user, account } = await createNewAccount();
-    let link = await createLink(user, account);
-
-    let page = await visit(`/${link.id}`);
-
-    await page.assertUrlContains(link.original);
-  });
-
-  test('Link exists via compressedUUID', async ({ visit }) => {
-    let { user, account } = await createNewAccount();
-    let link = await createLink(user, account);
-    let shorter = compressedUUID.encode(link.id);
-    let page = await visit(`/${shorter}`);
-
-    await page.assertUrlContains(link.original);
   });
 
   test('Link exists, but the owning account is unpaid', async ({ visit }) => {
@@ -35,28 +21,10 @@ test.group('vistiing a short link', () => {
     await page.assertTextContains('h1', `could not expand that URL`);
   }).skip(true, 'Account management not implemented');
 
-  test('Link exists, but is expired', async ({ visit }) => {
-    let { user, account } = await createNewAccount();
-    let link = await createLink(user, account, {
-      expiresAt: DateTime.fromJSDate(new Date('2022-02-02')),
-      expires_at: DateTime.fromJSDate(new Date('2022-02-02')),
-    });
-    let page = await visit(`/${link.id}`);
-    // let shorter = compressedUUID.encode(link.id);
-    // let page = await visit(`/${shorter}`);
-    // console.log(await page.innerText('body'));
-    await page.assertTextContains('h1', `could not expand that URL`);
-  });
-
   test('Link is from a free account', async ({ visit }) => {
     let page = await visit(`/does-not-exist`);
     await page.assertUrlContains('boop boop');
   }).skip(true, 'Free accounts not implemented yet');
-
-  test('Link exists twice from different accounts', async ({ visit }) => {
-    let page = await visit(`/does-not-exist`);
-    await page.assertUrlContains('google.com');
-  }).skip(true, 'TODO');
 
   test('Link exists twice from different accounts and one is expired', async ({ visit }) => {
     let page = await visit(`/does-not-exist`);

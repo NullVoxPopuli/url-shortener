@@ -4,6 +4,7 @@ import Account from './account.js';
 import type { BelongsTo } from '@adonisjs/lucid/types/relations';
 import User from './user.js';
 import { randomUUID } from 'node:crypto';
+import { compressedUUID } from '@nullvoxpopuli/url-compression';
 
 export default class Link extends BaseModel {
   @column({ isPrimary: true })
@@ -41,6 +42,10 @@ export default class Link extends BaseModel {
   @beforeCreate()
   static assignUuid(link: Link) {
     link.id = randomUUID();
+  }
+
+  get encodedId() {
+    return compressedUUID.encode(this.id);
   }
 
   static visibleTo = scope((query, user: User) => {

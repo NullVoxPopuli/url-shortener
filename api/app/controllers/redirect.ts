@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import Link from '#models/link';
 import type { HttpContext } from '@adonisjs/core/http';
 import { compressedUUID } from '@nullvoxpopuli/url-compression';
@@ -15,7 +16,7 @@ export default class LinksController {
      * Probably a UUID
      */
     if (id.length === 36) {
-      let link = await Link.find(id);
+      let link = await this.getBestResult(id);
       url = link?.original;
     }
 
@@ -29,12 +30,7 @@ export default class LinksController {
       }
 
       if (uuid) {
-        /**
-         * TODO: findAll / query because there can be duplicates
-         */
-        let link = await Link.query()
-          .withScopes((scopes) => scopes.notExpired())
-          .first();
+        let link = await this.getBestResult(uuid);
         url = link?.original;
       }
     }
@@ -50,12 +46,24 @@ export default class LinksController {
     }
 
     if (!url) {
+      response.status(404);
+
       return view.render('redirect/error', {
         id,
         host: request.host(),
       });
     }
 
-    response.redirect(url);
+    response.redirect().status(308).toPath(url);
+  }
+
+  async getBestResult(id: string) {
+    let link = await Link.find(id);
+
+    if (link?.expiresAt && link.expiresAt < DateTime.utc()) {
+      return;
+    }
+
+    return link;
   }
 }

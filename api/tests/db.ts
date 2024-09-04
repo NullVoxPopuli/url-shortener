@@ -49,7 +49,7 @@ export async function createNewAccount() {
 export async function createLink(
   user: User,
   account: Account,
-  urlOrOptions?: string | Partial<typeof Link>
+  urlOrOptions?: string | Partial<InstanceType<typeof Link>>
 ) {
   let link = new Link();
 
@@ -60,7 +60,9 @@ export async function createLink(
 
   Object.assign(link, options);
   link.original =
-    'original' in options ? options.original : faker.helpers.arrayElement(nonFreeURLs);
+    'original' in options && options.original
+      ? options.original
+      : (faker.helpers.arrayElement(nonFreeURLs) ?? faker.internet.url());
   link.owned_by = account.id;
   link.created_by = user.id;
   await link.save();
