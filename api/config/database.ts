@@ -35,9 +35,12 @@ const dbConfig = defineConfig({
     postgres: {
       client: 'pg',
       connection: {
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        ssl:
+          env.get('NODE_ENV') === 'test'
+            ? false
+            : {
+                rejectUnauthorized: false,
+              },
         connectionString: env.get('DATABASE_URL'),
       },
       migrations: {
