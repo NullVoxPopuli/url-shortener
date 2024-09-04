@@ -66,7 +66,6 @@ jobs:
           password: postgres
           database: postgres
           port: 34837
-          postgres-version: "14"
           ssl: "on"
         id: postgres
       - run: |
