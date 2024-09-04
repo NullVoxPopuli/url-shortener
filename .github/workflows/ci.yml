@@ -75,12 +75,13 @@ jobs:
           source .env.test
           export DB_CONNECTION=postgres
           # This looks ridiculous lol
-          export DATABASE_URL="${{ steps.postgres.outputs.connection-uri }}"
+          export DATABASE_URL="${{ steps.postgres.outputs.connection-uri }}?sslcert=${{ steps.postgres.outputs.certificate-path }}"
           pnpm ace migration:fresh
           pnpm ace test
         working-directory: api
         env:
-          PGSSLMODE: disable
+          PGSSLMODE: verify-full
+          PGSSLROOTCERT: ${{ steps.postgres.outputs.certificate-path }}
 
   tests_spa:
     name: SPA Tests
