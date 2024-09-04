@@ -76,8 +76,8 @@ jobs:
           export DB_CONNECTION=postgres
           # This looks ridiculous lol
           export DATABASE_URL="${{ steps.postgres.outputs.connection-uri }}"
-          node ace migration:fresh
-          node ace test
+          pnpm ace migration:fresh
+          pnpm ace test
         working-directory: api
         env:
           PGSSLMODE: disable
