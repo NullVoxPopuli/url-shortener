@@ -60,7 +60,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: wyvox/action-setup-pnpm@v3
       - run: ./config/hosts.sh
-      - uses: ikalnytskyi/action-setup-postgres@v6
+      - uses: ikalnytskyi/action-setup-postgres@e5d0db00b54ca4068073e312e72d31bdf30a6a97
         with:
           username: postgres_u
           password: postgres_pw
