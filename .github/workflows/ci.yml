@@ -74,6 +74,8 @@ jobs:
         working-directory: api
         env:
           PGSSLMODE: disable
+          PORT: 5001
+
 
   tests_spa:
     name: SPA Tests
