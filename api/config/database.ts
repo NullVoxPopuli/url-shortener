@@ -20,8 +20,10 @@ const sqlitePath = path.join(project, `db.${NODE_ENV}.sqlite3`);
 
 const dbConfig = defineConfig({
   connection: env.get('DB_CONNECTION'),
+  // prettyPrintDebugQueries: true,
   connections: {
     sqlite3: {
+      // debug: true,
       client: 'better-sqlite3',
       connection: {
         filename: sqlitePath,

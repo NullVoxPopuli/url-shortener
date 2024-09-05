@@ -1,9 +1,6 @@
-import { relationship, assertWellFormedLinkData } from '#tests/jsonapi';
 import { DateTime } from 'luxon';
 import { createLink, createNewAccount } from '#tests/db';
-import { changedRecords } from '#tests/db';
 import { ApiClient } from '@japa/api-client';
-import Link from '#models/link';
 import { test } from '@japa/runner';
 
 const get = (client: ApiClient, id: string) =>
@@ -35,7 +32,7 @@ test.group('GET /:link', () => {
     response.assertHeader('location', link.original);
   });
 
-  test(':link is expired', async ({ assert, client }) => {
+  test(':link is expired', async ({ client }) => {
     let { user, account } = await createNewAccount();
     let link = await createLink(user, account, {
       expiresAt: DateTime.fromJSDate(new Date('2022-02-02')),

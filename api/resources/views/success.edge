@@ -19,11 +19,11 @@
           y: .6
         }
       });
-    
+
       const button = document.querySelector(".short-url-with-copy button.copy-shortUrl");
-    
+
       if ("ClipboardItem" in globalThis) {
-        button.addEventListener("click", () => setClipboard("https://{{ data.attributes.shortUrl }}"));
+        button.addEventListener("click", () => setClipboard("{{ data.attributes.shortUrl }}"));
         async function setClipboard(text) {
           const type = "text/plain";
           const blob = new Blob([ text ], {

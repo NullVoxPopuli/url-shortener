@@ -22,6 +22,9 @@ export default class Account extends BaseModel {
   @column()
   declare admin_id: string;
 
+  @column()
+  declare isFree: boolean;
+
   @belongsTo(() => User, { foreignKey: 'admin_id' })
   declare admin: BelongsTo<typeof User>;
 

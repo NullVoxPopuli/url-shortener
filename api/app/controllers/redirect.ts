@@ -58,10 +58,18 @@ export default class LinksController {
   }
 
   async getBestResult(id: string) {
-    let link = await Link.find(id);
+    let link = await Link.query().preload('ownedBy').where('id', '=', id).first();
 
-    if (link?.expiresAt && link.expiresAt < DateTime.utc()) {
+    if (!link) {
       return;
+    }
+
+    if (link.expiresAt && link.expiresAt < DateTime.utc()) {
+      return;
+    }
+
+    if (link.ownedBy.isFree) {
+      return link;
     }
 
     return link;
