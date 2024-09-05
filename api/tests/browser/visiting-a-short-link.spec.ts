@@ -19,11 +19,6 @@ test.group('vistiing a short link', () => {
     await page.assertTextContains('h1', `could not expand that URL`);
   }).skip(true, 'Account management not implemented');
 
-  test('Link is from a free account', async ({ visit }) => {
-    let page = await visit(`/does-not-exist`);
-    await page.assertUrlContains('boop boop');
-  }).skip(true, 'Free accounts not implemented yet');
-
   test('Link exists twice from different accounts and one is expired', async ({ visit }) => {
     let page = await visit(`/does-not-exist`);
     await page.assertUrlContains('google.com');
