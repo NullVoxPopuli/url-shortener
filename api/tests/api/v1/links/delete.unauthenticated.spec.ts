@@ -21,7 +21,7 @@ test.group('DELETE [unauthenticated]', () => {
 
   test('tries to delete something that does not exist', async ({ client }) => {
     let id = uuidv4();
-    let response = await del(client, `made up ${id}`);
+    let response = await del(client, id);
 
     response.assertStatus(401);
     response.assertBody({
