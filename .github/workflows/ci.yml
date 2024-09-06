@@ -62,6 +62,51 @@ jobs:
       - run: ./config/hosts.sh
       - run: |
           echo "Running Tests Here"
+          set -a
+          source .env.test
+
+          export DB_CONNECTION=postgres
+          # This looks ridiculous lol
+          export DATABASE_URL="postgres://postgres:postgres@127.0.0.1:5432/postgres_db"
+          node ace migration:fresh
+          node ace test functional unit
+        working-directory: api
+        env:
+          PGSSLMODE: disable
+          PORT: 5001
+
+  tests_api_browser:
+    name: Browser Tests
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    needs: [tests_api]
+    # Here we test using postgres, because
+    # that's what production uses.
+    # We use sqlite locally, because postgres
+    # is _very_ invasive on a system.
+    # You could use docker, but docker is also a bit invasive.
+    services:
+      postgres:
+        # name of dockerhub image
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Exposes this port to the host
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
+      - run: ./config/hosts.sh
+      - run: |
+          echo "Running Tests Here"
           # pnpm run rebuild
           pnpm playwright install --with-deps
           set -a
@@ -71,7 +116,7 @@ jobs:
           # This looks ridiculous lol
           export DATABASE_URL="postgres://postgres:postgres@127.0.0.1:5432/postgres_db"
           node ace migration:fresh
-          node ace test
+          node ace test browser
         working-directory: api
         env:
           PGSSLMODE: disable
