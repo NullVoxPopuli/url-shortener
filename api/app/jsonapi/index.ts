@@ -61,6 +61,15 @@ export const jsonapi = {
 
     return 200;
   },
+  unprocessableContent: (reason: string) => {
+    return jsonapi.errors((error) => {
+      error({
+        status: 422,
+        title: 'Unprocessable Content',
+        detail: reason,
+      });
+    });
+  },
   notImplemented: () => {
     return jsonapi.errors((error) => {
       error({

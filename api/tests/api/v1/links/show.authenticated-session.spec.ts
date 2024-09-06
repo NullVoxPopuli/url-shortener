@@ -26,6 +26,23 @@ test.group('SHOW [authenticated session]', () => {
     assertWellFormedLinkData(data);
   });
 
+  test('id is not a valid UUID', async ({ client }) => {
+    let { user } = await createNewAccount();
+    let id = 'not a valid id';
+    let response = await show(user, client, id);
+
+    response.assertStatus(422);
+    response.assertBody({
+      errors: [
+        {
+          status: 422,
+          title: `Unprocessable Content`,
+          detail: `ID received is not a valid UUID`,
+        },
+      ],
+    });
+  });
+
   test('tries to show something that does not exist', async ({ client }) => {
     let { user } = await createNewAccount();
     let id = uuidv4();
