@@ -46,15 +46,36 @@ export async function createNewAccount() {
   return { user, account };
 }
 
-export async function createLink(user: User, account: Account) {
+export async function createLink(
+  user: User,
+  account: Account,
+  urlOrOptions?: string | Partial<InstanceType<typeof Link>>
+) {
   let link = new Link();
-  link.original = faker.internet.url();
+
+  let options =
+    typeof urlOrOptions === 'string'
+      ? { original: urlOrOptions }
+      : urlOrOptions || ({} as Partial<InstanceType<typeof Link>>);
+
+  Object.assign(link, options);
+  link.original =
+    'original' in options && options.original
+      ? options.original
+      : (faker.helpers.arrayElement(nonFreeURLs) ?? faker.internet.url());
   link.owned_by = account.id;
   link.created_by = user.id;
   await link.save();
 
   return link;
 }
+
+const nonFreeURLs = [
+  `https://www.google.com/`,
+  `https://www.google.com/maps`,
+  `https://news.ycombinator.com/`,
+  `https://lite.duckduckgo.com/lite`,
+];
 
 /**
  * Could be useful if we remove bootstrap.ts' withGlobalTransaction

@@ -1,3 +1,5 @@
+import logger from '@adonisjs/core/services/logger';
+
 interface Error {
   status?: number;
   title?: string;
@@ -59,6 +61,15 @@ export const jsonapi = {
 
     return 200;
   },
+  unprocessableContent: (reason: string) => {
+    return jsonapi.errors((error) => {
+      error({
+        status: 422,
+        title: 'Unprocessable Content',
+        detail: reason,
+      });
+    });
+  },
   notImplemented: () => {
     return jsonapi.errors((error) => {
       error({
@@ -95,11 +106,18 @@ export const jsonapi = {
     });
   },
   serverError: (e: { message: string; stack: string }) => {
+    logger.error({ err: e });
+
     return jsonapi.errors((error) => {
       error({
         status: 500,
-        title: e.message,
-        detail: e.stack,
+        /**
+         * Don't provide any details / etc, because we could expose
+         * or more likely, overwhelm the user.
+         *
+         * Users don't care about stacks or cryptic messages.
+         */
+        title: 'Server Error',
       });
     });
   },

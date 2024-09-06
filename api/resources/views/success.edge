@@ -4,18 +4,26 @@
     <span class="congrats">Congratulations, you have a short URL!</span>
     <span class="short-url-with-copy">
       <span class="short-url-content">
-        <a href="https://{{ data.attributes.shortUrl }}" target="_blank">
-          {{ data.attributes.shortUrl }}
+        <a href="{{ data.attributes.shortUrl }}" target="_blank">
+          {{ data.attributes.shortUrl.replace('https://', '') }}
         </a>
       </span>
       <button class="copy-shortUrl">Copy</button>
     </span>
 
     <script>
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: {
+          y: .6
+        }
+      });
+    
       const button = document.querySelector(".short-url-with-copy button.copy-shortUrl");
-      
+    
       if ("ClipboardItem" in globalThis) {
-        button.addEventListener("click", () => setClipboard("https://{{ data.attributes.shortUrl }}"));
+        button.addEventListener("click", () => setClipboard("{{ data.attributes.shortUrl }}"));
         async function setClipboard(text) {
           const type = "text/plain";
           const blob = new Blob([ text ], {

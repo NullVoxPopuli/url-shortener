@@ -15,6 +15,7 @@ export function link(link: Link): DataResponse {
         visits: link.visits,
         createdAt: link.createdAt,
         updatedAt: link.updatedAt,
+        expiresAt: link.expiresAt,
       },
       relationships: {
         ownedBy: { type: 'account', id: link.owned_by },

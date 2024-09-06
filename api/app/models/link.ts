@@ -4,6 +4,7 @@ import Account from './account.js';
 import type { BelongsTo } from '@adonisjs/lucid/types/relations';
 import User from './user.js';
 import { randomUUID } from 'node:crypto';
+import { compressedUUID } from '@nullvoxpopuli/url-compression';
 
 export default class Link extends BaseModel {
   @column({ isPrimary: true })
@@ -20,6 +21,9 @@ export default class Link extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime;
+
+  @column.dateTime()
+  declare expiresAt: DateTime;
 
   @column()
   declare owned_by: string;
@@ -40,7 +44,19 @@ export default class Link extends BaseModel {
     link.id = randomUUID();
   }
 
+  get encodedId() {
+    return compressedUUID.encode(this.id);
+  }
+
   static visibleTo = scope((query, user: User) => {
     query.where('owned_by', user.account_id);
+  });
+
+  static notExpired = scope((query) => {
+    query.whereNull('expiresAt').orWhereNot('expiresAt', '<', DateTime.utc().toSQLDate());
+  });
+
+  static expired = scope((query) => {
+    query.where('expires_at', '<=', DateTime.utc().toSQLDate());
   });
 }

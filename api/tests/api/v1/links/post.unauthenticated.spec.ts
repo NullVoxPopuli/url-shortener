@@ -95,4 +95,33 @@ test.group('POST [unauthenticated]', () => {
 
     relationship(data, 'createdBy');
   });
+
+  test('Success: The same URL shortened twice results in the same short URL', async ({
+    assert,
+    client,
+  }) => {
+    let first;
+    let second;
+    let url = 'https://limber.glimdown.com';
+
+    {
+      let response = await post(client, { originalUrl: url });
+      response.assertStatus(201);
+
+      first = response.body().data;
+    }
+    {
+      let response = await post(client, { originalUrl: url });
+      response.assertStatus(201);
+
+      second = response.body().data;
+    }
+
+    assert.strictEqual(first.shortUrl, second.shortUrl);
+    assert.notStrictEqual(
+      first.id,
+      second.id,
+      `The ids don't need to match, because when looking up the shortURL to find the long URL, it's the same. `
+    );
+  });
 });
