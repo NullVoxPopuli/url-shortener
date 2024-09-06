@@ -55,6 +55,7 @@
     "@swc/core": "^1.7.23",
     "@types/luxon": "^3.4.2",
     "@types/node": "^22.5.1",
+    "@types/uuid": "^10.0.0",
     "better-sqlite3": "^11.2.1",
     "chai": "^5.1.1",
     "concurrently": "^8.2.2",
@@ -64,7 +65,8 @@
     "prettier": "^3.3.3",
     "prettier-edgejs": "^0.2.27",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "uuid": "^10.0.0"
   },
   "dependencies": {
     "@adonisjs/ally": "^5.0.2",

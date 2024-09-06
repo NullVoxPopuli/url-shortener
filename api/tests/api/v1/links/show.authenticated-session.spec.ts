@@ -4,6 +4,7 @@ import { createLink, createNewAccount } from '#tests/db';
 import User from '#models/user';
 import { assertWellFormedLinkData } from '#tests/jsonapi';
 import { API_DOMAIN } from '#start/env';
+import { v4 as uuidv4 } from 'uuid';
 
 const show = (user: User, client: ApiClient, id: string) =>
   client
@@ -27,7 +28,8 @@ test.group('SHOW [authenticated session]', () => {
 
   test('tries to show something that does not exist', async ({ client }) => {
     let { user } = await createNewAccount();
-    let response = await show(user, client, 'made up id');
+    let id = uuidv4();
+    let response = await show(user, client, id);
 
     response.assertStatus(404);
     response.assertBody({
@@ -35,7 +37,7 @@ test.group('SHOW [authenticated session]', () => {
         {
           status: 404,
           title: `Link was not found`,
-          detail: 'Tried to find a Link via made%20up%20id, but could not find anything.',
+          detail: `Tried to find a Link via ${id}, but could not find anything.`,
         },
       ],
     });
