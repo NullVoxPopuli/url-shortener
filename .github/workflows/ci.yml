@@ -63,7 +63,7 @@ jobs:
       - run: |
           echo "Running Tests Here"
           # pnpm run rebuild
-          # pnpm playwright install --with-deps
+          pnpm playwright install --with-deps
           set -a
           source .env.test
 
