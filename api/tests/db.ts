@@ -23,7 +23,10 @@ export async function changedRecords(klass: typeof BaseModel, fn: () => unknown)
   );
 }
 
-export async function createNewAccount() {
+export async function createNewAccount(options?: {
+  account?: Partial<InstanceType<typeof Account>>;
+  user?: Partial<InstanceType<typeof User>>;
+}) {
   let user!: User;
   let account!: Account;
   await db.transaction(async (trx) => {
@@ -35,6 +38,13 @@ export async function createNewAccount() {
 
     user.useTransaction(trx);
     account.useTransaction(trx);
+
+    if (options?.user) {
+      Object.assign(user, options.user);
+    }
+    if (options?.account) {
+      Object.assign(account, options.account);
+    }
 
     await user.related('account').associate(account);
     await account.related('admin').associate(user);

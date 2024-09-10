@@ -60,9 +60,13 @@ test.group('POST [authenticated session]', () => {
     });
   });
 
-  test('Success: a non-glimdown.com URL', async ({ client, assert }) => {
+  test('Success: a non-glimdown.com URL (from a free account)', async ({ client, assert }) => {
     let data: any;
-    let { user } = await createNewAccount();
+    let { user } = await createNewAccount({
+      account: {
+        isFree: true,
+      },
+    });
     await changedRecords(Link, async () => {
       let response = await post(user, client, { originalUrl: 'https://google.com' });
       response.assertStatus(201);
@@ -82,12 +86,16 @@ test.group('POST [authenticated session]', () => {
     relationship(data, 'createdBy');
   });
 
-  test('Success: URLs from non-glimdown.com URL requires authentication', async ({
+  test('Success: URLs from non-glimdown.com URL requires authentication (from a free account)', async ({
     client,
     assert,
   }) => {
     let data: any;
-    let { user, account } = await createNewAccount();
+    let { user, account } = await createNewAccount({
+      account: {
+        isFree: true,
+      },
+    });
 
     await changedRecords(Link, async () => {
       let response = await post(user, client, { originalUrl: 'https://emberjs.com' });

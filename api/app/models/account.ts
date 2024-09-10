@@ -25,6 +25,11 @@ export default class Account extends BaseModel {
   @column()
   declare isFree: boolean;
 
+  get hasActiveSubscription() {
+    console.warn(`Subscription handling is not implemented yet`);
+    return false;
+  }
+
   @belongsTo(() => User, { foreignKey: 'admin_id' })
   declare admin: BelongsTo<typeof User>;
 
