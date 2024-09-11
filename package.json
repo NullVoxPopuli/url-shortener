@@ -34,12 +34,12 @@
     "web-client/node_modules",
     "packages/url-compression/node_modules"
   ],
-  "packageManager": "pnpm@9.9.0",
+  "packageManager": "pnpm@9.10.0",
   "engines": {
     "node": "^22.0.0"
   },
   "volta": {
     "node": "22.6.0",
-    "pnpm": "9.9.0"
+    "pnpm": "9.10.0"
   }
 }
