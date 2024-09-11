@@ -1,3 +1,5 @@
+import { confirm } from 'node-confirm';
+
 /*
 |--------------------------------------------------------------------------
 | Environment variables service
@@ -63,3 +65,10 @@ console.log(`
   DOMAIN: ${env.get('DOMAIN')}
   DB_CONNECTION: ${env.get('DB_CONNECTION')}
 `);
+
+if (!process.env.DEPLOYMENT_PLATFORM) {
+  if (env.get('DATABASE_URL').includes('rds')) {
+    console.log('You are bout to use the production database. Are you sure?');
+    await confirm();
+  }
+}

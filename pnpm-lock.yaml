@@ -50,6 +50,9 @@ importers:
       luxon:
         specifier: ^3.5.0
         version: 3.5.0
+      node-confirm:
+        specifier: ^1.0.2
+        version: 1.0.2
       pg:
         specifier: ^8.12.0
         version: 8.12.0
@@ -6487,6 +6490,9 @@ packages:
     resolution: {integrity: sha512-bLn/fU/ALVBE9wj+p4Y21ZJWYFjUXLXPi/IewyLZkx3ApxKDNBWCKdReeKOtD8dWpOdDCeMyLh6ZewzcLsG2Nw==}
     engines: {node: '>=10'}
 
+  node-confirm@1.0.2:
+    resolution: {integrity: sha512-36OPnRCnafn5Y8a4qnB28X63TrSsXeKnPq/USf7wAfYNPd4MJJlGmNS/trLxvav569OYJtndZ2MTxZ+a6zKPKQ==}
+
   node-int64@0.4.0:
     resolution: {integrity: sha512-O5lz91xSOeoXP6DulyHfllpq+Eg00MWitZIbtPfoSEvqIHdl5gfcY6hYzDWnj0qD5tz52PI08u9qUvSVeUBeHw==}
 
@@ -8704,6 +8710,9 @@ packages:
   yargs@17.7.2:
     resolution: {integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==}
     engines: {node: '>=12'}
+
+  yesno@0.4.0:
+    resolution: {integrity: sha512-tdBxmHvbXPBKYIg81bMCB7bVeDmHkRzk5rVJyYYXurwKkHq/MCd8rz4HSJUP7hW0H2NlXiq8IFiWvYKEHhlotA==}
 
   yn@3.1.1:
     resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}
@@ -16347,6 +16356,10 @@ snapshots:
     dependencies:
       semver: 7.6.3
 
+  node-confirm@1.0.2:
+    dependencies:
+      yesno: 0.4.0
+
   node-int64@0.4.0: {}
 
   node-notifier@10.0.1:
@@ -18762,6 +18775,8 @@ snapshots:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 21.1.1
+
+  yesno@0.4.0: {}
 
   yn@3.1.1: {}
 
