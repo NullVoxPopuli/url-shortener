@@ -44,6 +44,7 @@
     "@typescript-eslint/parser": "^8.1.0",
     "@warp-drive/build-config": "0.0.0-alpha.35",
     "concurrently": "^8.2.2",
+    "decorator-transforms": "^2.1.0",
     "ember-auto-import": "^2.7.3",
     "ember-cli": "~5.11.0",
     "ember-cli-babel": "^8.2.0",
@@ -68,6 +69,14 @@
   },
   "ember": {
     "edition": "octane"
+  },
+  "ember-addon": {
+    "type": "app",
+    "version": 2
+  },
+  "exports": {
+    "./tests/*": "./tests/*",
+    "./*": "./app/*"
   },
   "dependencies": {
     "@ember-data-types/request-utils": "5.4.0-alpha.98",
