@@ -29,6 +29,10 @@ export default class Account extends BaseModel {
     console.warn(`Subscription handling is not implemented yet`);
     return false;
   }
+  get hasCustomDomain() {
+    console.warn(`Custom domain not configured`);
+    return false;
+  }
 
   @belongsTo(() => User, { foreignKey: 'admin_id' })
   declare admin: BelongsTo<typeof User>;
