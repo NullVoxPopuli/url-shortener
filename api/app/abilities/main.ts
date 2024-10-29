@@ -1,5 +1,4 @@
 import User from '#models/user';
-import Account from '#models/account';
 import Link from '#models/link';
 import { Bouncer } from '@adonisjs/bouncer';
 
@@ -55,5 +54,5 @@ export const canConfigureCustomDomain = Bouncer.ability((user: User) => {
 });
 
 export const canUseShortLinks = Bouncer.ability((user: User) => {
-  return canUseCustomDomain(user) && user.account.hasCustomDomain;
+  return canUseCustomDomain.execute(user) && user.account.hasCustomDomain;
 });
