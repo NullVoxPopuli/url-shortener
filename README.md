@@ -1,3 +1,23 @@
+## Usage 
+
+### JavaScript
+
+Using JavaScript, you can make any long URL a short link with this snippet
+
+```js 
+fetch(`https://api.nvp.gg/v1/links`, { 
+  method: 'POST', 
+  headers: { 
+    'Accept': 'application/vnd.api+json',
+    'Content-Type': 'application/json'
+  }, 
+  body: JSON.stringify({ originalUrl: window.location.href } )}
+)
+  .then(req => req.json())
+  .then(console.log)
+```
+Noting that only glimdown.com URLs are free.
+
 ## Development
 
 Add to your `/etc/hosts` file

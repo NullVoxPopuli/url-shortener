@@ -13,11 +13,6 @@ module.exports = async function (defaults) {
   });
 
   return maybeEmbroider(app, {
-    skipBabel: [
-      {
-        package: 'qunit',
-      },
-    ],
     amdCompatibility: {
       es: [
         /**
