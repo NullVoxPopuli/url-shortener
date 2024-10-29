@@ -8,8 +8,8 @@ export default Route(
         <h1>nvp.gg</h1>
         <em>The professional, API-first, user-friendly, URL shortener</em>
 
-        <button>Login with Google</button>
-        <button>Login with GitHub</button>
+        <button type="button">Login with Google</button>
+        <button type="button">Login with GitHub</button>
       </div>
     </Hero>
 
