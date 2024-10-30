@@ -10,7 +10,7 @@
 
 import router from '@adonisjs/core/services/router';
 import server from '@adonisjs/core/services/server';
-import env from './env.ts';
+import env from './env.js';
 
 /**
  * The error handler is used to convert an exception
