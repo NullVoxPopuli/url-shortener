@@ -4,6 +4,7 @@ import { ApiClient } from '@japa/api-client';
 import Link from '#models/link';
 import { test } from '@japa/runner';
 import { API_DOMAIN } from '#start/env';
+import { assert } from 'chai';
 
 const post = (client: ApiClient, body = {}) =>
   client.post(`http://${API_DOMAIN}/v1/links`).json(body);
@@ -94,6 +95,14 @@ test.group('POST [unauthenticated]', () => {
     assertWellFormedLinkData(data);
 
     relationship(data, 'createdBy');
+
+    let id = data.id;
+
+    let link = await Link.query().preload('ownedBy').where('id', '=', id).first();
+
+    assert.ok(link?.owned_by);
+    assert.ok(link?.ownedBy.id);
+    assert.ok(link?.ownedBy.isFree);
   });
 
   test('Success: The same URL shortened twice results in the same short URL', async ({

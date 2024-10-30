@@ -6,6 +6,11 @@ import User from '#models/user';
 
 import { glimdownOwner } from '#consts';
 
+/**
+ * NOTE: Seeders are not idempotent out of the box
+ *      like migrations (sorta)
+ * SEE: https://lucid.adonisjs.com/docs/seeders
+ */
 export default class extends BaseSeeder {
   async run() {
     await db.transaction(async (trx) => {

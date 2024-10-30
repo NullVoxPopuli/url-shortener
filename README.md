@@ -1,8 +1,16 @@
 ## Usage 
 
-### JavaScript
+### cURL
 
-Using JavaScript, you can make any long URL a short link with this snippet
+```bash 
+curl --header 'Content-Type: application/vnd.api+json' \
+     --header 'Accept: application/vnd.api+json' \
+     --data '{ "originalUrl":"https://your.domain.here/sub/path?query" }' \
+     --request POST \
+     https://api.nvp.gg/v1/links
+```
+
+### JavaScript
 
 ```js 
 fetch(`https://api.nvp.gg/v1/links`, { 
