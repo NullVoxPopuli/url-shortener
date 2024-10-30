@@ -13,20 +13,27 @@ import { glimdownOwner } from '#consts';
  */
 export default class extends BaseSeeder {
   async run() {
-    await db.transaction(async (trx) => {
-      await trx.insertQuery().table(Account.table).insert({
-        id: glimdownOwner.id,
-        admin_id: glimdownOwner.id,
-        name: glimdownOwner.name,
-        created_at: DateTime.utc().toSQLDate(),
-      });
+    let existingAccount = await Account.find(glimdownOwner.id);
+    let existingUser = await Account.find(glimdownOwner.id);
 
-      await trx.insertQuery().table(User.table).insert({
-        id: glimdownOwner.id,
-        name: glimdownOwner.name,
-        account_id: glimdownOwner.id,
-        created_at: DateTime.utc().toSQLDate(),
-      });
+    await db.transaction(async (trx) => {
+      if (!existingAccount) {
+        await trx.insertQuery().table(Account.table).insert({
+          id: glimdownOwner.id,
+          admin_id: glimdownOwner.id,
+          name: glimdownOwner.name,
+          created_at: DateTime.utc().toSQLDate(),
+        });
+      }
+
+      if (!existingUser) {
+        await trx.insertQuery().table(User.table).insert({
+          id: glimdownOwner.id,
+          name: glimdownOwner.name,
+          account_id: glimdownOwner.id,
+          created_at: DateTime.utc().toSQLDate(),
+        });
+      }
     });
   }
 }
