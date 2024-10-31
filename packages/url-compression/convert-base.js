@@ -31,28 +31,56 @@
  * @param {string} input
  */
 export function base16To64(input) {
-  return btoa(
-    // @ts-ignore
-    input
-      .match(/\w{2}/g)
-      .map(function (a) {
-        return String.fromCharCode(parseInt(a, 16));
-      })
-      .join(""),
-  )
-    .replaceAll("+", "_")
-    .replaceAll("/", ".")
-    .replaceAll("=", "-");
+  return (
+    btoa(
+      // @ts-ignore
+      input
+        .match(/\w{2}/g)
+        .map(function (a) {
+          return String.fromCharCode(parseInt(a, 16));
+        })
+        .join(""),
+    )
+      .replaceAll("+", "_")
+      .replaceAll("/", ".")
+      // Seems safe...
+      // in Base64, the = indicates that the
+      // input is not a multiple of 3 bytes
+      //
+      // See: https://medium.com/@partha.pratimnayak/understanding-base64-encoding-7764b4ecce3c
+      //   - two equal signs, just to indicate that it had to add two characters of padding.
+      //   - If we have five bytes, we have one equal sign,
+      //   - and if we have six bytes, then there are no equal signs,
+      //     indicating that the input fits neatly into base64 with no need for padding.
+      //     The padding is null.
+      //
+      // Our base16 strings are always going to be 32 characters
+      // which should be 32 bytes. which is one byte shy of % 3 === 0
+      .replaceAll(/==$/g, "")
+  );
 }
+
+const padding = {
+  1: "==",
+  2: "=",
+  0: "",
+};
 
 /**
  * @param {string} base64String
  */
 export function base64To16(base64String) {
+  let neededPadding = base64String.length % 3;
+  // @ts-ignore
+  let chars = padding[neededPadding];
+  let raw64 =
+    base64String
+      .replaceAll(".", "/")
+      .replaceAll("_", "+")
+      .replaceAll("-", "=") + chars;
+
   // Decode base64 to byte array
-  const binaryString = atob(
-    base64String.replaceAll(".", "/").replaceAll("_", "+").replaceAll("-", "="),
-  );
+  const binaryString = atob(raw64);
   const hexString = Array.from(binaryString)
     .map((char) => char.charCodeAt(0).toString(16).padStart(2, "0"))
     .join("");

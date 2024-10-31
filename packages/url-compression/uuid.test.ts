@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { randomUUID } from "node:crypto";
 
 import { compressedUUID } from "./uuid.js";
 
@@ -66,6 +67,26 @@ ed14add2-9fdc-49e4-b434-4ca65278df84
   .filter(Boolean);
 
 describe("compressed UUID", () => {
+  for (let sample of samples) {
+    it(`shrinks ${sample}`, () => {
+      let result = compressedUUID.encode(sample);
+
+      expect(result.length).toBeLessThan(sample.length);
+    });
+
+    it(`to/from of ${sample} is symmetric`, () => {
+      let uriComponent = compressedUUID.encode(sample);
+      let result = compressedUUID.decode(uriComponent);
+
+      expect(result).toBe(sample);
+    });
+  }
+});
+
+describe("Random compressed UUID", () => {
+  let samples = Array(100)
+    .fill(null)
+    .map(() => randomUUID());
   for (let sample of samples) {
     it(`shrinks ${sample}`, () => {
       let result = compressedUUID.encode(sample);
