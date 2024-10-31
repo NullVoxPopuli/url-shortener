@@ -23,19 +23,11 @@
 //`;
 
 /**
- * @param {string} value
- * @param {number} fromBase
- * @param {number} toBase
- */
-export function convertBase(value, fromBase, toBase) {
-  return fromBase === 16 ? base16To64(value) : base64To16(value);
-}
-
-/**
  * @param {string} input
  */
-function base16To64(input) {
+export function base16To64(input) {
   return btoa(
+    // @ts-ignore
     input
       .match(/\w{2}/g)
       .map(function (a) {
@@ -50,7 +42,7 @@ function base16To64(input) {
 /**
  * @param {string} base64String
  */
-function base64To16(base64String) {
+export function base64To16(base64String) {
   // Decode base64 to byte array
   const binaryString = atob(
     base64String.replaceAll(".", "/").replaceAll("_", "+"),

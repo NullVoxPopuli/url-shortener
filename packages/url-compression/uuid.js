@@ -1,4 +1,4 @@
-import { convertBase, MAX_BASE } from './convert-base.js'
+import { base64To16, base16To64 } from "./convert-base.js";
 
 /**
  * The URL allows
@@ -28,32 +28,32 @@ import { convertBase, MAX_BASE } from './convert-base.js'
  *
  */
 
-const HYPHENS = [8, 12 + 1, 16 + 2, 20 + 3]
+const HYPHENS = [8, 12 + 1, 16 + 2, 20 + 3];
 
 export const compressedUUID = {
   /**
    * @param {string} hex
    */
   encode: (hex) => {
-    let noHyphens = hex.replaceAll('-', '').toLowerCase()
+    let noHyphens = hex.replaceAll("-", "").toLowerCase();
 
-    return convertBase(noHyphens, 16, MAX_BASE)
+    return base16To64(noHyphens);
   },
   /**
    * @param {string} str
    */
   decode: (str) => {
-    let noHyphens = convertBase(str, MAX_BASE, 16)
+    let noHyphens = base64To16(str);
 
-    let result = noHyphens
+    let result = noHyphens;
 
     for (let i of HYPHENS) {
-      result = insert(result, i, '-')
+      result = insert(result, i, "-");
     }
 
-    return result
+    return result;
   },
-}
+};
 
 /**
  * @param {string} str
@@ -61,5 +61,5 @@ export const compressedUUID = {
  * @param {string} value
  */
 function insert(str, index, value) {
-  return str.substr(0, index) + value + str.substr(index)
+  return str.substr(0, index) + value + str.substr(index);
 }
