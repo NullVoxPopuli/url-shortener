@@ -6,6 +6,11 @@
  *    - Changed default alphabet
  *    - No Negative number support
  *
+ * Base64 replacements:
+ *  + => _ because + means space
+ *  / => . because / means subpath
+ *  = => - because = means key = value
+ *
  */
 // const letters = "abcdefghijklmnopqrstuvwxyz"; // * 2 = 52
 // const digits = "0123456789"; // 52 + 10 = 62
@@ -36,7 +41,8 @@ export function base16To64(input) {
       .join(""),
   )
     .replaceAll("+", "_")
-    .replaceAll("/", ".");
+    .replaceAll("/", ".")
+    .replaceAll("=", "-");
 }
 
 /**
@@ -45,7 +51,7 @@ export function base16To64(input) {
 export function base64To16(base64String) {
   // Decode base64 to byte array
   const binaryString = atob(
-    base64String.replaceAll(".", "/").replaceAll("_", "+"),
+    base64String.replaceAll(".", "/").replaceAll("_", "+").replaceAll("-", "="),
   );
   const hexString = Array.from(binaryString)
     .map((char) => char.charCodeAt(0).toString(16).padStart(2, "0"))
