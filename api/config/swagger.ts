@@ -1,4 +1,5 @@
 // for AdonisJS v6
+import { DOMAIN } from '#start/env';
 import path from 'node:path';
 import url from 'node:url';
 
@@ -11,19 +12,20 @@ export default {
     version: '1.0.0',
     description: 'Documentation for the { json:api } API for using nvp.gg',
   },
-  snakeCase: true,
+  snakeCase: false,
 
   debug: false, // set to true, to get some useful debug output
   ignore: ['/_/', '/'],
   // if PUT/PATCH are provided for the same route, prefer PUT
   // But we want to be explicit
   preferredPutPatch: 'PATCH',
+  fileNameInSummary: false,
   common: {
     parameters: {}, // OpenAPI conform parameters that are commonly used
     headers: {}, // OpenAPI conform headers that are commonly used
   },
   securitySchemes: {}, // optional
-  authMiddlewares: ['auth', 'auth:api'], // optional
+  authMiddlewares: ['auth:api'], // optional
   defaultSecurityScheme: 'BearerAuth', // optional
   // persist authorization between reloads on the swagger page
   persistAuthorization: true,

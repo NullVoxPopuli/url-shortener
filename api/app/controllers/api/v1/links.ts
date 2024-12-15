@@ -8,12 +8,16 @@ import { listLinks } from './actions/list.js';
 export default class LinksController {
   /**
    * @create
-   * @description creates a link
+   * @description create a link
    */
   async create(context: HttpContext) {
     return action(context, createLink);
   }
 
+  /**
+   * @delete
+   * @description delete a link
+   */
   async delete(context: HttpContext) {
     await context.auth.authenticate();
 
@@ -22,7 +26,7 @@ export default class LinksController {
 
   /**
    * @show
-   * @description shows the details of a link
+   * @description show a link
    */
   async show(context: HttpContext) {
     await context.auth.authenticate();
@@ -33,7 +37,7 @@ export default class LinksController {
   /**
    * @index
    * @operationId getLinks
-   * @description list all your links
+   * @description list links
    */
   async index(context: HttpContext) {
     await context.auth.authenticate();

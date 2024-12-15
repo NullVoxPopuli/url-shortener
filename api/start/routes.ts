@@ -34,16 +34,15 @@ router
 
 router
   .group(async () => {
-    // const { default: swagger } = await import('#config/swagger');
-    // const { default: AutoSwagger } = await import('adonis-autoswagger');
-
     router.get('/swagger', async () => {
-      return AutoSwagger.default.docs(router.toJSON(), swagger);
+      let routes = router.toJSON()[`api.${DOMAIN}`];
+
+      return AutoSwagger.default.docs({ root: routes }, swagger);
     });
 
-    router.get('/', () => {
-      return AutoSwagger.default.ui('/swagger', swagger);
-    });
+    router.get('/privacy', ({ view }) => view.render('docs/privacy'));
+    router.get('/terms', ({ view }) => view.render('docs/terms'));
+    router.get('/', ({ view }) => view.render('docs/scalar-ui', { DOMAIN }));
   })
   .domain(`docs.${DOMAIN}`);
 
