@@ -7,9 +7,9 @@
   "scripts": {
     "rebuild": "./rebuild.sh",
     "start": "node bin/server.js",
-    "build": "pnpm build:docs && pnpm build:server",
+    "build": "pnpm build:docs && pnpm build:server && cp ./swagger.yml build/",
     "build:docs": "node ace docs:generate",
-    "build:server": "node ace build --ignore-ts-errors --production",
+    "build:server": "node ace build --ignore-ts-errors",
     "ace": "NODE_OPTIONS='--no-deprecation' node ace ",
     "dev": "NODE_OPTIONS='--no-deprecation' node ace serve --hmr",
     "dev:offline": "NODE_ENV=development DB_CONNECTION=sqlite3 NODE_OPTIONS='--no-deprecation' node ace serve --hmr",
