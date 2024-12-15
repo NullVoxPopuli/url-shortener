@@ -220,8 +220,8 @@ importers:
         specifier: ^8.2.3
         version: 8.2.3(ember-source@6.0.1(@glimmer/component@2.0.0)(@glint/template@1.4.1-unstable.34c4510)(rsvp@4.8.5)(webpack@5.97.1))
       ember-primitives:
-        specifier: ^0.27.1
-        version: 0.27.1(n4ykqiruu74sao2grqf2lwtayy)
+        specifier: ^0.27.2
+        version: 0.27.2(n4ykqiruu74sao2grqf2lwtayy)
       ember-resolver:
         specifier: ^13.1.0
         version: 13.1.0(ember-source@6.0.1(@glimmer/component@2.0.0)(@glint/template@1.4.1-unstable.34c4510)(rsvp@4.8.5)(webpack@5.97.1))
@@ -2804,10 +2804,6 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@nolyfill/hasown@1.0.29':
-    resolution: {integrity: sha512-9h/nxZqmCy26r9VXGUz+Q77vq3eINXOYgE4st3dj6DoE7tulfJueCLw5d4hfDy3S8mKg4cFXaP+KxYQ+txvMzw==}
-    engines: {node: '>=12.4.0'}
-
   '@paralleldrive/cuid2@2.2.2':
     resolution: {integrity: sha512-ZOBkgDwEdoYVlSeRbYYXs0S9MejQofiVYoTbKzy/6GQa39/q5tQU2IX46+shYnUkpEl3wc+J6wRlar7r2EK2xA==}
 
@@ -5229,14 +5225,14 @@ packages:
     peerDependencies:
       ember-source: '>= 3.28.0'
 
-  ember-primitives@0.27.1:
-    resolution: {integrity: sha512-u2zBuCY2uMdZ7QCzP8FPnNMT+0sYsw/6OftBULlEQVHWN874Xg/PxKKea/wacnqMh6gQb+ljn1m2zRQaoYT9Jg==}
+  ember-primitives@0.27.2:
+    resolution: {integrity: sha512-pyhwxo9ODl3Y5cIhOYCWIS+qNt7XACg8o3mwWq0AcLA0odNfB0lpcm37U4xHTCz9GZ8rpU0/AP9zjSLyqZKtSA==}
     peerDependencies:
       '@ember/test-helpers': '>= 3.2.0'
       '@ember/test-waiters': '>= 3.0.2'
       '@glimmer/component': '>= 1.1.2'
       '@glimmer/tracking': '>= 1.1.2'
-      '@glint/template': ^1.5.0
+      '@glint/template': '>= 1.3.0'
       ember-modifier: '>= 4.1.0'
       ember-resources: '>= 6.1.0'
       ember-source: '>= 4.12.0'
@@ -12850,8 +12846,6 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  '@nolyfill/hasown@1.0.29': {}
-
   '@paralleldrive/cuid2@2.2.2':
     dependencies:
       '@noble/hashes': 1.6.1
@@ -15698,7 +15692,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  ember-primitives@0.27.1(n4ykqiruu74sao2grqf2lwtayy):
+  ember-primitives@0.27.2(n4ykqiruu74sao2grqf2lwtayy):
     dependencies:
       '@babel/runtime': 7.26.0
       '@ember/test-waiters': 4.0.0(@glint/template@1.4.1-unstable.34c4510)
@@ -17390,7 +17384,7 @@ snapshots:
 
   is-accessor-descriptor@1.0.1:
     dependencies:
-      hasown: '@nolyfill/hasown@1.0.29'
+      hasown: 2.0.2
 
   is-alphabetical@1.0.4: {}
 
@@ -17439,7 +17433,7 @@ snapshots:
 
   is-data-descriptor@1.0.1:
     dependencies:
-      hasown: '@nolyfill/hasown@1.0.29'
+      hasown: 2.0.2
 
   is-data-view@1.0.1:
     dependencies:
