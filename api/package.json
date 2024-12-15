@@ -7,7 +7,9 @@
   "scripts": {
     "rebuild": "./rebuild.sh",
     "start": "node bin/server.js",
-    "build": "node ace build --ignore-ts-errors",
+    "build": "pnpm build:docs && pnpm build:server",
+    "build:docs": "node ace docs:generate",
+    "build:server": "node ace build --ignore-ts-errors --production",
     "ace": "NODE_OPTIONS='--no-deprecation' node ace ",
     "dev": "NODE_OPTIONS='--no-deprecation' node ace serve --hmr",
     "dev:offline": "NODE_ENV=development DB_CONNECTION=sqlite3 NODE_OPTIONS='--no-deprecation' node ace serve --hmr",
@@ -81,6 +83,7 @@
     "@adonisjs/static": "^1.1.1",
     "@nullvoxpopuli/url-compression": "workspace:^",
     "@vinejs/vine": "^3.0.0",
+    "adonis-autoswagger": "^3.64.0",
     "edge.js": "^6.2.0",
     "find-up": "^7.0.0",
     "luxon": "^3.5.0",

@@ -6,6 +6,10 @@ import { showLink } from './actions/show.js';
 import { listLinks } from './actions/list.js';
 
 export default class LinksController {
+  /**
+   * @create
+   * @description creates a link
+   */
   async create(context: HttpContext) {
     return action(context, createLink);
   }
@@ -16,12 +20,21 @@ export default class LinksController {
     return action(context, deleteLink);
   }
 
+  /**
+   * @show
+   * @description shows the details of a link
+   */
   async show(context: HttpContext) {
     await context.auth.authenticate();
 
     return action(context, showLink);
   }
 
+  /**
+   * @index
+   * @operationId getLinks
+   * @description list all your links
+   */
   async index(context: HttpContext) {
     await context.auth.authenticate();
 

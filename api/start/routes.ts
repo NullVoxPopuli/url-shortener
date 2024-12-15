@@ -8,6 +8,8 @@
 */
 import { DOMAIN } from '#start/env';
 import router from '@adonisjs/core/services/router';
+import AutoSwagger from 'adonis-autoswagger';
+import swagger from '#config/swagger';
 
 function version(name: string, callback: () => unknown) {
   return router.group(() => callback()).prefix(`/${name}`);
@@ -31,8 +33,17 @@ router
   .domain(`api.${DOMAIN}`);
 
 router
-  .group(() => {
-    // TODO: docs subdomain for generated API documentation
+  .group(async () => {
+    // const { default: swagger } = await import('#config/swagger');
+    // const { default: AutoSwagger } = await import('adonis-autoswagger');
+
+    router.get('/swagger', async () => {
+      return AutoSwagger.default.docs(router.toJSON(), swagger);
+    });
+
+    router.get('/', () => {
+      return AutoSwagger.default.ui('/swagger', swagger);
+    });
   })
   .domain(`docs.${DOMAIN}`);
 
