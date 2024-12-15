@@ -1,0 +1,16 @@
+diff --git a/dist/autoswagger.js b/dist/autoswagger.js
+index e2d9b047ba5ce2022ab696b45915abe6308c01ce..5338ffe3ae2fa02423bc53b095309e001a629b6f 100644
+--- a/dist/autoswagger.js
++++ b/dist/autoswagger.js
+@@ -407,10 +407,9 @@ class AutoSwagger {
+                             break;
+                     }
+                 }
+-                const sf = sourceFile.split("/").at(-1).replace(".ts", "");
+                 let m = {
+                     summary: `${summary}${action !== "" ? ` (${action})` : "route"}`,
+-                    description: description + "\n\n _" + sourceFile + "_ - **" + action + "**",
++                    description: description + "\n\n **" + action + "**",
+                     operationId: operationId,
+                     parameters: parameters,
+                     tags: tags,

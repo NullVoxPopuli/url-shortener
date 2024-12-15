@@ -22,8 +22,8 @@
     "dev": "cd api && node ace serve --hmr"
   },
   "devDependencies": {
-    "typescript": "^5.7.2",
-    "@glint/core": "unstable"
+    "@glint/core": "unstable",
+    "typescript": "^5.7.2"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -31,10 +31,16 @@
       "node-gyp"
     ],
     "peerDependencyRules": {
-      "allowAny": ["prettier", "@ember-data/*"]
+      "allowAny": [
+        "prettier",
+        "@ember-data/*"
+      ]
     },
     "overrides": {
       "prettier": "github:jurgenwerk/prettier#glimmer-embed-style-wip"
+    },
+    "patchedDependencies": {
+      "adonis-autoswagger": "patches/adonis-autoswagger.patch"
     }
   },
   "cacheDirectories": [

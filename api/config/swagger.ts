@@ -1,5 +1,4 @@
 // for AdonisJS v6
-import { DOMAIN } from '#start/env';
 import path from 'node:path';
 import url from 'node:url';
 

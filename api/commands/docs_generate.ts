@@ -17,4 +17,3 @@ export default class DocsGenerate extends BaseCommand {
     await AutoSwagger.default.writeFile(Router.toJSON(), swagger);
   }
 }
-
