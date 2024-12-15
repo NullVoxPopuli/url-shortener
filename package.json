@@ -20,13 +20,17 @@
     "dev": "cd api && node ace serve --hmr"
   },
   "devDependencies": {
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "@glint/core": "unstable"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "better-sqlite3",
       "node-gyp"
-    ]
+    ],
+    "overrides": {
+      "prettier": "github:jurgenwerk/prettier#glimmer-embed-style-wip"
+    }
   },
   "cacheDirectories": [
     "node_modules",
