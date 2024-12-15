@@ -12,6 +12,7 @@
     "start:web": "pnpm --filter 'web-client' start",
     "build": "pnpm --filter 'api' build",
     "rebuild": "echo 'rebuilding packages with binaries'n'such'; pnpm --filter '*' rebuild",
+    "lint": "pnpm --filter '*' lint",
     "lint:fix": "pnpm lint:eslint && pnpm lint:prettier",
     "lint:eslint": "pnpm --filter '*' lint --fix ",
     "lint:prettier": "pnpm --filter '*' format",
@@ -28,6 +29,9 @@
       "better-sqlite3",
       "node-gyp"
     ],
+    "peerDependencyRules": {
+      "allowAny": ["prettier", "@ember-data/*"]
+    },
     "overrides": {
       "prettier": "github:jurgenwerk/prettier#glimmer-embed-style-wip"
     }
