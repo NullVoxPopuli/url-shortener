@@ -22,7 +22,7 @@ export default class Account extends BaseModel {
   @column()
   declare admin_id: string;
 
-  @column()
+  @column({ columnName: 'is_free' })
   declare isFree: boolean;
 
   get hasActiveSubscription() {

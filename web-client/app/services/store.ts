@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
 export { default } from '@ember-data/store';
 import { setBuildURLConfig } from '@ember-data/request-utils';
 

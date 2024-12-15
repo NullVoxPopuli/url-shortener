@@ -23,6 +23,7 @@ export default class extends BaseSeeder {
           admin_id: glimdownOwner.id,
           name: glimdownOwner.name,
           created_at: DateTime.utc().toSQLDate(),
+          is_free: true,
         });
       }
 

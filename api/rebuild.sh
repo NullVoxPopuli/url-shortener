@@ -4,3 +4,4 @@ pnpm concurrently \
   "pnpm exec playwright install" \
   --names "node-gyp,better-sqlite3,playwright" \
   --prefix-colors "auto"
+

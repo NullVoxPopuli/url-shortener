@@ -7,11 +7,13 @@
   "author": "NullVoxPopuli",
   "license": "GPL-3.0",
   "scripts": {
+    "prepare": "pnpm --filter '*' run rebuild",
     "start": "concurrently 'pnpm:start:api' 'pnpm:start:web'",
     "start:api": "pnpm --filter 'api' dev",
     "start:web": "pnpm --filter 'web-client' start",
     "build": "pnpm --filter 'api' build",
     "rebuild": "echo 'rebuilding packages with binaries'n'such'; pnpm --filter '*' rebuild",
+    "lint": "pnpm --filter '*' lint",
     "lint:fix": "pnpm lint:eslint && pnpm lint:prettier",
     "lint:eslint": "pnpm --filter '*' lint --fix ",
     "lint:prettier": "pnpm --filter '*' format",
@@ -20,13 +22,20 @@
     "dev": "cd api && node ace serve --hmr"
   },
   "devDependencies": {
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.2",
+    "@glint/core": "unstable"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "better-sqlite3",
       "node-gyp"
-    ]
+    ],
+    "peerDependencyRules": {
+      "allowAny": ["prettier", "@ember-data/*"]
+    },
+    "overrides": {
+      "prettier": "github:jurgenwerk/prettier#glimmer-embed-style-wip"
+    }
   },
   "cacheDirectories": [
     "node_modules",

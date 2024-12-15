@@ -33,7 +33,7 @@ export async function createNewAccount(options?: {
     user = new User();
     account = new Account();
 
-    user.name = faker.internet.userName();
+    user.name = faker.internet.username();
     account.name = faker.company.name();
 
     user.useTransaction(trx);
