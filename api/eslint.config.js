@@ -1,3 +1,4 @@
+// @ts-expect-error
 import { configApp } from '@adonisjs/eslint-config';
 const base = configApp();
 
