@@ -9,8 +9,9 @@ export default class LinksController {
   /**
    * @create
    * @summary create a link
-   * @description create a link
+   * @description Sending a POST to this action will create a Link record, which will can then be used to generate a short URL.
    * @operationId null
+   * @responseHeader 201 - Content-Type - application/vnd+api.json
    */
   async create(context: HttpContext) {
     return action(context, createLink);
