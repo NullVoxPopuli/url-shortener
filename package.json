@@ -40,7 +40,6 @@
       "prettier": "github:jurgenwerk/prettier#glimmer-embed-style-wip"
     },
     "patchedDependencies": {
-      "adonis-autoswagger": "patches/adonis-autoswagger.patch"
     }
   },
   "cacheDirectories": [

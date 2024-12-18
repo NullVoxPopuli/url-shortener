@@ -7,8 +7,8 @@
   "scripts": {
     "rebuild": "./rebuild.sh",
     "start": "node bin/server.js",
-    "build": "pnpm build:docs && pnpm build:server && cp ./swagger.yml build/",
-    "build:docs": "node ace docs:generate",
+    "build": "pnpm build:swagger && pnpm build:server",
+    "build:swagger": "node ace swagger:generate",
     "build:server": "node ace build --ignore-ts-errors",
     "ace": "NODE_OPTIONS='--no-deprecation' node ace ",
     "dev": "NODE_OPTIONS='--no-deprecation' node ace serve --hmr",
@@ -27,6 +27,7 @@
     "#consts": "./app/consts.js",
     "#jsonapi": "./app/jsonapi/index.js",
     "#jsonapi/*": "./app/jsonapi/*.js",
+    "#openapi": "./app/openapi.js",
     "#controllers/*": "./app/controllers/*.js",
     "#exceptions/*": "./app/exceptions/*.js",
     "#models/*": "./app/models/*.js",
@@ -65,6 +66,7 @@
     "concurrently": "^9.1.0",
     "eslint": "^9.17.0",
     "hot-hook": "^0.4.0",
+    "openapi3-ts": "^4.4.0",
     "playwright": "^1.49.1",
     "prettier": "github:jurgenwerk/prettier#glimmer-embed-style-wip",
     "prettier-edgejs": "^0.2.34",
@@ -83,7 +85,6 @@
     "@adonisjs/static": "^1.1.1",
     "@nullvoxpopuli/url-compression": "workspace:^",
     "@vinejs/vine": "^3.0.0",
-    "adonis-autoswagger": "^3.64.0",
     "edge.js": "^6.2.0",
     "find-up": "^7.0.0",
     "luxon": "^3.5.0",
@@ -91,6 +92,7 @@
     "pg": "^8.13.1",
     "pino-pretty": "^13.0.0",
     "reflect-metadata": "^0.2.2",
+    "ts-deepmerge": "^7.0.2",
     "ts-japi": "^1.11.4"
   },
   "hotHook": {

@@ -1,0 +1,223 @@
+openapi: "3.0.0"
+info:
+  title: "nvp.gg API Documentation"
+  version: "1.0.0"
+  description: "Documentation for the { json:api } API for using nvp.gg"
+components:
+  responses:
+    Forbidden:
+      description: "Access token is missing or invalid"
+    Accepted:
+      description: "The request was accepted"
+    Created:
+      description: "The resource has been created"
+    NotFound:
+      description: "The resource has been created"
+    NotAcceptable:
+      description: "The resource has been created"
+  securitySchemes:
+    BearerAuth:
+      type: "http"
+      scheme: "bearer"
+    BasicAuth:
+      type: "http"
+      scheme: "basic"
+    ApiKeyAuth:
+      type: "apiKey"
+      in: "header"
+      name: "X-API-Key"
+  schemas:
+    Any:
+      description: "Any JSON object not defined as schema"
+    Account:
+      type: "object"
+      required: []
+      properties:
+        id:
+          type: "string"
+          example: "Lorem Ipsum"
+        name:
+          type: "string"
+          example: "John Doe"
+        createdAt:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        admin_id:
+          type: "string"
+          example: "Lorem Ipsum"
+        isFree:
+          type: "boolean"
+          example: true
+        admin:
+          $ref: "#/components/schemas/User"
+          example: null
+        users:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/User"
+            example: null
+      description: "Account (Model)"
+    CustomLink:
+      type: "object"
+      required: []
+      properties:
+        id:
+          type: "number"
+          example: 598
+        name:
+          type: "string"
+          example: "John Doe"
+        createdAt:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        link:
+          $ref: "#/components/schemas/Link"
+          example: null
+      description: "CustomLink (Model)"
+    Link:
+      type: "object"
+      required: []
+      properties:
+        id:
+          type: "string"
+          example: "Lorem Ipsum"
+        original:
+          type: "string"
+          example: "Lorem Ipsum"
+        visits:
+          type: "number"
+          example: 933
+        createdAt:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        expiresAt:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        owned_by:
+          type: "string"
+          example: "Lorem Ipsum"
+        ownedBy:
+          $ref: "#/components/schemas/Account"
+          example: null
+        created_by:
+          type: "string"
+          example: "Lorem Ipsum"
+        createdBy:
+          $ref: "#/components/schemas/User"
+          example: null
+      description: "Link (Model)"
+    User:
+      type: "object"
+      required: []
+      properties:
+        id:
+          type: "string"
+          example: "Lorem Ipsum"
+        name:
+          type: "string"
+          example: "John Doe"
+        createdAt:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        account_id:
+          type: "string"
+          example: "Lorem Ipsum"
+        account:
+          $ref: "#/components/schemas/Account"
+          example: null
+        links:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Link"
+            example: null
+        oauth_github_id:
+          type: "string"
+          example: "Lorem Ipsum"
+        oauth_github_token:
+          type: "string"
+          example: "Lorem Ipsum"
+      description: "User (Model)"
+    PaginationMeta:
+      type: "object"
+      properties:
+        total:
+          type: "number"
+          example: 100
+          nullable: false
+        page:
+          type: "number"
+          example: 2
+          nullable: false
+        perPage:
+          type: "number"
+          example: 10
+          nullable: false
+        currentPage:
+          type: "number"
+          example: 3
+          nullable: false
+        lastPage:
+          type: "number"
+          example: 10
+          nullable: false
+        firstPage:
+          type: "number"
+          example: 1
+          nullable: false
+        lastPageUrl:
+          type: "string"
+          example: "/?page=10"
+          nullable: false
+        firstPageUrl:
+          type: "string"
+          example: "/?page=1"
+          nullable: false
+        nextPageUrl:
+          type: "string"
+          example: "/?page=6"
+          nullable: false
+        previousPageUrl:
+          type: "string"
+          example: "/?page=5"
+          nullable: false
+paths:
+  /{id}:
+    get:
+      summary: " (findLink)"
+      description: "\n\n **findLink**"
+      parameters:
+        - in: "path"
+          name: "id"
+          schema:
+            type: "string"
+          required: true
+      tags:
+        - ""
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json: {}
+      security: []
+tags: []

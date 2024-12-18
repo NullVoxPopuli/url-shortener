@@ -8,8 +8,6 @@
 */
 import { DOMAIN } from '#start/env';
 import router from '@adonisjs/core/services/router';
-import AutoSwagger from 'adonis-autoswagger';
-import swagger from '#config/swagger';
 
 function version(name: string, callback: () => unknown) {
   return router.group(() => callback()).prefix(`/${name}`);
@@ -34,10 +32,8 @@ router
 
 router
   .group(async () => {
-    router.get('/swagger', async () => {
-      let routes = router.toJSON()[`api.${DOMAIN}`];
-
-      return AutoSwagger.default.docs({ root: routes }, swagger);
+    router.get('/swagger', ({ response }) => {
+      return response.redirect('/swagger.json');
     });
 
     router.get('/privacy', ({ view }) => view.render('docs/privacy'));

@@ -2,8 +2,6 @@
 node_modules
 build
 tmp
-swagger.json
-swagger.yml
 
 # Secrets
 .env
