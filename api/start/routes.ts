@@ -31,8 +31,14 @@ router
   .domain(`api.${DOMAIN}`);
 
 router
-  .group(() => {
-    // TODO: docs subdomain for generated API documentation
+  .group(async () => {
+    router.get('/swagger', ({ response }) => {
+      return response.redirect('/swagger.json');
+    });
+
+    router.get('/privacy', ({ view }) => view.render('docs/privacy'));
+    router.get('/terms', ({ view }) => view.render('docs/terms'));
+    router.get('/', ({ view }) => view.render('docs/scalar-ui', { DOMAIN }));
   })
   .domain(`docs.${DOMAIN}`);
 

@@ -18,6 +18,8 @@ export interface DataResponse {
   included?: unknown[];
 }
 
+export const mediaType = 'application/vnd.api+json';
+
 export type Response = ErrorResponse | DataResponse;
 
 /**

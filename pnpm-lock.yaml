@@ -71,6 +71,9 @@ importers:
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
+      ts-deepmerge:
+        specifier: ^7.0.2
+        version: 7.0.2
       ts-japi:
         specifier: ^1.11.4
         version: 1.11.4
@@ -132,6 +135,9 @@ importers:
       hot-hook:
         specifier: ^0.4.0
         version: 0.4.0
+      openapi3-ts:
+        specifier: ^4.4.0
+        version: 4.4.0
       playwright:
         specifier: ^1.49.1
         version: 1.49.1
@@ -270,7 +276,7 @@ importers:
         version: 4.0.1-unstable.c51ca2b(@embroider/compat@3.6.2-unstable.c51ca2b(@embroider/core@3.4.16-unstable.c51ca2b(@glint/template@1.4.1-unstable.34c4510))(@glint/template@1.4.1-unstable.34c4510))(@embroider/core@3.4.16-unstable.c51ca2b(@glint/template@1.4.1-unstable.34c4510))
       '@embroider/vite':
         specifier: 0.2.1-unstable.c51ca2b
-        version: 0.2.1-unstable.c51ca2b(@embroider/core@3.4.16-unstable.c51ca2b(@glint/template@1.4.1-unstable.34c4510))(@glint/template@1.4.1-unstable.34c4510)(rollup@4.28.1)(vite@6.0.3(@types/node@22.10.2)(terser@5.37.0))
+        version: 0.2.1-unstable.c51ca2b(@embroider/core@3.4.16-unstable.c51ca2b(@glint/template@1.4.1-unstable.34c4510))(@glint/template@1.4.1-unstable.34c4510)(rollup@4.28.1)(vite@6.0.3(@types/node@22.10.2)(terser@5.37.0)(yaml@2.6.1))
       '@eslint/js':
         specifier: ^9.17.0
         version: 9.17.0
@@ -369,7 +375,7 @@ importers:
         version: 8.18.0(eslint@9.17.0)(typescript@5.7.2)
       vite:
         specifier: ^6.0.3
-        version: 6.0.3(@types/node@22.10.2)(terser@5.37.0)
+        version: 6.0.3(@types/node@22.10.2)(terser@5.37.0)(yaml@2.6.1)
       webpack:
         specifier: ^5.97.1
         version: 5.97.1
@@ -7520,6 +7526,9 @@ packages:
   openapi-types@12.1.3:
     resolution: {integrity: sha512-N4YtSYJqghVu4iek2ZUvcN/0aqH1kRDuNqzcycDxhOUpg7GdvLa2F3DgS6yBNhInhv2r/6I0Flkn7CqL8+nIcw==}
 
+  openapi3-ts@4.4.0:
+    resolution: {integrity: sha512-9asTNB9IkKEzWMcHmVZE7Ts3kC9G7AFHfs8i7caD8HbI76gEjdkId4z/AkP83xdZsH7PLAnnbl47qZkXuxpArw==}
+
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
@@ -9137,6 +9146,10 @@ packages:
     peerDependencies:
       typescript: '>=4.2.0'
 
+  ts-deepmerge@7.0.2:
+    resolution: {integrity: sha512-akcpDTPuez4xzULo5NwuoKwYRtjQJ9eoNfBACiBMaXwNAx7B1PKfe5wqUFJuW5uKzQ68YjDFwPaWHDG1KnFGsA==}
+    engines: {node: '>=14.13.1'}
+
   ts-japi@1.11.4:
     resolution: {integrity: sha512-Nh49KRuDUxnUYbaFLZhhjj2Hbqlw/xYcp/Kp5ct8ZWWW3al9PdZEVbljABzPvlOtjoz1rfi5hzCPol3WUJ8bmA==}
     engines: {node: '>=10'}
@@ -9811,6 +9824,11 @@ packages:
   yaml@1.10.2:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
+
+  yaml@2.6.1:
+    resolution: {integrity: sha512-7r0XPzioN/Q9kXBro/XPnA6kznR73DHq+GXh5ON7ZozRO6aMjbmiBuKste2wslTFkC5d1dw0GooOCepZXJ2SAg==}
+    engines: {node: '>= 14'}
+    hasBin: true
 
   yargs-parser@21.1.1:
     resolution: {integrity: sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==}
@@ -12143,7 +12161,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@embroider/vite@0.2.1-unstable.c51ca2b(@embroider/core@3.4.16-unstable.c51ca2b(@glint/template@1.4.1-unstable.34c4510))(@glint/template@1.4.1-unstable.34c4510)(rollup@4.28.1)(vite@6.0.3(@types/node@22.10.2)(terser@5.37.0))':
+  '@embroider/vite@0.2.1-unstable.c51ca2b(@embroider/core@3.4.16-unstable.c51ca2b(@glint/template@1.4.1-unstable.34c4510))(@glint/template@1.4.1-unstable.34c4510)(rollup@4.28.1)(vite@6.0.3(@types/node@22.10.2)(terser@5.37.0)(yaml@2.6.1))':
     dependencies:
       '@babel/core': 7.26.0
       '@embroider/core': 3.4.16-unstable.c51ca2b(@glint/template@1.4.1-unstable.34c4510)
@@ -12160,7 +12178,7 @@ snapshots:
       send: 0.18.0
       source-map-url: 0.4.1
       terser: 5.36.0
-      vite: 6.0.3(@types/node@22.10.2)(terser@5.37.0)
+      vite: 6.0.3(@types/node@22.10.2)(terser@5.37.0)(yaml@2.6.1)
     transitivePeerDependencies:
       - '@glint/template'
       - bufferutil
@@ -18414,6 +18432,10 @@ snapshots:
 
   openapi-types@12.1.3: {}
 
+  openapi3-ts@4.4.0:
+    dependencies:
+      yaml: 2.6.1
+
   optionator@0.9.4:
     dependencies:
       deep-is: 0.1.4
@@ -20343,6 +20365,8 @@ snapshots:
     dependencies:
       typescript: 5.7.2
 
+  ts-deepmerge@7.0.2: {}
+
   ts-japi@1.11.4: {}
 
   ts-morph@23.0.0:
@@ -20684,7 +20708,7 @@ snapshots:
       fsevents: 2.3.3
       terser: 5.37.0
 
-  vite@6.0.3(@types/node@22.10.2)(terser@5.37.0):
+  vite@6.0.3(@types/node@22.10.2)(terser@5.37.0)(yaml@2.6.1):
     dependencies:
       esbuild: 0.24.0
       postcss: 8.4.49
@@ -20693,6 +20717,7 @@ snapshots:
       '@types/node': 22.10.2
       fsevents: 2.3.3
       terser: 5.37.0
+      yaml: 2.6.1
 
   vitest@2.1.8(@types/node@22.10.2)(jsdom@25.0.1)(terser@5.37.0):
     dependencies:
@@ -21010,6 +21035,8 @@ snapshots:
       yaml: 1.10.2
 
   yaml@1.10.2: {}
+
+  yaml@2.6.1: {}
 
   yargs-parser@21.1.1: {}
 

@@ -6,6 +6,8 @@ import CustomLink from '#models/custom_link';
 
 export default class LinksController {
   /**
+   * @no-swagger
+   *
    * TODO: scope to domain
    */
   async findLink({ view, request, response }: HttpContext) {
