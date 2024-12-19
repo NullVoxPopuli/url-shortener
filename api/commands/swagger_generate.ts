@@ -29,6 +29,10 @@ const SWAGGER_SCHEMAS = {
   Any: { description: 'Any JSON object not defined as schema' },
 };
 
+/**
+ * Docs:
+ * - https://swagger.io/docs/specification/v3_0/
+ */
 function generate() {
   const main: OpenAPIObject = {
     openapi: '3.0.0',
@@ -39,6 +43,9 @@ function generate() {
     },
     components: {
       schemas: {
+        jsonapi: {
+          $ref: 'https://raw.githubusercontent.com/json-api/json-api/refs/heads/gh-pages/_schemas/1.0/schema.json',
+        },
         ...SWAGGER_SCHEMAS,
       },
     },

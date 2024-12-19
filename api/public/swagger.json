@@ -1,1 +1,93 @@
-{"openapi":"3.0.0","info":{"title":"nvp.gg API Documentation","version":"1.0.0","description":"Documentation for the { json:api } API for using nvp.gg"},"components":{"schemas":{"Any":{"description":"Any JSON object not defined as schema"}}},"servers":[{"url":"https://api.nvp.gg"}],"tags":[],"paths":{"/v1/links":{"get":{"summary":"GET links","description":"Lists links belonging to your authenticated user"},"post":{"summary":"POST links","description":"Create a new short link belonging to your authenticated user"}},"/v1/links/{id}":{"get":{"summary":"GET link","parameters":[{"in":"path","name":"id","schema":{"type":"string"},"required":true}],"responses":{"200":{"description":"OK","content":{"application/vnd.api+json":{}}}}},"delete":{"parameters":[{"in":"path","name":"id","schema":{"type":"string"},"required":true}],"summary":"DELETE link","description":"Delete a link owned by your authenticated user"}}}}
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "nvp.gg API Documentation",
+    "version": "1.0.0",
+    "description": "Documentation for the { json:api } API for using nvp.gg"
+  },
+  "components": {
+    "schemas": {
+      "jsonapi": {
+        "$ref": "https://raw.githubusercontent.com/json-api/json-api/refs/heads/gh-pages/_schemas/1.0/schema.json"
+      },
+      "Any": {
+        "description": "Any JSON object not defined as schema"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.nvp.gg"
+    }
+  ],
+  "tags": [],
+  "paths": {
+    "/v1/links": {
+      "get": {
+        "summary": "List links",
+        "description": "Lists links belonging to your authenticated user"
+      },
+      "post": {
+        "summary": "Create links",
+        "description": "Create a new short link belonging to your authenticated user"
+      }
+    },
+    "/v1/links/{id}": {
+      "get": {
+        "summary": "Show link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "https://raw.githubusercontent.com/json-api/json-api/refs/heads/gh-pages/_schemas/1.0/schema.json#/definitions/resource"
+                    },
+                    "included": {
+                      "$ref": "https://raw.githubusercontent.com/json-api/json-api/refs/heads/gh-pages/_schemas/1.0/schema.json#/definitions/included"
+                    }
+                  },
+                  "example": {
+                    "data": {
+                      "attributes": {
+                        "originalURL": "https://bah"
+                      }
+                    },
+                    "included": []
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "summary": "Delete link",
+        "description": "Delete a link owned by your authenticated user"
+      }
+    }
+  }
+}

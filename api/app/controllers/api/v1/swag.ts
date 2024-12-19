@@ -1,4 +1,5 @@
-import { dynamicSegment } from '#openapi';
+import { mediaType } from '#jsonapi';
+import { dynamicSegment, jsonapiRef } from '#openapi';
 import { OpenAPIObject } from 'openapi3-ts/oas31';
 
 const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
@@ -21,7 +22,28 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
           200: {
             description: 'OK',
             content: {
-              'application/vnd.api+json': {},
+              [mediaType]: {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: {
+                      $ref: jsonapiRef('definitions/resource'),
+                    },
+                    included: {
+                      $ref: jsonapiRef('definitions/included'),
+                    },
+                  },
+
+                  example: {
+                    data: {
+                      attributes: {
+                        originalURL: 'https://bah',
+                      },
+                    },
+                    included: [],
+                  },
+                },
+              },
             },
           },
         },
