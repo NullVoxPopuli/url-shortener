@@ -18,6 +18,8 @@ function version(name: string, callback: () => unknown) {
  */
 router
   .group(() => {
+    // let errors = () => import('#controllers/api/errors');
+
     version('v1', () => {
       let links = () => import('#controllers/api/v1/links');
 

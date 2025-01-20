@@ -1,3 +1,4 @@
+import { code } from '#utils/error-codes';
 import logger from '@adonisjs/core/services/logger';
 
 interface Error {
@@ -5,6 +6,7 @@ interface Error {
   title?: string;
   detail?: string;
   source?: { pointer?: string };
+  code?: string;
 }
 
 interface ErrorResponse {
@@ -35,6 +37,10 @@ export function error({ title, status, detail }: Error) {
 }
 
 export function errors() {}
+
+type EntityNotFound = { kind: string; id: string };
+type PageNotFound = { url: string };
+type FallbackNotFound = { message: string };
 
 export const jsonapi = {
   empty: (): Response => ({ data: {} }),
@@ -98,12 +104,43 @@ export const jsonapi = {
       });
     });
   },
-  notFound: ({ kind, id }: { kind: string; id: string }) => {
+  notFound: (params: EntityNotFound | PageNotFound | FallbackNotFound) => {
+    if ('kind' in params && 'id') {
+      let { kind, id } = params;
+
+      return jsonapi.errors((error) => {
+        error({
+          status: 404,
+          title: `${kind} was not found`,
+          detail: `Tried to find a ${kind} via ${id}, but could not find anything.`,
+        });
+      });
+    }
+
+    if ('url' in params) {
+      return jsonapi.errors((error) => {
+        error({
+          status: 404,
+          title: `Could not find: ${params.url}`,
+          detail: `Please check the URL and try again.`,
+        });
+      });
+    }
+
+    if ('message' in params) {
+      return jsonapi.errors((error) => {
+        error({
+          status: 404,
+          title: params.message,
+        });
+      });
+    }
+
     return jsonapi.errors((error) => {
       error({
         status: 404,
-        title: `${kind} was not found`,
-        detail: `Tried to find a ${kind} via ${id}, but could not find anything.`,
+        title: 'Not Found',
+        ...code.e1000,
       });
     });
   },
