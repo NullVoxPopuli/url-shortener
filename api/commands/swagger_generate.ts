@@ -21,8 +21,8 @@ import { join } from 'node:path';
 import { merge } from 'ts-deepmerge';
 import v1 from '#controllers/api/v1/swag';
 import type { OpenAPIObject } from 'openapi3-ts/oas31';
-import { mimeType } from '#jsonapi';
-import { jsonapiRef, ref } from '#openapi';
+import { specName, mimeType } from '#jsonapi';
+import { componentSchemaRef, jsonapiRef, ref } from '#openapi';
 import { DOMAIN } from '#start/env';
 
 const HERE = import.meta.dirname;
@@ -31,6 +31,49 @@ const OUTPUT_PATH = join(PUBLIC, 'swagger.json');
 
 const SWAGGER_SCHEMAS = {
   Any: { description: 'Any JSON object not defined as schema' },
+  Relationship: {
+    description: `A ${specName} Relationship`,
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'object',
+          properties: {
+            type: 'string',
+            id: 'string',
+          },
+        },
+      },
+    },
+  },
+  Link: {
+    description: 'A Link',
+    schema: {
+      type: 'object',
+      properties: {
+        id: 'string',
+        attributes: {
+          schema: {
+            type: 'object',
+            properties: {
+              shortUrl: 'string',
+              visits: 'integer',
+              createdAt: 'date',
+              updatedAt: 'date',
+              expiresAt: 'date',
+            },
+          },
+        },
+        relationships: {
+          type: 'object',
+          properties: {
+            ownedBy: componentSchemaRef('Relationship'),
+            createdBy: componentSchemaRef('Relationship'),
+          },
+        },
+      },
+    },
+  },
   Unauthenticated: {
     description: 'Unauthenticated',
     content: {
@@ -107,6 +150,7 @@ function generate() {
         email: 'support@nvp.gg',
         url: `https://${DOMAIN}/_/support`,
       },
+      termsOfService: `https://${DOMAIN}/_/terms`,
       description: stripIndent`
         Documentation for the [\`{ json:api }\`](https://jsonapi.org) API for using [nvp.gg](https://nvp.gg)
 

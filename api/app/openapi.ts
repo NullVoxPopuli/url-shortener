@@ -14,3 +14,7 @@ export function jsonapiRef(selector: string) {
 export function ref(ref: string) {
   return { $ref: ref };
 }
+
+export function componentSchemaRef(schema: string) {
+  return ref(`#/components/schemas/${schema}`);
+}

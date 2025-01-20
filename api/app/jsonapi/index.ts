@@ -23,6 +23,8 @@ export interface DataResponse {
 
 export const mimeType = 'application/vnd.api+json' as const;
 
+export const specName = '{ json:api }' as const;
+
 export type Response = ErrorResponse | DataResponse;
 
 /**
