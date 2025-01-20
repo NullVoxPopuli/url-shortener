@@ -1,5 +1,5 @@
 import { mimeType } from '#jsonapi';
-import { dynamicSegment, jsonapiRef } from '#openapi';
+import { dynamicSegment, jsonapiRef, ref } from '#openapi';
 import { OpenAPIObject } from 'openapi3-ts/oas31';
 
 const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
@@ -18,18 +18,17 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
             description: 'Success',
             content: {
               [mimeType]: {
-                schema: {},
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { type: 'string' },
+                  },
+                },
               },
             },
           },
-          401: {
-            description: 'not authenticated',
-            content: {
-              [mimeType]: {
-                schema: {},
-              },
-            },
-          },
+          401: ref('#/components/schemas/Unauthenticated'),
+          415: ref('#/components/schemas/UnsupportedMediaType'),
         },
       },
       post: {

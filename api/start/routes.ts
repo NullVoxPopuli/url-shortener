@@ -13,17 +13,14 @@ function version(name: string, callback: () => unknown) {
   return router.group(() => callback()).prefix(`/${name}`);
 }
 
-import ForceMimeType from '#middleware/require_jsonapi_mimetype';
-
-const forceMimeType = new ForceMimeType();
+import { apiThrottle } from '#start/limiter';
+import { forceMimeType } from '#middleware/require_jsonapi_mimetype';
 
 /**
  * API Routes
  */
 router
   .group(() => {
-    // let errors = () => import('#controllers/api/errors');
-
     version('v1', () => {
       let links = () => import('#controllers/api/v1/links');
 
@@ -34,7 +31,7 @@ router
       router.delete('links/:id', [links, 'delete']);
     });
   })
-  .use([forceMimeType.handle])
+  .use([apiThrottle, forceMimeType])
   .domain(`api.${DOMAIN}`);
 
 router

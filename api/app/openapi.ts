@@ -10,3 +10,7 @@ export function dynamicSegment(name: string) {
 export function jsonapiRef(selector: string) {
   return `https://raw.githubusercontent.com/json-api/json-api/refs/heads/gh-pages/_schemas/1.0/schema.json#/${selector}`;
 }
+
+export function ref(ref: string) {
+  return { $ref: ref };
+}

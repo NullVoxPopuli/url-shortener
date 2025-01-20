@@ -23,3 +23,9 @@ export default class RequireJsonAPIMimeType {
     return next();
   }
 }
+
+const singleton = new RequireJsonAPIMimeType();
+
+export function forceMimeType(context: HttpContext, next: NextFn) {
+  return singleton.handle(context, next);
+}
