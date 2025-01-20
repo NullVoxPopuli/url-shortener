@@ -20,6 +20,7 @@ import { join } from 'node:path';
 import { merge } from 'ts-deepmerge';
 import v1 from '#controllers/api/v1/swag';
 import type { OpenAPIObject } from 'openapi3-ts/oas31';
+import { mimeType } from '#jsonapi';
 
 const HERE = import.meta.dirname;
 const PUBLIC = join(HERE, '../public');
@@ -39,7 +40,12 @@ function generate() {
     info: {
       title: 'nvp.gg API Documentation',
       version: '1.0.0',
-      description: 'Documentation for the { json:api } API for using nvp.gg',
+      description:
+        'Documentation for the [`{ json:api }`](https://jsonapi.org) API for using [nvp.gg](https://nvp.gg)\n\n' +
+        '-----------------------------\n' +
+        '\n\n\n' +
+        `\n` +
+        `All endpoints use the \`${mimeType}\` MIME type for both \`Accept\` and \`Content-Type\` headers.`,
     },
     components: {
       schemas: {
@@ -52,7 +58,7 @@ function generate() {
     servers: [
       {
         url: 'https://api.nvp.gg',
-        // description: '',
+        description: 'The API endpoint for nvp.gg',
       },
     ],
     tags: [],

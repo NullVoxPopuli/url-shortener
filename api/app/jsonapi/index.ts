@@ -1,4 +1,5 @@
 import { code } from '#utils/error-codes';
+import type { HttpContext } from '@adonisjs/core/http';
 import logger from '@adonisjs/core/services/logger';
 
 interface Error {
@@ -20,7 +21,7 @@ export interface DataResponse {
   included?: unknown[];
 }
 
-export const mediaType = 'application/vnd.api+json';
+export const mimeType = 'application/vnd.api+json' as const;
 
 export type Response = ErrorResponse | DataResponse;
 
@@ -59,6 +60,18 @@ export const jsonapi = {
 
     return result;
   },
+
+  /**
+   * Alias for configuring the response.
+   */
+  send: (context: Pick<HttpContext, 'response'>, payload: Response) => {
+    let status = jsonapi.statusFrom(payload);
+
+    context.response.safeStatus(status);
+    context.response.header('Content-Type', mimeType);
+    return context.response.json(payload);
+  },
+
   statusFrom: (payload: Response) => {
     if ('errors' in payload) {
       let status = payload.errors.map((error) => error.status).filter(Boolean) as number[];
@@ -75,6 +88,15 @@ export const jsonapi = {
         status: 422,
         title: 'Unprocessable Content',
         detail: reason,
+      });
+    });
+  },
+  unsupportedMediaType: ({ used, header }: { used: string; header: string }) => {
+    return jsonapi.errors((error) => {
+      error({
+        status: 415,
+        title: 'Unsupported media type',
+        detail: `Expected the ${header} header to by set to ${mimeType}, but instead it was ${used}`,
       });
     });
   },

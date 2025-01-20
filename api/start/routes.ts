@@ -13,6 +13,10 @@ function version(name: string, callback: () => unknown) {
   return router.group(() => callback()).prefix(`/${name}`);
 }
 
+import ForceMimeType from '#middleware/require_jsonapi_mimetype';
+
+const forceMimeType = new ForceMimeType();
+
 /**
  * API Routes
  */
@@ -30,6 +34,7 @@ router
       router.delete('links/:id', [links, 'delete']);
     });
   })
+  .use([forceMimeType.handle])
   .domain(`api.${DOMAIN}`);
 
 router

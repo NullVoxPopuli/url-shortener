@@ -1,4 +1,4 @@
-import { mediaType } from '#jsonapi';
+import { mimeType } from '#jsonapi';
 import { dynamicSegment, jsonapiRef } from '#openapi';
 import { OpenAPIObject } from 'openapi3-ts/oas31';
 
@@ -8,6 +8,29 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       get: {
         summary: 'List links',
         description: 'Lists links belonging to your authenticated user',
+        requestBody: {
+          content: {
+            [mimeType]: { schema: {} },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Success',
+            content: {
+              [mimeType]: {
+                schema: {},
+              },
+            },
+          },
+          401: {
+            description: 'not authenticated',
+            content: {
+              [mimeType]: {
+                schema: {},
+              },
+            },
+          },
+        },
       },
       post: {
         summary: 'Create links',
@@ -22,7 +45,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
           200: {
             description: 'OK',
             content: {
-              [mediaType]: {
+              [mimeType]: {
                 schema: {
                   type: 'object',
                   properties: {
