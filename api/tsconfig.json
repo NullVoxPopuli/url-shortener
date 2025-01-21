@@ -4,6 +4,8 @@
     "rootDir": "./",
     "outDir": "./build",
     "sourceMap": true,
+    "emitDeclarationOnly": false,
+    "noEmit": true,
 
     // Compat
     "allowJs": true,

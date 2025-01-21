@@ -12,8 +12,8 @@
   },
   "scripts": {
     "build": "vite build",
-    "lint": "concurrently \"pnpm:lint:*(!fix)\" --names \"lint:\"",
-    "lint:fix": "concurrently \"pnpm:lint:*:fix\" --names \"fix:\"",
+    "_lint": "concurrently \"pnpm:lint:*(!fix)\" --names \"lint:\"",
+    "_lint:fix": "concurrently \"pnpm:lint:*:fix\" --names \"fix:\"",
     "lint:hbs": "ember-template-lint .",
     "lint:hbs:fix": "ember-template-lint . --fix",
     "lint:js": "eslint .",

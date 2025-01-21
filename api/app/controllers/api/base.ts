@@ -1,4 +1,4 @@
-import { jsonapi, mimeType } from '#jsonapi';
+import { jsonapi } from '#jsonapi';
 import type { HttpContext } from '@adonisjs/core/http';
 import type { Response } from '#jsonapi';
 

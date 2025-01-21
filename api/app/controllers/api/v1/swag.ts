@@ -1,5 +1,5 @@
 import { mimeType } from '#jsonapi';
-import { componentSchemaRef, dynamicSegment, jsonapiRef, ref } from '#openapi';
+import { componentSchemaRef, dynamicSegment, jsonapiRef } from '#openapi';
 import { OpenAPIObject } from 'openapi3-ts/oas31';
 
 const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
