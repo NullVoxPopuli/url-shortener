@@ -159,9 +159,9 @@ importers:
       prettier-edgejs:
         specifier: ^0.2.34
         version: 0.2.34
-      ts-node:
-        specifier: ^10.9.2
-        version: 10.9.2(@swc/core@1.10.12)(@types/node@22.13.0)(typescript@5.7.3)
+      ts-node-maintained:
+        specifier: ^10.9.4
+        version: 10.9.5(@swc/core@1.10.12)(@types/node@22.13.0)(typescript@5.7.3)
       typescript:
         specifier: ^5.7.3
         version: 5.7.3
@@ -8268,8 +8268,8 @@ packages:
   ts-morph@23.0.0:
     resolution: {integrity: sha512-FcvFx7a9E8TUe6T3ShihXJLiJOiqyafzFKUO4aqIHDUCIvADdGNShcbc2W5PMr3LerXRv7mafvFZ9lRENxJmug==}
 
-  ts-node@10.9.2:
-    resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
+  ts-node-maintained@10.9.5:
+    resolution: {integrity: sha512-p8LJFxBTE3YZYGcOMxWKEpaY2nz55NyOg+mTDIOW/MrOIUTAAb7+UkleRu5z90P/fCVVv5pXN1/nb92G/tSNyw==}
     hasBin: true
     peerDependencies:
       '@swc/core': '>=1.2.50'
@@ -18336,7 +18336,7 @@ snapshots:
       '@ts-morph/common': 0.24.0
       code-block-writer: 13.0.3
 
-  ts-node@10.9.2(@swc/core@1.10.12)(@types/node@22.13.0)(typescript@5.7.3):
+  ts-node-maintained@10.9.5(@swc/core@1.10.12)(@types/node@22.13.0)(typescript@5.7.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
