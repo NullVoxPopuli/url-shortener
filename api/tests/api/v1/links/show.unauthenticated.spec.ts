@@ -6,8 +6,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 const show = (client: ApiClient, id: string) =>
   client.get(`http://${API_DOMAIN}/v1/links/${id}`).header('Accept', 'application/vnd.api+json');
+import { setup } from '#tests/helpers';
 
-test.group('SHOW [unauthenticated]', () => {
+test.group('SHOW [unauthenticated]', (group) => {
+  setup(group);
+
   test('tries to show a real link', async ({ client }) => {
     let { user, account } = await createNewAccount();
     let link = await createLink(user, account);
