@@ -3,6 +3,7 @@ import { ApiClient } from '@japa/api-client';
 import User from '#models/user';
 import { createLink, createNewAccount } from '#tests/db';
 import { API_DOMAIN } from '#start/env';
+import { setup } from '#tests/helpers';
 
 const get = (user: User, client: ApiClient) =>
   client
@@ -10,7 +11,9 @@ const get = (user: User, client: ApiClient) =>
     .header('Accept', 'application/vnd.api+json')
     .loginAs(user);
 
-test.group('GET [authenticated session]', () => {
+test.group('GET [authenticated session]', (group) => {
+  setup(group);
+
   test('default endpoint returns a list (which is empty because there are no links)', async ({
     client,
   }) => {

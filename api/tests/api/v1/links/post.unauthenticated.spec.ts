@@ -5,11 +5,14 @@ import Link from '#models/link';
 import { test } from '@japa/runner';
 import { API_DOMAIN } from '#start/env';
 import { assert } from 'chai';
+import { setup } from '#tests/helpers';
 
 const post = (client: ApiClient, body = {}) =>
   client.post(`http://${API_DOMAIN}/v1/links`).json(body);
 
-test.group('POST [unauthenticated]', () => {
+test.group('POST [unauthenticated]', (group) => {
+  setup(group);
+
   test('Error: no url', async ({ client }) => {
     let response = await post(client, {});
 

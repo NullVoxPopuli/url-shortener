@@ -3,11 +3,14 @@ import { ApiClient } from '@japa/api-client';
 import { createLink, createNewAccount } from '#tests/db';
 import { API_DOMAIN } from '#start/env';
 import { v4 as uuidv4 } from 'uuid';
+import { setup } from '#tests/helpers';
 
 const del = (client: ApiClient, id: string) =>
   client.get(`http://${API_DOMAIN}/v1/links/${id}`).header('Accept', 'application/vnd.api+json');
 
-test.group('DELETE [unauthenticated]', () => {
+test.group('DELETE [unauthenticated]', (group) => {
+  setup(group);
+
   test('tries to delete a real link', async ({ client }) => {
     let { user, account } = await createNewAccount();
     let link = await createLink(user, account);

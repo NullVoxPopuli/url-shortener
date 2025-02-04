@@ -5,8 +5,11 @@ import Link from '#models/link';
 import { test } from '@japa/runner';
 import User from '#models/user';
 import { API_DOMAIN, DOMAIN } from '#start/env';
+import { setup } from '#tests/helpers';
 
-test.group('POST [authenticated session]', () => {
+test.group('POST [authenticated session]', (group) => {
+  setup(group);
+
   const post = (user: User, client: ApiClient, body = {}) =>
     client
       .post(`http://${API_DOMAIN}/v1/links`)

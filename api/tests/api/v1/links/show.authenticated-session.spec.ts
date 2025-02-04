@@ -5,6 +5,7 @@ import User from '#models/user';
 import { assertWellFormedLinkData } from '#tests/jsonapi';
 import { API_DOMAIN } from '#start/env';
 import { v4 as uuidv4 } from 'uuid';
+import { setup } from '#tests/helpers';
 
 const show = (user: User, client: ApiClient, id: string) =>
   client
@@ -13,7 +14,9 @@ const show = (user: User, client: ApiClient, id: string) =>
     .withGuard('web')
     .loginAs(user);
 
-test.group('SHOW [authenticated session]', () => {
+test.group('SHOW [authenticated session]', (group) => {
+  setup(group);
+
   test('tries to show a real link', async ({ client }) => {
     let { user, account } = await createNewAccount();
     let link = await createLink(user, account);
