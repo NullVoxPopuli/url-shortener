@@ -144,7 +144,10 @@ jobs:
       - uses: wyvox/action-setup-pnpm@v3
       # bug with ignore-scripts=true?
       # - run: pnpm rebuild
-      - run: pnpm build
+      - run: |
+          set -a
+          source .env.test
+          pnpm build
         working-directory: api
 
   # build_api_image:
