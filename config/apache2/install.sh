@@ -1,5 +1,11 @@
 #!/bin/bash
 
+echo -e "\nEnsuring dependencies are installed (requires sudo)"
+sudo apt install apache2 libapache2-mod-wsgi-py3
+
+echo -e "\nRunning sudo a2enmod wsgi"
+sudo a2enmod wsgi
+
 echo -e "\nMust use sudo for updating /etc\n"
 
 config_from_git="$(dirname "${BASH_SOURCE[0]}")/nvp-local.conf"

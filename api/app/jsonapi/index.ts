@@ -1,3 +1,5 @@
+import { code } from '#utils/error-codes';
+import type { HttpContext } from '@adonisjs/core/http';
 import logger from '@adonisjs/core/services/logger';
 
 interface Error {
@@ -5,6 +7,7 @@ interface Error {
   title?: string;
   detail?: string;
   source?: { pointer?: string };
+  code?: string;
 }
 
 interface ErrorResponse {
@@ -17,6 +20,10 @@ export interface DataResponse {
   links?: unknown[];
   included?: unknown[];
 }
+
+export const mimeType = 'application/vnd.api+json' as const;
+
+export const specName = '{ json:api }' as const;
 
 export type Response = ErrorResponse | DataResponse;
 
@@ -33,6 +40,10 @@ export function error({ title, status, detail }: Error) {
 }
 
 export function errors() {}
+
+type EntityNotFound = { kind: string; id: string };
+type PageNotFound = { url: string };
+type FallbackNotFound = { message: string };
 
 export const jsonapi = {
   empty: (): Response => ({ data: {} }),
@@ -51,6 +62,18 @@ export const jsonapi = {
 
     return result;
   },
+
+  /**
+   * Alias for configuring the response.
+   */
+  send: (context: Pick<HttpContext, 'response'>, payload: Response) => {
+    let status = jsonapi.statusFrom(payload);
+
+    context.response.safeStatus(status);
+    context.response.header('Content-Type', mimeType);
+    return context.response.json(payload);
+  },
+
   statusFrom: (payload: Response) => {
     if ('errors' in payload) {
       let status = payload.errors.map((error) => error.status).filter(Boolean) as number[];
@@ -67,6 +90,15 @@ export const jsonapi = {
         status: 422,
         title: 'Unprocessable Content',
         detail: reason,
+      });
+    });
+  },
+  unsupportedMediaType: ({ used, header }: { used: string; header: string }) => {
+    return jsonapi.errors((error) => {
+      error({
+        status: 415,
+        title: 'Unsupported media type',
+        detail: `Expected the ${header} header to by set to ${mimeType}, but instead it was ${used}`,
       });
     });
   },
@@ -96,12 +128,43 @@ export const jsonapi = {
       });
     });
   },
-  notFound: ({ kind, id }: { kind: string; id: string }) => {
+  notFound: (params: EntityNotFound | PageNotFound | FallbackNotFound) => {
+    if ('kind' in params && 'id') {
+      let { kind, id } = params;
+
+      return jsonapi.errors((error) => {
+        error({
+          status: 404,
+          title: `${kind} was not found`,
+          detail: `Tried to find a ${kind} via ${id}, but could not find anything.`,
+        });
+      });
+    }
+
+    if ('url' in params) {
+      return jsonapi.errors((error) => {
+        error({
+          status: 404,
+          title: `Could not find: ${params.url}`,
+          detail: `Please check the URL and try again.`,
+        });
+      });
+    }
+
+    if ('message' in params) {
+      return jsonapi.errors((error) => {
+        error({
+          status: 404,
+          title: params.message,
+        });
+      });
+    }
+
     return jsonapi.errors((error) => {
       error({
         status: 404,
-        title: `${kind} was not found`,
-        detail: `Tried to find a ${kind} via ${id}, but could not find anything.`,
+        title: 'Not Found',
+        ...code.e1000,
       });
     });
   },

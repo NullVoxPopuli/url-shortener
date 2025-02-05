@@ -1,5 +1,6 @@
 import { test } from '@japa/runner';
 import { DOMAIN } from '#start/env';
+import { setup } from '#tests/helpers';
 
 // `http://${env.get('DOMAIN')}:${env.get('PORT')}`;
 
@@ -24,7 +25,9 @@ async function goHome(visit: Visit) {
   };
 }
 
-test.group('Creating a link', () => {
+test.group('Creating a link', (group) => {
+  setup(group);
+
   test('glimdown.com URLs are free', async ({ assert, visit }) => {
     const { page, click, fillIn, getAttribute } = await goHome(visit);
 

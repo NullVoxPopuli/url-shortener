@@ -12,7 +12,7 @@ export default class AuthMiddleware {
    *
    * TODO: use the route builder for app.nvp.gg/auth/unauthenticated
    */
-  redirectTo = '/_/lo-fi';
+  redirectTo = '/_/unauthenticated';
 
   async handle(
     ctx: HttpContext,

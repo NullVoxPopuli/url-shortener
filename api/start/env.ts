@@ -47,6 +47,13 @@ const env = await Env.create(new URL('../', import.meta.url), {
   GOOGLE_CLIENT_SECRET: Env.schema.string(),
   TWITTER_CLIENT_ID: Env.schema.string(),
   TWITTER_CLIENT_SECRET: Env.schema.string(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring the limiter package
+  |----------------------------------------------------------
+  */
+  LIMITER_STORE: Env.schema.enum(['database', 'memory'] as const),
 });
 
 export default env;

@@ -18,18 +18,20 @@ export default class LoggerMiddleware {
     if (ctx.response.getStatus() > 400) {
       let body = ctx.response.getBody();
 
-      if ('frames' in body) {
-        let cwd = process.cwd();
-        let frames = body.frames;
-        let stack = frames.map((x: any) => {
-          let filePath = x.filePath;
-          if (filePath.includes('.pnpm')) {
-            let [, path] = filePath.split('/.pnpm/');
-            return '[.pnpm]/' + path;
-          }
-          return filePath.replace(cwd, './');
-        });
-        console.error(stack);
+      if (typeof body === 'object' && body !== null) {
+        if ('frames' in body) {
+          let cwd = process.cwd();
+          let frames = body.frames;
+          let stack = frames.map((x: any) => {
+            let filePath = x.filePath;
+            if (filePath.includes('.pnpm')) {
+              let [, path] = filePath.split('/.pnpm/');
+              return '[.pnpm]/' + path;
+            }
+            return filePath.replace(cwd, './');
+          });
+          console.error(stack);
+        }
       }
     }
   }

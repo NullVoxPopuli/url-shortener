@@ -32,7 +32,7 @@ const parserOptions = {
       ecmaVersion: 'latest',
     },
     ts: {
-      projectService: true,
+      projectService: false,
       tsconfigRootDir: import.meta.dirname,
     },
   },
@@ -80,7 +80,7 @@ export default ts.config(
       parser: ember.parser,
       parserOptions: parserOptions.esm.ts,
     },
-    extends: [...ts.configs.recommendedTypeChecked, ember.configs.gts],
+    extends: [...ts.configs.recommended, ember.configs.gts],
   },
   {
     files: ['tests/**/*-test.{js,gjs,ts,gts}'],

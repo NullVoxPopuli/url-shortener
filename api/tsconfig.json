@@ -4,11 +4,16 @@
     "rootDir": "./",
     "outDir": "./build",
     "sourceMap": true,
+    "emitDeclarationOnly": false,
+    // NOTE: adonis uses tsc in `ace build`, so we cant set this to true
+    //       as is done in every other TS project of ours.
+    //
+    // HOWEVER: we can't use ts extensions with this set.
+    "noEmit": false,
 
     // Compat
     "allowJs": true,
     "checkJs": true,
-    "allowImportingTsExtensions": true,
 
     // Be less annoying
     "noEmitOnError": false,

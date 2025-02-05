@@ -21,7 +21,7 @@ export async function htmlAction(
     return result;
   } catch (error) {
     // Uncomment for debugging
-    console.error('catch: ', error.message, error.name);
+    console.error('catch: ', error.message, error.name, error.stack);
 
     if ('name' in error) {
       switch (error.name) {
