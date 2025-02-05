@@ -52,7 +52,7 @@
     "@adonisjs/prettier-config": "^1.4.0",
     "@adonisjs/tsconfig": "^1.4.0",
     "@faker-js/faker": "^9.3.0",
-    "@japa/api-client": "^2.0.4",
+    "@japa/api-client": "^3.0.3",
     "@japa/assert": "^4.0.1",
     "@japa/browser-client": "^2.1.1",
     "@japa/plugin-adonisjs": "^4.0.0",

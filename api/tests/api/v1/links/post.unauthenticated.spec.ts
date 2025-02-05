@@ -1,20 +1,18 @@
-import { relationship, assertWellFormedLinkData } from '#tests/jsonapi';
+import { relationship, assertWellFormedLinkData, clientFor } from '#tests/jsonapi';
 import { changedRecords } from '#tests/db';
-import { ApiClient } from '@japa/api-client';
 import Link from '#models/link';
 import { test } from '@japa/runner';
 import { API_DOMAIN } from '#start/env';
 import { assert } from 'chai';
 import { setup } from '#tests/helpers';
 
-const post = (client: ApiClient, body = {}) =>
-  client.post(`http://${API_DOMAIN}/v1/links`).json(body);
+const ENDPOINT = `http://${API_DOMAIN}/v1/links`;
 
 test.group('POST [unauthenticated]', (group) => {
   setup(group);
 
   test('Error: no url', async ({ client }) => {
-    let response = await post(client, {});
+    let response = await clientFor(client, ENDPOINT).post({});
 
     response.assertStatus(422);
     response.assertBody({
@@ -28,7 +26,7 @@ test.group('POST [unauthenticated]', (group) => {
   });
 
   test('Error: missing url', async ({ client }) => {
-    let response = await post(client, { originalUrl: '' });
+    let response = await clientFor(client, ENDPOINT).post({ originalUrl: '' });
 
     response.assertStatus(422);
     response.assertBody({
@@ -42,7 +40,7 @@ test.group('POST [unauthenticated]', (group) => {
   });
 
   test('Error: malformed url', async ({ client }) => {
-    let response = await post(client, { originalUrl: 'abcd' });
+    let response = await clientFor(client, ENDPOINT).post({ originalUrl: 'abcd' });
 
     response.assertStatus(422);
     response.assertBody({
@@ -56,7 +54,7 @@ test.group('POST [unauthenticated]', (group) => {
   });
 
   test('Error: any non-glimdown.com URL requires authentication', async ({ client }) => {
-    let response = await post(client, { originalUrl: 'https://google.com' });
+    let response = await clientFor(client, ENDPOINT).post({ originalUrl: 'https://google.com' });
 
     response.assertStatus(401);
     response.assertBody({
@@ -73,7 +71,9 @@ test.group('POST [unauthenticated]', (group) => {
   test('Success: URLs from glimdown.com are always allowed', async ({ client }) => {
     let data: any;
     await changedRecords(Link, async () => {
-      let response = await post(client, { originalUrl: 'https://glimdown.com' });
+      let response = await clientFor(client, ENDPOINT).post({
+        originalUrl: 'https://glimdown.com',
+      });
 
       response.assertStatus(201);
 
@@ -88,7 +88,9 @@ test.group('POST [unauthenticated]', (group) => {
   test('Success: URLs from limber.glimdown.com are always allowed', async ({ client }) => {
     let data: any;
     await changedRecords(Link, async () => {
-      let response = await post(client, { originalUrl: 'https://limber.glimdown.com' });
+      let response = await clientFor(client, ENDPOINT).post({
+        originalUrl: 'https://limber.glimdown.com',
+      });
 
       response.assertStatus(201);
 
@@ -117,13 +119,13 @@ test.group('POST [unauthenticated]', (group) => {
     let url = 'https://limber.glimdown.com';
 
     {
-      let response = await post(client, { originalUrl: url });
+      let response = await clientFor(client, ENDPOINT).post({ originalUrl: url });
       response.assertStatus(201);
 
       first = response.body().data;
     }
     {
-      let response = await post(client, { originalUrl: url });
+      let response = await clientFor(client, ENDPOINT).post({ originalUrl: url });
       response.assertStatus(201);
 
       second = response.body().data;

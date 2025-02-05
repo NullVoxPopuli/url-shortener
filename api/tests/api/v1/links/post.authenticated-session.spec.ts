@@ -15,6 +15,7 @@ test.group('POST [authenticated session]', (group) => {
       .post(`http://${API_DOMAIN}/v1/links`)
       .json(body)
       .header('Accept', 'application/vnd.api+json')
+      .header('Content-Type', 'application/vnd.api+json')
       .withGuard('web')
       .loginAs(user);
 

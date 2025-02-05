@@ -13,6 +13,9 @@ concurrency:
   group: ci-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
+env:
+  NODE_ENV: "test"
+
 jobs:
   lint:
     name: Lint

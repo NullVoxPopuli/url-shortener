@@ -1,3 +1,4 @@
+import { setup } from '#tests/helpers';
 import { test } from '@japa/runner';
 
 /**
@@ -5,7 +6,9 @@ import { test } from '@japa/runner';
  * playwright acts like a user, and doesn't have a way to
  * halt redirects from happening.
  */
-test.group('vistiing a short link', () => {
+test.group('vistiing a short link', (group) => {
+  setup(group);
+
   test('Link does not exist', async ({ visit }) => {
     let page = await visit(`/does-not-exist`);
     await page.assertTextContains('h1', `could not expand that URL`);

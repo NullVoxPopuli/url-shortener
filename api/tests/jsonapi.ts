@@ -1,5 +1,18 @@
 import { assert } from 'chai';
 import { DOMAIN } from '#start/env';
+import { ApiClient, ApiResponse } from '@japa/api-client';
+
+export function clientFor(client: ApiClient, url: string) {
+  return {
+    post: (body = {}) => {
+      return client
+        .post(url)
+        .json(body)
+        .header('Accept', 'application/vnd.api+json')
+        .header('Content-Type', 'application/vnd.api+json');
+    },
+  };
+}
 
 export function hasRelationship(resource: any, name: string, type: string) {
   let r = relationship(resource, name);
@@ -42,4 +55,14 @@ export function assertWellFormedLinkData(data: any) {
 
   hasRelationship(data, 'createdBy', 'user');
   hasRelationship(data, 'ownedBy', 'account');
+}
+
+export function assertUnauthorized(response: ApiResponse) {
+  response.assertStatus(401);
+
+  let body = response.body();
+
+  assert.strictEqual(body.errors.length, 1);
+  assert.strictEqual(body.errors[0].status, 401);
+  assert.strictEqual(body.errors[0].title, 'Not Authenticated');
 }
