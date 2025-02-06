@@ -56,5 +56,8 @@
   "volta": {
     "node": "22.6.0",
     "pnpm": "9.10.0"
+  },
+  "dependencies": {
+    "ts-node-maintained": "^10.9.4"
   }
 }
