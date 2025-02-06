@@ -3,8 +3,8 @@ import * as QUnit from 'qunit';
 import { setup } from 'qunit-dom';
 import { start as qunitStart } from 'ember-qunit';
 
-import Application from 'web-client/app';
-import config from 'web-client/config/environment';
+import Application from '#app/app';
+import config from '#config';
 
 export function start() {
   setApplication(Application.create(config.APP));

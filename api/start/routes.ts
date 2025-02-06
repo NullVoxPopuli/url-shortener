@@ -23,15 +23,50 @@ router
   .group(() => {
     version('v1', () => {
       let links = () => import('#controllers/api/v1/links');
+      let billing = () => import('#controllers/api/v1/billing');
 
       router.get('links', [links, 'index']);
       router.post('links', [links, 'create']);
       // Links are not updatable (for now?)
       router.get('links/:id', [links, 'show']);
       router.delete('links/:id', [links, 'delete']);
+
+      router.post('billing/checkout', [billing, 'checkout']);
+      router.post('billing/portal', [billing, 'portal']);
+      router.get('billing/status', [billing, 'status']);
     });
   })
   .use([apiThrottle, forceMimeType])
+  .domain(`api.${DOMAIN}`);
+
+/**
+ * Browser-friendly billing routes (no JSON:API header enforcement).
+ *
+ * Kept separate so the /billing/success redirect handler can be visited from
+ * a normal browser navigation.
+ */
+router
+  .group(() => {
+    version('v1', () => {
+      let billing = () => import('#controllers/api/v1/billing');
+
+      router.get('billing/success', [billing, 'success']);
+    });
+  })
+  .use([apiThrottle])
+  .domain(`api.${DOMAIN}`);
+
+/**
+ * Stripe calls this; signature-verified, so no auth / throttle / MIME
+ * enforcement. As a routed request, the bodyparser enforces its size
+ * limit and retains the raw body for signature verification.
+ */
+router
+  .group(() => {
+    let stripeWebhook = () => import('#controllers/stripe_webhook');
+
+    router.post('stripe/webhook', [stripeWebhook, 'handle']);
+  })
   .domain(`api.${DOMAIN}`);
 
 router

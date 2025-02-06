@@ -1,5 +1,5 @@
-import { DataResponse } from '#jsonapi';
-import Link from '#models/link';
+import type { DataResponse } from '#jsonapi';
+import type Link from '#models/link';
 import { DOMAIN } from '#start/env';
 
 export function link(link: Link): DataResponse {

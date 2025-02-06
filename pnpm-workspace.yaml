@@ -2,3 +2,16 @@ packages:
   - api
   - web-client
   - packages/*
+
+allowBuilds:
+  '@swc/core': true
+  better-sqlite3: true
+  core-js: true
+  esbuild: true
+  node-gyp: true
+  unrs-resolver: true
+
+peerDependencyRules:
+  allowAny:
+    - prettier
+    - '@ember-data/*'

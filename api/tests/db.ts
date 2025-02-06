@@ -1,6 +1,6 @@
 import { test } from '@japa/runner';
 import { assert } from 'chai';
-import { BaseModel } from '@adonisjs/lucid/orm';
+import type { BaseModel } from '@adonisjs/lucid/orm';
 import db from '@adonisjs/lucid/services/db';
 import Account from '#models/account';
 import User from '#models/user';

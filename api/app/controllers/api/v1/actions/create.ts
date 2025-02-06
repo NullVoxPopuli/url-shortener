@@ -3,7 +3,7 @@ import { jsonapi } from '#jsonapi';
 import Link from '#models/link';
 import { render } from '#jsonapi/data';
 import { glimdownOwner } from '#consts';
-import User from '#models/user';
+import type User from '#models/user';
 import Account from '#models/account';
 
 export async function createLink(context: HttpContext) {
