@@ -40,7 +40,6 @@
       "prettier": "github:jurgenwerk/prettier#glimmer-embed-style-wip"
     },
     "patchedDependencies": {
-      "@adonisjs/assembler": "patches/@adonisjs__assembler.patch"
     }
   },
   "cacheDirectories": [
