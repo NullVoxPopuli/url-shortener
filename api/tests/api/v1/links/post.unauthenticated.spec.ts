@@ -85,6 +85,23 @@ test.group('POST [unauthenticated]', (group) => {
     relationship(data, 'createdBy');
   });
 
+  test('Success: URLs from repl.nvp.gg are always allowed', async ({ client }) => {
+    let data: any;
+    await changedRecords(Link, async () => {
+      let response = await clientFor(client, ENDPOINT).post({
+        originalUrl: 'https://repl.nvp.gg',
+      });
+
+      response.assertStatus(201);
+
+      data = response.body().data;
+    });
+
+    assertWellFormedLinkData(data);
+
+    relationship(data, 'createdBy');
+  });
+
   test('Success: URLs from limber.glimdown.com are always allowed', async ({ client }) => {
     let data: any;
     await changedRecords(Link, async () => {
@@ -117,6 +134,35 @@ test.group('POST [unauthenticated]', (group) => {
     let first;
     let second;
     let url = 'https://limber.glimdown.com';
+
+    {
+      let response = await clientFor(client, ENDPOINT).post({ originalUrl: url });
+      response.assertStatus(201);
+
+      first = response.body().data;
+    }
+    {
+      let response = await clientFor(client, ENDPOINT).post({ originalUrl: url });
+      response.assertStatus(201);
+
+      second = response.body().data;
+    }
+
+    assert.strictEqual(first.shortUrl, second.shortUrl);
+    assert.notStrictEqual(
+      first.id,
+      second.id,
+      `The ids don't need to match, because when looking up the shortURL to find the long URL, it's the same. `
+    );
+  });
+
+  test('Success: The same URL shortened twice results in the same short URL (repl)', async ({
+    assert,
+    client,
+  }) => {
+    let first;
+    let second;
+    let url = 'https://repl.nvp.gg';
 
     {
       let response = await clientFor(client, ENDPOINT).post({ originalUrl: url });

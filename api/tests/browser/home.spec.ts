@@ -40,6 +40,18 @@ test.group('Creating a link', (group) => {
     assert.match(href || '<null>', new RegExp(`^https://${DOMAIN}/`));
   });
 
+  test('repl.nvp.gg URLs are free', async ({ assert, visit }) => {
+    const { page, click, fillIn, getAttribute } = await goHome(visit);
+
+    await fillIn('[name=originalUrl]', 'https://repl.nvp.gg?foo');
+    await click('button[type=submit]');
+
+    await page.assertTextContains('.create-success', 'Congratulations');
+    let href = await getAttribute('.short-url-content a', 'href');
+
+    assert.match(href || '<null>', new RegExp(`^https://${DOMAIN}/`));
+  });
+
   test('Other domains require login', async ({ assert, visit }) => {
     const { page, click, fillIn } = await goHome(visit);
 
