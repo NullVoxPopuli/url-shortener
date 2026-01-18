@@ -29,7 +29,7 @@ importers:
         version: 5.1.1(@adonisjs/core@6.19.3(@adonisjs/assembler@7.8.2(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0))
       '@adonisjs/auth':
         specifier: ^9.3.1
-        version: 9.5.1(6b2bd7ec29f2e3c48da0991ceb6f39c3)
+        version: 9.5.1(p5grlqoizembbn45vzffxszpdq)
       '@adonisjs/bouncer':
         specifier: ^3.1.5
         version: 3.1.6(@adonisjs/core@6.19.3(@adonisjs/assembler@7.8.2(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0))(edge.js@6.4.0)
@@ -81,6 +81,9 @@ importers:
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
+      stripe:
+        specifier: ^17.7.0
+        version: 17.7.0
       ts-deepmerge:
         specifier: ^7.0.2
         version: 7.0.3
@@ -474,7 +477,7 @@ packages:
     version: 2.1.2
     peerDependencies:
       eslint: ^9.9.0
-      prettier: ^3.3.3
+      prettier: github:jurgenwerk/prettier#glimmer-embed-style-wip
 
   '@adonisjs/eslint-plugin@2.2.1':
     resolution: {integrity: sha512-FlMAjhWYOHpWtzQY8+VLtXHyHJ6ts15PCZ2xgSH7OcKsBiwQSEUPXH6nGiY0hlG09Li/Jqco4fEhmrf7KEi4jQ==}
@@ -5135,7 +5138,7 @@ packages:
       '@types/eslint': '>=8.0.0'
       eslint: '>=8.0.0'
       eslint-config-prettier: '>= 7.0.0 <10.0.0 || >=10.1.0'
-      prettier: '>=3.0.0'
+      prettier: github:jurgenwerk/prettier#glimmer-embed-style-wip
     peerDependenciesMeta:
       '@types/eslint':
         optional: true
@@ -7600,7 +7603,7 @@ packages:
     version: 2.1.2
     engines: {node: 18.* || >= 20}
     peerDependencies:
-      prettier: '>= 3.0.0'
+      prettier: github:jurgenwerk/prettier#glimmer-embed-style-wip
 
   prettier@https://codeload.github.com/jurgenwerk/prettier/tar.gz/4ec1dd2669715bb9e4487366f330f7686fb5d159:
     resolution: {tarball: https://codeload.github.com/jurgenwerk/prettier/tar.gz/4ec1dd2669715bb9e4487366f330f7686fb5d159}
@@ -8505,6 +8508,10 @@ packages:
   strip-json-comments@5.0.3:
     resolution: {integrity: sha512-1tB5mhVo7U+ETBKNf92xT4hrQa3pm0MZ0PQvuDnWgAAGHDsfp4lPSpiS6psrSiet87wyGPh9ft6wmhOMQ0hDiw==}
     engines: {node: '>=14.16'}
+
+  stripe@17.7.0:
+    resolution: {integrity: sha512-aT2BU9KkizY9SATf14WhhYVv2uOapBWX0OFWF4xvcj1mPaNotlSc2CsxpS4DS46ZueSppmCF5BX1sNYBtwBvfw==}
+    engines: {node: '>=12.*'}
 
   strtok3@10.3.4:
     resolution: {integrity: sha512-KIy5nylvC5le1OdaaoCJ07L+8iQzJHGH6pWDuzS+d07Cu7n1MZ2x26P8ZKIWfbK02+XIL8Mp4RkWeqdUCrDMfg==}
@@ -9553,7 +9560,7 @@ snapshots:
     transitivePeerDependencies:
       - babel-plugin-macros
 
-  '@adonisjs/auth@9.5.1(6b2bd7ec29f2e3c48da0991ceb6f39c3)':
+  '@adonisjs/auth@9.5.1(p5grlqoizembbn45vzffxszpdq)':
     dependencies:
       '@adonisjs/core': 6.19.3(@adonisjs/assembler@7.8.2(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)
       '@adonisjs/presets': 2.6.4(@adonisjs/assembler@7.8.2(typescript@5.9.3))(@adonisjs/core@6.19.3(@adonisjs/assembler@7.8.2(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0))
@@ -19380,6 +19387,11 @@ snapshots:
   strip-json-comments@3.1.1: {}
 
   strip-json-comments@5.0.3: {}
+
+  stripe@17.7.0:
+    dependencies:
+      '@types/node': 25.0.9
+      qs: 6.14.1
 
   strtok3@10.3.4:
     dependencies:
