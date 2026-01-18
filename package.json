@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@glint/core": "unstable",
-    "typescript": "^5.7.2"
+    "typescript": "^5.9.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -39,8 +39,7 @@
     "overrides": {
       "prettier": "github:jurgenwerk/prettier#glimmer-embed-style-wip"
     },
-    "patchedDependencies": {
-    }
+    "patchedDependencies": {}
   },
   "cacheDirectories": [
     "node_modules",
@@ -53,6 +52,6 @@
     "node": "^24.0.0"
   },
   "dependencies": {
-    "ts-node-maintained": "^10.9.4"
+    "ts-node-maintained": "^10.9.6"
   }
 }
