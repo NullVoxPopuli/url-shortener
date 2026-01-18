@@ -48,13 +48,9 @@
     "web-client/node_modules",
     "packages/url-compression/node_modules"
   ],
-  "packageManager": "pnpm@9.10.0",
+  "packageManager": "pnpm@10.28.0",
   "engines": {
-    "node": "^22.0.0"
-  },
-  "volta": {
-    "node": "22.6.0",
-    "pnpm": "9.10.0"
+    "node": "^24.0.0"
   },
   "dependencies": {
     "ts-node-maintained": "^10.9.4"
