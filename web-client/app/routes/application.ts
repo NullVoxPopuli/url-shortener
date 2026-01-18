@@ -1,4 +1,5 @@
 import Route from '@ember/routing/route';
+
 import { setupTabster } from 'ember-primitives/tabster';
 
 

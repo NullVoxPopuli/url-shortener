@@ -1,7 +1,9 @@
-export { default } from '@ember-data/store';
-import { setBuildURLConfig } from '@ember-data/request-utils';
+import { useRecommendedStore } from '@warp-drive/core';
+import { JSONAPICache } from '@warp-drive/json-api';
 
-setBuildURLConfig({
-  host: 'https://nvp.gg',
-  namespace: '_/v1',
+export default useRecommendedStore({
+  cache: JSONAPICache,
+  schemas: [
+    // -- your schemas here
+  ],
 });
