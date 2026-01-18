@@ -223,9 +223,15 @@ importers:
       '@glimmer/component':
         specifier: ^2.0.0
         version: 2.0.0
+      '@warp-drive/core':
+        specifier: ^5.8.1
+        version: 5.8.1(@babel/core@7.28.6)(@glint/template@1.7.3)
       '@warp-drive/ember':
         specifier: 5.8.1
         version: 5.8.1(@babel/core@7.28.6)(@ember/test-waiters@4.1.1(@glint/template@1.7.3))(@glint/template@1.7.3)
+      '@warp-drive/json-api':
+        specifier: ^5.8.1
+        version: 5.8.1(@glint/template@1.7.3)(@warp-drive/core@5.8.1(@babel/core@7.28.6)(@glint/template@1.7.3))
       ember-modifier:
         specifier: ^4.2.2
         version: 4.2.2(@babel/core@7.28.6)
