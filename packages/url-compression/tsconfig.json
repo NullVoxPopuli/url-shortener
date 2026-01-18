@@ -1,5 +1,5 @@
 {
-  "extends": ["@tsconfig/strictest", "@tsconfig/ember"],
+  "extends": ["@tsconfig/strictest", "@tsconfig/node24"],
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
