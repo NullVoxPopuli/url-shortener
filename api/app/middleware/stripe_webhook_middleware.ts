@@ -23,6 +23,9 @@ const allowedEvents = new Set([
   'payment_intent.succeeded',
   'payment_intent.payment_failed',
   'payment_intent.canceled',
+  'subscription_schedule.updated',
+  'subscription_schedule.canceled',
+  'subscription_schedule.released',
 ]);
 
 function pathname(url: string) {
@@ -84,12 +87,11 @@ export default class StripeWebhookMiddleware {
       return ctx.response.json({ received: true });
     }
 
-    try {
-      await syncStripeDataToAccountByCustomerId(customerId);
-    } catch (error) {
-      // Webhooks will be retried by Stripe; still return 200 to avoid loops.
-      console.error('[STRIPE HOOK] Error processing event', error);
-    }
+    // Fire-and-forget: ack Stripe immediately, sync in the background.
+    // If the sync fails, Stripe will retry the webhook.
+    syncStripeDataToAccountByCustomerId(customerId).catch((error) => {
+      console.error(`[STRIPE HOOK] Error processing ${event.type}`, error);
+    });
 
     return ctx.response.json({ received: true });
   }

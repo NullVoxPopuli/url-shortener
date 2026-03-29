@@ -41,8 +41,23 @@ export async function getOrCreateStripeCustomerIdForAccount(params: {
     },
   });
 
+  // Atomically set the customer ID only if no other request beat us to it.
+  const updated = await Account.query()
+    .where('id', account.id)
+    .whereNull('stripe_customer_id')
+    .update({ stripe_customer_id: customer.id });
+
+  // Lucid .update() returns the number of affected rows (as a number or wrapped in an array).
+  const affectedRows = Array.isArray(updated) ? updated[0] : updated;
+
+  if (affectedRows === 0) {
+    // Another request already created a customer — clean up the orphan.
+    await stripe.customers.del(customer.id);
+    await account.refresh();
+    return account.stripeCustomerId!;
+  }
+
   account.stripeCustomerId = customer.id;
-  await account.save();
 
   return customer.id;
 }

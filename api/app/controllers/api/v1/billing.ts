@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import env from '#start/env';
+import { DOMAIN } from '#start/env';
 import { jsonapi } from '#jsonapi';
 import Account from '#models/account';
 import { stripe } from '#services/stripe';
@@ -11,6 +12,22 @@ import {
 function mustBeAccountAdmin(params: { userId: string; account: Account }) {
   const { userId, account } = params;
   return account.admin_id === userId;
+}
+
+/**
+ * Guard against open-redirect attacks by only allowing redirects to
+ * our own domain or relative paths.
+ */
+function isSafeRedirect(url: string): boolean {
+  // Relative paths are always safe.
+  if (url.startsWith('/')) return true;
+
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname === DOMAIN || parsed.hostname.endsWith(`.${DOMAIN}`);
+  } catch {
+    return false;
+  }
 }
 
 export default class BillingController {
@@ -37,6 +54,18 @@ export default class BillingController {
         context,
         jsonapi.notAuthorized({ stack: 'Only the account admin can manage billing' })
       );
+    }
+
+    if (account.hasActiveSubscription) {
+      return jsonapi.send(context, {
+        errors: [
+          {
+            status: 409,
+            title: 'Subscription already active',
+            detail: 'This account already has an active subscription. Use the billing portal to manage it.',
+          },
+        ],
+      });
     }
 
     const customerId = await getOrCreateStripeCustomerIdForAccount({
@@ -72,7 +101,9 @@ export default class BillingController {
    * Users often return before webhooks arrive. Sync eagerly.
    */
   async success({ auth, response, request }: HttpContext) {
-    const returnTo = request.input('return_to') || env.get('STRIPE_CANCEL_URL');
+    const fallback = env.get('STRIPE_CANCEL_URL');
+    const candidate = request.input('return_to');
+    const returnTo = candidate && isSafeRedirect(candidate) ? candidate : fallback;
 
     try {
       await auth.authenticateUsing(['web', 'api']);

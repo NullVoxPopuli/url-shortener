@@ -5,12 +5,12 @@ import User from './user.js';
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations';
 
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set([
-  // Stripe “active” statuses (per docs + practical SaaS reality)
+  // Stripe “active” statuses — grant access while payment is still recoverable.
+  // `unpaid` is excluded: all retry attempts are exhausted.
+  // `paused` is excluded: the subscription is intentionally suspended.
   'active',
   'trialing',
   'past_due',
-  'unpaid',
-  'paused',
 ]);
 
 export default class Account extends BaseModel {
