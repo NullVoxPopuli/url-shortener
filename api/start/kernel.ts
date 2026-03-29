@@ -29,6 +29,7 @@ if (env.get('LOG_LEVEL') === 'trace') {
  */
 server.use([
   () => import('#middleware/container_bindings_middleware'),
+  () => import('#middleware/stripe_webhook_middleware'),
   () => import('@adonisjs/cors/cors_middleware'),
   () => import('@adonisjs/static/static_middleware'),
 ]);

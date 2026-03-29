@@ -54,6 +54,37 @@ const env = await Env.create(new URL('../', import.meta.url), {
   |----------------------------------------------------------
   */
   LIMITER_STORE: Env.schema.enum(['database', 'memory'] as const),
+
+  /*
+  |----------------------------------------------------------
+  | Stripe
+  |----------------------------------------------------------
+  |
+  | The API uses Stripe Checkout + webhooks. We intentionally keep a
+  | single "source of truth" sync function (called both after success
+  | redirects and from webhooks) to avoid split-brain states.
+  */
+  STRIPE_SECRET_KEY: Env.schema.string(),
+  STRIPE_WEBHOOK_SECRET: Env.schema.string(),
+  STRIPE_PRICE_ID: Env.schema.string(),
+
+  /**
+   * Where Stripe Checkout should send users after payment.
+   * Example: https://api.example.com/v1/billing/success
+   */
+  STRIPE_SUCCESS_URL: Env.schema.string(),
+
+  /**
+   * Where Stripe Checkout should send users when they cancel.
+   * Example: https://app.example.com/billing
+   */
+  STRIPE_CANCEL_URL: Env.schema.string(),
+
+  /**
+   * Billing portal return URL.
+   * Example: https://app.example.com/settings/billing
+   */
+  STRIPE_PORTAL_RETURN_URL: Env.schema.string(),
 });
 
 export default env;
