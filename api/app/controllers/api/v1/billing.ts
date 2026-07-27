@@ -58,7 +58,12 @@ export default class BillingController {
       try {
         await syncStripeDataToAccount(account);
       } catch (error) {
-        // The webhook will sync eventually; don't 500 a browser redirect.
+        // Don't 500 a browser redirect — this eager sync is only an
+        // optimization. Completing checkout also fires webhook events
+        // (checkout.session.completed, customer.subscription.created,
+        // invoice.paid, ...); each POST to /stripe/webhook runs this
+        // same sync, and returns 500 on failure so Stripe keeps
+        // retrying with backoff until a sync succeeds.
         console.error('[STRIPE] Eager sync after checkout failed', error);
       }
     }
