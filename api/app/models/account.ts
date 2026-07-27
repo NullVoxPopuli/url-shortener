@@ -46,10 +46,20 @@ export default class Account extends BaseModel {
   @column({ columnName: 'stripe_price_id' })
   declare stripePriceId: string | null;
 
-  @column({ columnName: 'stripe_current_period_start' })
+  /**
+   * The pg driver returns bigint columns as strings; coerce so these
+   * are actually the `number | null` they claim to be.
+   */
+  @column({
+    columnName: 'stripe_current_period_start',
+    consume: (value) => (value === null ? null : Number(value)),
+  })
   declare stripeCurrentPeriodStart: number | null;
 
-  @column({ columnName: 'stripe_current_period_end' })
+  @column({
+    columnName: 'stripe_current_period_end',
+    consume: (value) => (value === null ? null : Number(value)),
+  })
   declare stripeCurrentPeriodEnd: number | null;
 
   @column({ columnName: 'stripe_cancel_at_period_end' })

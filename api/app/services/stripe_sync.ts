@@ -52,7 +52,13 @@ export async function getOrCreateStripeCustomerIdForAccount(params: {
 
   if (affectedRows === 0) {
     // Another request already created a customer — clean up the orphan.
-    await stripe.customers.del(customer.id);
+    // Best-effort: an orphaned (never-used) customer is harmless, so a
+    // failed delete should not fail the caller's checkout.
+    try {
+      await stripe.customers.del(customer.id);
+    } catch (error) {
+      console.error(`[STRIPE] Failed to delete orphaned customer ${customer.id}`, error);
+    }
     await account.refresh();
     return account.stripeCustomerId!;
   }
