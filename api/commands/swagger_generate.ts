@@ -1,5 +1,5 @@
 import { BaseCommand } from '@adonisjs/core/ace';
-import { CommandOptions } from '@adonisjs/core/types/ace';
+import { type CommandOptions } from '@adonisjs/core/types/ace';
 import { stripIndent } from 'common-tags';
 
 export default class SwaggerGenerate extends BaseCommand {

@@ -1,6 +1,6 @@
 import { test } from '@japa/runner';
-import { ApiClient } from '@japa/api-client';
-import User from '#models/user';
+import { type ApiClient } from '@japa/api-client';
+import type User from '#models/user';
 import { createLink, createNewAccount } from '#tests/db';
 import { API_DOMAIN } from '#start/env';
 import { setup } from '#tests/helpers';

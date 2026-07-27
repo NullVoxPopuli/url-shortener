@@ -1,7 +1,7 @@
 import { test } from '@japa/runner';
-import { ApiClient } from '@japa/api-client';
+import { type ApiClient } from '@japa/api-client';
 import { createLink, createNewAccount } from '#tests/db';
-import User from '#models/user';
+import type User from '#models/user';
 import { assertWellFormedLinkData } from '#tests/jsonapi';
 import { API_DOMAIN } from '#start/env';
 import { v4 as uuidv4 } from 'uuid';

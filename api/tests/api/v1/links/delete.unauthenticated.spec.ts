@@ -1,5 +1,5 @@
 import { test } from '@japa/runner';
-import { ApiClient } from '@japa/api-client';
+import { type ApiClient } from '@japa/api-client';
 import { createLink, createNewAccount } from '#tests/db';
 import { API_DOMAIN } from '#start/env';
 import { v4 as uuidv4 } from 'uuid';

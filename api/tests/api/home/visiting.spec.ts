@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 import { createLink, createNewAccount } from '#tests/db';
-import { ApiClient } from '@japa/api-client';
+import { type ApiClient } from '@japa/api-client';
 import { test } from '@japa/runner';
 
 const get = (client: ApiClient, id: string) =>
