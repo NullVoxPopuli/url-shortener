@@ -56,6 +56,19 @@ router
   .use([apiThrottle])
   .domain(`api.${DOMAIN}`);
 
+/**
+ * Stripe calls this; signature-verified, so no auth / throttle / MIME
+ * enforcement. As a routed request, the bodyparser enforces its size
+ * limit and retains the raw body for signature verification.
+ */
+router
+  .group(() => {
+    let stripeWebhook = () => import('#controllers/stripe_webhook');
+
+    router.post('stripe/webhook', [stripeWebhook, 'handle']);
+  })
+  .domain(`api.${DOMAIN}`);
+
 router
   .group(async () => {
     router.get('/swagger', ({ response }) => {
