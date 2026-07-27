@@ -32,16 +32,38 @@ function pathname(url: string) {
   return url.split('?')[0];
 }
 
+/**
+ * Stripe events are small; anything larger is not a legitimate webhook.
+ * Without a cap, this endpoint would buffer arbitrarily large bodies
+ * in memory before the signature check can reject them.
+ */
+const MAX_BODY_BYTES = 1024 * 1024;
+
+class BodyTooLarge extends Error {}
+
 async function readRawBody(ctx: HttpContext): Promise<Buffer> {
   // NOTE: This middleware is mounted in the *server* middleware stack, so
   // the body parser has not run yet.
-  const req: any = (ctx.request as any).request;
+  const req = ctx.request.request;
 
   return await new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
+    let total = 0;
 
     req.on('data', (chunk: Buffer | string) => {
-      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+
+      total += buffer.length;
+      if (total > MAX_BODY_BYTES) {
+        // Stop reading, but leave the socket intact so the 413 response
+        // can actually be delivered; node closes the connection after
+        // responding to a request whose body was not fully consumed.
+        req.pause();
+        reject(new BodyTooLarge());
+        return;
+      }
+
+      chunks.push(buffer);
     });
 
     req.on('end', () => resolve(Buffer.concat(chunks)));
@@ -64,7 +86,16 @@ export default class StripeWebhookMiddleware {
       return ctx.response.json({ error: 'Missing Stripe-Signature header' });
     }
 
-    const body = await readRawBody(ctx);
+    let body;
+    try {
+      body = await readRawBody(ctx);
+    } catch (error) {
+      if (error instanceof BodyTooLarge) {
+        ctx.response.status(413);
+        return ctx.response.json({ error: 'Payload too large' });
+      }
+      throw error;
+    }
 
     let event;
     try {
@@ -87,11 +118,16 @@ export default class StripeWebhookMiddleware {
       return ctx.response.json({ received: true });
     }
 
-    // Fire-and-forget: ack Stripe immediately, sync in the background.
-    // If the sync fails, Stripe will retry the webhook.
-    syncStripeDataToAccountByCustomerId(customerId).catch((error) => {
+    // Await the sync (one Stripe API call + one DB write) so that a failure
+    // can be reported to Stripe as a 500 — that is what makes Stripe retry.
+    // A fire-and-forget that acks 200 would silently drop failed syncs.
+    try {
+      await syncStripeDataToAccountByCustomerId(customerId);
+    } catch (error) {
       console.error(`[STRIPE HOOK] Error processing ${event.type}`, error);
-    });
+      ctx.response.status(500);
+      return ctx.response.json({ error: 'Sync failed' });
+    }
 
     return ctx.response.json({ received: true });
   }
