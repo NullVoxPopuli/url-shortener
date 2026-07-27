@@ -1,5 +1,7 @@
 import { BaseCommand, flags } from '@adonisjs/core/ace';
-import { CommandOptions } from '@adonisjs/core/types/ace';
+import type { CommandOptions } from '@adonisjs/core/types/ace';
+// type-only: erased at runtime, so the command still lazy-loads its deps
+import type { stripe } from '#services/stripe';
 
 /**
  * Idempotent Stripe test-data seeder.
@@ -120,7 +122,7 @@ export default class StripeSeed extends BaseCommand {
   }
 }
 
-type StripeClient = typeof import('#services/stripe').stripe;
+type StripeClient = typeof stripe;
 
 /**
  * Refuse to run against live mode. Test keys start with sk_test_ / rk_test_.

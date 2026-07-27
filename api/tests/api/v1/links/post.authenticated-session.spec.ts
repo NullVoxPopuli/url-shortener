@@ -1,6 +1,6 @@
 import { hasUUID, attr, hasAttr, relationship, assertWellFormedLinkData } from '#tests/jsonapi';
 import { changedRecords, createNewAccount } from '#tests/db';
-import { type ApiClient } from '@japa/api-client';
+import type { ApiClient } from '@japa/api-client';
 import Link from '#models/link';
 import { test } from '@japa/runner';
 import type User from '#models/user';

@@ -1,4 +1,4 @@
-import { type DataResponse } from '#jsonapi';
+import type { DataResponse } from '#jsonapi';
 import type Link from '#models/link';
 import { DOMAIN } from '#start/env';
 

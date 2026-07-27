@@ -1,5 +1,5 @@
 import { test } from '@japa/runner';
-import { type ApiClient } from '@japa/api-client';
+import type { ApiClient } from '@japa/api-client';
 import { API_DOMAIN } from '#start/env';
 import { setup } from '#tests/helpers';
 import { assertUnauthorized } from '#tests/jsonapi';

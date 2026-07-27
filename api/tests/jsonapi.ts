@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import { DOMAIN } from '#start/env';
-import { type ApiClient, type ApiResponse } from '@japa/api-client';
+import type { ApiClient, ApiResponse } from '@japa/api-client';
 
 export function clientFor(client: ApiClient, url: string) {
   return {
