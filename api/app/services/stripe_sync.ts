@@ -3,7 +3,7 @@ import Account from '#models/account';
 import { stripe } from '#services/stripe';
 import type Stripe from 'stripe';
 
-export type STRIPE_SUB_CACHE =
+export type StripeSubCache =
   | {
       subscriptionId: string | null;
       status: Stripe.Subscription.Status;
@@ -77,14 +77,14 @@ export async function getOrCreateStripeCustomerIdForAccount(params: {
  */
 export async function syncStripeDataToAccountByCustomerId(
   customerId: string
-): Promise<STRIPE_SUB_CACHE | null> {
+): Promise<StripeSubCache | null> {
   const account = await Account.findBy('stripe_customer_id', customerId);
   if (!account) return null;
 
   return await syncStripeDataToAccount(account);
 }
 
-export async function syncStripeDataToAccount(account: Account): Promise<STRIPE_SUB_CACHE | null> {
+export async function syncStripeDataToAccount(account: Account): Promise<StripeSubCache | null> {
   const customerId = account.stripeCustomerId;
   if (!customerId) return null;
 
@@ -126,7 +126,7 @@ export async function syncStripeDataToAccount(account: Account): Promise<STRIPE_
         }
       : null;
 
-  const subData: STRIPE_SUB_CACHE = {
+  const subData: StripeSubCache = {
     subscriptionId: subscription.id,
     status: subscription.status,
     priceId,
