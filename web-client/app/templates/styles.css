@@ -1,7 +1,20 @@
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
+  height: 100%;
   font-family: Verdana, Geneva, Tahoma, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+h1 {
+  font-family: "Arial";
+  font-style: italic;
+  text-decoration: underline;
+
+  &.soft {
+    text-decoration: none;
+  }
 }
 
 /**
@@ -18,6 +31,10 @@ html, body {
 }
 
 .ember-primitives__hero__wrapper {
+  width: 100dvw;
+  height: 100dvh;
+  position: relative;
+  z-index: 0;
   display: grid;
   justify-content: center;
   align-items: center;
@@ -26,56 +43,56 @@ html, body {
   animation: gradient-animation 16s ease infinite;
 }
 
-.hero-content {
-  display: grid;
-  gap: 1rem;
-
-  h1 {
-    margin: 0;
-    font-size: 3rem;
-    color: white;
-  }
-
-  em {
-    color: white;
-  }
+.theme-dark .ember-primitives__hero__wrapper {
+  background-image: linear-gradient(-45deg in oklch,
+      #07133d,
+      #101c5c,
+      #32166d,
+      #090b2a);
 }
+
+.ember-primitives__sticky-footer__wrapper {
+  height: 100%;
+  overflow: auto;
+}
+
+.ember-primitives__sticky-footer__container {
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.nvp__header {
+  z-index: var(--z-site-nav, 50);
+}
+
+
+.nvp__header.home-header {
+  position: sticky;
+  top: 0;
+  margin-bottom: -3.5rem;
+  background: transparent !important;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.nvp__header.did-scroll {
+  background: rgba(100, 70, 200, 0.75);
+  box-shadow: var(--shadow-xl);
+  backdrop-filter: blur(5px);
+}
+
 
 @keyframes gradient-animation {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
 }
-
-.shorten-url-form {
-  display: grid;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: 0.25rem;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(5px);
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
-
-  label {
-    display: grid;
-    gap: 1rem;
-    font-weight: bold;
-  }
-
-  input {
-    padding: 0.25rem 0.5rem;
-  }
-
-  button {
-    justify-self: end;
-    font-size: 1rem;
-    padding: 0.25rem 0.5rem;
-  }
-}
-

@@ -7,6 +7,7 @@
   height: 100%;
   overflow: auto;
 }
+
 .ember-primitives__sticky-footer__container {
   min-height: 100%;
   display: grid;
@@ -70,7 +71,6 @@ h1 {
   overflow: hidden;
   position: absolute;
   white-space: nowrap;
-  widto: 1px;
 }
 
 .ember-primitives__hero__wrapper {
@@ -85,6 +85,7 @@ h1 {
 .header-spacer {
   height: 80px;
 }
+
 .hero-content {
   display: grid;
   gap: 1rem;
@@ -111,9 +112,11 @@ h1 {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -236,6 +239,7 @@ h1 {
         }
       }
     }
+
     .copy-shortUrl {
       border: none;
       font-size: 1.5rem;
@@ -335,36 +339,47 @@ footer {
 .flex-wrap {
   flex-wrap: wrap;
 }
+
 .mx-auto {
   margin: 0 auto;
 }
+
 .justify-between {
   justify-content: space-between;
 }
+
 .flex {
   display: flex;
 }
+
 .grid {
   display: grid;
 }
+
 .flex-column {
   flex-direction: column;
 }
+
 .gap-3 {
   gap: 0.75rem;
 }
+
 .gap-8 {
   gap: 2rem;
 }
+
 .gap-12 {
   gap: 3rem;
 }
+
 .h-6 {
   height: 1.5rem;
 }
+
 .w-6 {
   width: 1.5rem;
 }
+
 .fill-slate-900 {
   fill: black;
 }

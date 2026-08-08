@@ -1,6 +1,7 @@
 {
   "extends": "@ember/app-tsconfig",
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "emitDeclarationOnly": false,
     "noEmit": true,
     "baseUrl": ".",
@@ -16,7 +17,8 @@
     "types": [
       "ember-source/types",
       "vite/client",
-      "@glint/ember-tsc/types"
+      "@glint/ember-tsc/types",
+      "ember-scoped-css/types"
     ]
   },
   "include": ["app", "tests", "types", "vite.config.mjs"],

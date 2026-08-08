@@ -6,7 +6,7 @@
 | The routes file is used for defining the HTTP routes.
 |
 */
-import { DOMAIN } from '#start/env';
+import { APP_ORIGIN, DOMAIN } from '#start/env';
 import router from '@adonisjs/core/services/router';
 
 function version(name: string, callback: () => unknown) {
@@ -66,6 +66,23 @@ router
     let stripeWebhook = () => import('#controllers/stripe_webhook');
 
     router.post('stripe/webhook', [stripeWebhook, 'handle']);
+  })
+  .domain(`api.${DOMAIN}`);
+
+/**
+ * OAuth routes (browser redirects, no JSON:API middleware).
+ */
+router
+  .group(() => {
+    const github = () => import('#controllers/auth/github');
+    const auth = () => import('#controllers/auth');
+
+    router.get('/_/auth/github', [github, 'redirect']);
+    router.get('/_/auth/callback/github', [github, 'callback']);
+    router.get('/_/auth/logout', [auth, 'logout']);
+    router.get('/_/unauthenticated', ({ response }) => {
+      return response.redirect(`${APP_ORIGIN}/auth/login`);
+    });
   })
   .domain(`api.${DOMAIN}`);
 

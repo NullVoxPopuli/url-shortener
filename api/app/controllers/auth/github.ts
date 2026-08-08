@@ -1,3 +1,4 @@
+import { APP_ORIGIN } from '#start/env';
 import Account from '#models/account';
 import User from '#models/user';
 import db from '@adonisjs/lucid/services/db';
@@ -5,6 +6,10 @@ import db from '@adonisjs/lucid/services/db';
 import type { HttpContext } from '@adonisjs/core/http';
 
 export default class GitHubController {
+  async redirect({ ally }: HttpContext) {
+    return ally.use('github').redirect();
+  }
+
   async callback({ ally, session, auth, response }: HttpContext) {
     const gh = ally.use('github');
 
@@ -48,7 +53,7 @@ export default class GitHubController {
     await auth.use('web').login(user);
     await auth.authenticate();
 
-    response.redirect('/');
+    response.redirect(APP_ORIGIN);
   }
 
   async findOrCreate(id: string, name: string, token: string) {
