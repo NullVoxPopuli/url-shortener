@@ -1,6 +1,8 @@
 import app from '@adonisjs/core/services/app';
 import { defineConfig } from '@adonisjs/core/http';
 
+import { DOMAIN } from '#start/env';
+
 /**
  * The configuration settings used by the HTTP server
  */
@@ -19,7 +21,7 @@ export const http = defineConfig({
    * defined inside the "config/session.ts" file.
    */
   cookie: {
-    domain: 'nvp.gg',
+    domain: `.${DOMAIN}`,
     path: '/',
     maxAge: '2h',
     httpOnly: true,

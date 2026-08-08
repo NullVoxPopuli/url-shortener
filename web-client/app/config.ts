@@ -13,7 +13,7 @@ const ENV: Config = {
   environment: import.meta.env.DEV ? 'development' : 'production',
   rootURL: '/',
   locationType: 'history',
-  authOrigin: import.meta.env.DEV ? 'http://nvp.local:5001' : 'https://nvp.gg',
+  authOrigin: import.meta.env.DEV ? 'http://nvp.local' : 'https://nvp.gg',
   apiOrigin: import.meta.env.DEV ? 'http://api.nvp.local:5001' : 'https://api.nvp.gg',
   docsOrigin: import.meta.env.DEV ? 'http://docs.nvp.local:5001' : 'https://docs.nvp.gg',
   EmberENV: {},

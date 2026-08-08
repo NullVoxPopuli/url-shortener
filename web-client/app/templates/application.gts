@@ -9,6 +9,7 @@ import { Header as NvpHeader, Shell, ThemeToggle } from 'nvp.ui';
 import config from '#config';
 
 import { Footer } from './components/footer';
+import HeaderAuthActions from './components/header-auth-actions';
 
 const docsOrigin = config.docsOrigin;
 
@@ -56,7 +57,6 @@ const HeaderLinks = <template>
 </template>;
 
 const HeaderActions = <template>
-  <a href="/auth/login">Login</a>
-  <a href="/auth/signup">Signup</a>
+  <HeaderAuthActions />
   <ThemeToggle />
 </template>;

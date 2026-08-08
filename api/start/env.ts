@@ -95,6 +95,7 @@ export const isPG = env.get('DB_CONNECTION') === 'postgres';
 const isProd = env.get('NODE_ENV') === 'production';
 export const APP_ORIGIN = isProd ? `https://app.${DOMAIN}` : `http://app.${DOMAIN}:5002`;
 export const API_ORIGIN = isProd ? `https://api.${DOMAIN}` : `http://api.${DOMAIN}:5001`;
+export const AUTH_ORIGIN = isProd ? `https://${DOMAIN}` : `http://${DOMAIN}`;
 
 // Probably just for testing
 export const API_DOMAIN = `api.${DOMAIN}:${env.get('PORT')}`;

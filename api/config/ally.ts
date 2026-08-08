@@ -1,14 +1,14 @@
-import env, { API_ORIGIN } from '#start/env';
+import env, { AUTH_ORIGIN } from '#start/env';
 import { defineConfig, services } from '@adonisjs/ally';
 
-const callbackBase = `${API_ORIGIN}/_/auth/callback`;
+const callbackBase = `${AUTH_ORIGIN}/_/auth/callback`;
 
 const allyConfig = defineConfig({
   github: services.github({
     clientId: env.get('GITHUB_CLIENT_ID')!,
     clientSecret: env.get('GITHUB_CLIENT_SECRET')!,
     callbackUrl: `${callbackBase}/github`,
-    scopes: ['user:name'],
+    scopes: ['read:user', 'user:email'],
   }),
   google: services.google({
     clientId: env.get('GOOGLE_CLIENT_ID')!,

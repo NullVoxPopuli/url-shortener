@@ -6,7 +6,7 @@
 | The routes file is used for defining the HTTP routes.
 |
 */
-import { APP_ORIGIN, DOMAIN } from '#start/env';
+import { APP_ORIGIN, AUTH_ORIGIN, DOMAIN } from '#start/env';
 import router from '@adonisjs/core/services/router';
 
 function version(name: string, callback: () => unknown) {
@@ -79,12 +79,13 @@ router
 
     router.get('/_/auth/github', [github, 'redirect']);
     router.get('/_/auth/callback/github', [github, 'callback']);
+    router.get('/_/auth/me', [auth, 'me']);
     router.get('/_/auth/logout', [auth, 'logout']);
     router.get('/_/unauthenticated', ({ response }) => {
       return response.redirect(`${APP_ORIGIN}/auth/login`);
     });
   })
-  .domain(`api.${DOMAIN}`);
+  .domain(new URL(AUTH_ORIGIN).hostname);
 
 router
   .group(async () => {
