@@ -229,8 +229,8 @@ importers:
         specifier: ~7.3.0-alpha.5
         version: 7.3.0-alpha.5(@glimmer/component@2.1.1(supports-color@10.2.2))(supports-color@10.2.2)
       nvp.ui:
-        specifier: ^0.9.0
-        version: 0.9.0(@babel/core@7.28.6(supports-color@10.2.2))(ember-source@7.3.0-alpha.5(@glimmer/component@2.1.1(supports-color@10.2.2))(supports-color@10.2.2))(supports-color@10.2.2)
+        specifier: ^0.9.2
+        version: 0.9.2(@babel/core@7.28.6(supports-color@10.2.2))(ember-source@7.3.0-alpha.5(@glimmer/component@2.1.1(supports-color@10.2.2))(supports-color@10.2.2))(supports-color@10.2.2)
       reactiveweb:
         specifier: ^1.9.3
         version: 1.9.3(@babel/core@7.28.6(supports-color@10.2.2))(@ember/test-waiters@4.1.2(supports-color@10.2.2))(@glimmer/component@2.1.1(supports-color@10.2.2))(@glint/template@1.8.0)(supports-color@10.2.2)
@@ -6168,8 +6168,8 @@ packages:
     resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
     engines: {node: '>=18'}
 
-  nvp.ui@0.9.0:
-    resolution: {integrity: sha512-vZ15fsJJK9l6W+VV1vhM2fK74miJyodx5xGocp6KbRk6YnlZvbuhtR77yN1Ho7DUvOM9ioj+8vhuAxeQRJ6DaQ==}
+  nvp.ui@0.9.2:
+    resolution: {integrity: sha512-/oEONEpnBgCaY5Hm2iQzuXQWxXM6T6Q3V2HpsLAdcbkl9DPAP3qUjQu+MTyWhzug5/OyAjalcwFIq2I6/MBe8A==}
 
   nwsapi@2.2.24:
     resolution: {integrity: sha512-7YRhZ3jS45LwmSCT4b2sVFHt/WuovaktDU07QrtOBY2PXskss5a9jfmR9jptyumwXST+rFjrmppMY1KT/yn35A==}
@@ -14821,7 +14821,7 @@ snapshots:
       path-key: 4.0.0
       unicorn-magic: 0.3.0
 
-  nvp.ui@0.9.0(@babel/core@7.28.6(supports-color@10.2.2))(ember-source@7.3.0-alpha.5(@glimmer/component@2.1.1(supports-color@10.2.2))(supports-color@10.2.2))(supports-color@10.2.2):
+  nvp.ui@0.9.2(@babel/core@7.28.6(supports-color@10.2.2))(ember-source@7.3.0-alpha.5(@glimmer/component@2.1.1(supports-color@10.2.2))(supports-color@10.2.2))(supports-color@10.2.2):
     dependencies:
       '@ember/test-helpers': 5.4.3(@babel/core@7.28.6(supports-color@10.2.2))(supports-color@10.2.2)
       '@ember/test-waiters': 4.1.2(supports-color@10.2.2)

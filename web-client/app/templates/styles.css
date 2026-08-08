@@ -17,6 +17,14 @@ h1 {
   }
 }
 
+.nvp__site-theme-toggle:has(:focus-visible) label {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--ring-shadow);
+  border-radius: var(--radius);
+  z-index: var(--z-focused);
+}
+
 /**
 * Opposite of aria-hidden=true
 */
