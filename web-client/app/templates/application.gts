@@ -6,12 +6,9 @@ import { pageTitle } from 'ember-page-title';
 import { StickyFooter } from 'ember-primitives';
 import { Header as NvpHeader, Shell, ThemeToggle } from 'nvp.ui';
 
-import config from '#config';
-
 import { Footer } from './components/footer';
 import HeaderAuthActions from './components/header-auth-actions';
-
-const docsOrigin = config.docsOrigin;
+import HeaderLinks from './components/header-links';
 
 function handleScroll(event: Event) {
   const scrollContainer = event.currentTarget as HTMLElement;
@@ -49,12 +46,6 @@ function handleScroll(event: Event) {
     </StickyFooter>
   </Shell>
 </template>
-
-const HeaderLinks = <template>
-  <a href={{docsOrigin}}>API Documentation</a>
-  <span aria-hidden="true">|</span>
-  <a href={{docsOrigin}}>Pricing</a>
-</template>;
 
 const HeaderActions = <template>
   <HeaderAuthActions />
