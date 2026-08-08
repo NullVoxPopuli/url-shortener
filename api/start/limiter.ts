@@ -16,10 +16,29 @@ export const throttle = limiter.define('global', () => {
   return limiter.allowRequests(30).every('1 minute');
 });
 
-export const apiThrottle = limiter.define('api', (ctx) => {
+export const apiThrottle = limiter.define('api', async (ctx) => {
   if (env.get('NODE_ENV') === 'test') {
-    return limiter.noLimit();
+    return limiter.noLimit() as never;
   }
+
+  // Resolve the session guard before selecting the quota. Do not use Origin
+  // for this decision; it is client-controlled and can be spoofed.
+  try {
+    await ctx.auth.use('web').authenticate();
+
+    // First-party browser requests use the session cookie and are not part of
+    // the public API quota.
+    return limiter.noLimit() as never;
+  } catch {
+    // Continue to API-token and anonymous quota selection.
+  }
+
+  try {
+    await ctx.auth.use('api').authenticate();
+  } catch {
+    // Anonymous requests use the IP-based limit below.
+  }
+
   /**
    * Allow logged-in users to make 100 requests by
    * their user ID

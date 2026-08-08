@@ -13,6 +13,8 @@ export default class HeaderLinks extends Component {
     {{#if this.currentUser.isAuthenticated}}
       <a href="/">Home</a>
       <span aria-hidden="true">|</span>
+      <a href="/dashboard">Dashboard</a>
+      <span aria-hidden="true">|</span>
     {{/if}}
     <a href={{docsOrigin}}>API Documentation</a>
     <span aria-hidden="true">|</span>

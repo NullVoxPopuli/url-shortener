@@ -52,6 +52,8 @@ export default class CurrentUserService extends Service {
         const data = (await response.json()) as CurrentUserResponse;
 
         if (data.authenticated) {
+          console.debug('Authenticated', this.isAuthenticated);
+
           return data.user;
         }
       } catch (e) {
