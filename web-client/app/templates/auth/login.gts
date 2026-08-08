@@ -1,23 +1,22 @@
-import { BrowserWindow, Button } from 'nvp.ui';
+import { Button } from 'nvp.ui';
+
 import config from '#config';
 
-const githubLoginUrl = config.apiOrigin + '/_/auth/github';
+const githubLoginUrl = config.authOrigin + '/_/auth/github';
 
 <template>
-  <section class="landing-shell">
-    <header class="landing-header">
-      <h1>Login</h1>
-      <p>
-        Continue with GitHub to access billing and account-managed links.
-      </p>
-    </header>
+  <main class="auth-page">
+    <section class="auth-card surface">
+      <div class="auth-heading">
+        <h1>Login</h1>
+        <p>Continue with GitHub to access billing and account-managed links.</p>
+      </div>
 
-    <BrowserWindow @url={{config.apiOrigin}} @shadow={{true}}>
       <div class="auth-actions">
         <a class="oauth-link" href={{githubLoginUrl}}>
           <Button @variant="primary">Login with GitHub</Button>
         </a>
       </div>
-    </BrowserWindow>
-  </section>
+    </section>
+  </main>
 </template>

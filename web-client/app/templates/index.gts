@@ -1,4 +1,5 @@
 import { Hero } from 'ember-primitives/layout/hero';
+
 import config from '#config';
 
 import { ShortenURLForm } from './components/form';
