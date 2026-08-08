@@ -2,7 +2,7 @@ import { Button } from 'nvp.ui';
 
 import config from '#config';
 
-const logoutUrl = config.apiOrigin + '/_/auth/logout';
+const logoutUrl = config.authOrigin + '/_/auth/logout';
 
 <template>
   <main class="auth-page">
