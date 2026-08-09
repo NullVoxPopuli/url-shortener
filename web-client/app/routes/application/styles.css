@@ -38,8 +38,13 @@ h1 {
   width: 1px;
 }
 
-.ember-primitives__hero__wrapper {
-  width: 100dvw;
+/*
+ * Doubled selector out-specifies ember-primitives' own
+ * `width: 100dvw` rule, which overflows our nested scroll
+ * container (dvw ignores scrollbar widths).
+ */
+.ember-primitives__hero__wrapper.ember-primitives__hero__wrapper {
+  width: 100%;
   height: 100dvh;
   position: relative;
   z-index: 0;
