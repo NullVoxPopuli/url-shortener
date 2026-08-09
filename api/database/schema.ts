@@ -84,6 +84,21 @@ export class CustomLinkSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class LinkVisitSchema extends BaseModel {
+  static $columns = ['id', 'linkId', 'referrer', 'userAgent', 'visitedAt'] as const
+  $columns = LinkVisitSchema.$columns
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare linkId: string
+  @column()
+  declare referrer: string | null
+  @column()
+  declare userAgent: string | null
+  @column.dateTime()
+  declare visitedAt: DateTime
+}
+
 export class LinkSchema extends BaseModel {
   static $columns = ['createdAt', 'createdBy', 'expiresAt', 'id', 'original', 'ownedBy', 'updatedAt', 'visits'] as const
   $columns = LinkSchema.$columns
@@ -114,6 +129,19 @@ export class RateLimitSchema extends BaseModel {
   declare key: string
   @column()
   declare points: number
+}
+
+export class StripeWebhookEventSchema extends BaseModel {
+  static $columns = ['customerId', 'eventId', 'eventType', 'processedAt'] as const
+  $columns = StripeWebhookEventSchema.$columns
+  @column()
+  declare customerId: string | null
+  @column({ isPrimary: true })
+  declare eventId: string
+  @column()
+  declare eventType: string
+  @column.dateTime()
+  declare processedAt: DateTime
 }
 
 export class UserSchema extends BaseModel {
