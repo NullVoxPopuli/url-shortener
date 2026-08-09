@@ -81,8 +81,6 @@ test.group('POST [unauthenticated]', (group) => {
     });
 
     assertWellFormedLinkData(data);
-
-    relationship(data, 'createdBy');
   });
 
   test('Success: URLs from repl.nvp.gg are always allowed', async ({ client }) => {
@@ -98,8 +96,6 @@ test.group('POST [unauthenticated]', (group) => {
     });
 
     assertWellFormedLinkData(data);
-
-    relationship(data, 'createdBy');
   });
 
   test('Success: URLs from limber.glimdown.com are always allowed', async ({ client }) => {
@@ -115,8 +111,6 @@ test.group('POST [unauthenticated]', (group) => {
     });
 
     assertWellFormedLinkData(data);
-
-    relationship(data, 'createdBy');
 
     let id = data.id;
 

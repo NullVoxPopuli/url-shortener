@@ -48,13 +48,18 @@ export function hasUUID(resource: any) {
 
 export function assertWellFormedLinkData(data: any) {
   hasUUID(data);
+  assert.strictEqual(data.type, 'link');
   hasAttr(data, 'createdAt');
   hasAttr(data, 'updatedAt');
+  hasAttr(data, 'original');
   assert.include(attr(data, 'shortUrl'), `https://${DOMAIN}`);
   assert.ok(attr(data, 'shortUrl').startsWith(`https://${DOMAIN}`));
 
-  hasRelationship(data, 'createdBy', 'user');
-  hasRelationship(data, 'ownedBy', 'account');
+  /**
+   * Deliberately no `relationships`: account/user have no public
+   * endpoints, so the payload does not advertise them.
+   */
+  assert.notProperty(data, 'relationships');
 }
 
 export function assertUnauthorized(response: ApiResponse) {

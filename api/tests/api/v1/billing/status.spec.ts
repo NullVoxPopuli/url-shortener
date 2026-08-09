@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import type { ApiClient } from '@japa/api-client';
 import type User from '#models/user';
 import { API_DOMAIN } from '#start/env';
-import { createNewAccount } from '#tests/db';
+import { createLink, createNewAccount } from '#tests/db';
 import { setup } from '#tests/helpers';
 import { assertUnauthorized } from '#tests/jsonapi';
 
@@ -43,6 +43,40 @@ test.group('GET /v1/billing/status', (group) => {
     assert.isFalse(attributes.hasActiveSubscription);
     assert.isNull(attributes.stripe.customerId);
     assert.isNull(attributes.stripe.subscriptionStatus);
+
+    // plan + usage are top-level attributes (not nested in stripe)
+    assert.strictEqual(attributes.plan.key, 'none');
+    assert.strictEqual(attributes.plan.monthlyLinkLimit, 5);
+    assert.strictEqual(attributes.usage.used, 0);
+    assert.strictEqual(attributes.usage.remaining, 5);
+    assert.ok(attributes.usage.periodStart);
+    assert.ok(attributes.usage.periodEnd);
+    assert.isArray(attributes.availablePlans);
+    assert.strictEqual(attributes.availablePlans.length, 3);
+  });
+
+  test('usage counts links created this period', async ({ client }) => {
+    const { user, account } = await createNewAccount();
+
+    await createLink(user, account, 'https://example.com/1');
+    await createLink(user, account, 'https://example.com/2');
+
+    const response = await getStatus(client, user);
+    const attributes = response.body().data.attributes;
+
+    assert.strictEqual(attributes.usage.used, 2);
+    assert.strictEqual(attributes.usage.remaining, 3);
+  });
+
+  test('a legacy free account is unlimited', async ({ client }) => {
+    const { user } = await createNewAccount({ account: { isFree: true } });
+
+    const response = await getStatus(client, user);
+    const attributes = response.body().data.attributes;
+
+    assert.strictEqual(attributes.plan.key, 'free');
+    assert.isNull(attributes.plan.monthlyLinkLimit);
+    assert.isNull(attributes.usage.remaining);
   });
 
   test('an account with an active subscription reports it', async ({ client }) => {

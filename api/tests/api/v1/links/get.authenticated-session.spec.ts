@@ -22,8 +22,6 @@ test.group('GET [authenticated session]', (group) => {
 
     response.assertStatus(200);
     response.assertBody({
-      included: [],
-      links: [],
       data: [],
     });
   });
