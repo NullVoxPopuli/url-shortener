@@ -1,11 +1,55 @@
+import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
+import { on } from '@ember/modifier';
+
 import { formatDate } from './format';
+import { QrCode } from './qr-code';
 
 import type { TOC } from '@ember/component/template-only';
 import type { Link } from '#app/data/types';
 
+interface QrDisclosureSignature {
+  Args: {
+    data: string;
+    watermark: boolean;
+  };
+}
+
+/**
+ * The QR svg is only rendered (and thus only generated) once the
+ * disclosure is first opened.
+ */
+class QrDisclosure extends Component<QrDisclosureSignature> {
+  @tracked isOpen = false;
+
+  onToggle = (event: Event) => {
+    this.isOpen = (event.currentTarget as HTMLDetailsElement).open;
+  };
+
+  <template>
+    <details class="qr-details" {{on "toggle" this.onToggle}}>
+      <summary>View</summary>
+      {{#if this.isOpen}}
+        <QrCode @data={{@data}} @watermark={{@watermark}} />
+      {{/if}}
+    </details>
+
+    <style scoped>
+      .qr-details summary {
+        cursor: pointer;
+      }
+
+      .qr-details[open] {
+        padding-bottom: var(--padding-2);
+      }
+    </style>
+  </template>
+}
+
 interface Signature {
   Args: {
     links: Link[];
+    watermark: boolean;
   };
 }
 
@@ -15,6 +59,7 @@ export const LinksTable: TOC<Signature> = <template>
       <thead>
         <tr>
           <th scope="col">Short link</th>
+          <th scope="col">QR code</th>
           <th scope="col">Visits</th>
           <th scope="col">Created</th>
           <th scope="col">Expires</th>
@@ -29,6 +74,9 @@ export const LinksTable: TOC<Signature> = <template>
                 target="_blank"
                 rel="noopener noreferrer"
               >{{link.shortUrl}}</a>
+            </td>
+            <td>
+              <QrDisclosure @data={{link.shortUrl}} @watermark={{@watermark}} />
             </td>
             <td>{{link.visits}}</td>
             <td>{{formatDate link.createdAt}}</td>

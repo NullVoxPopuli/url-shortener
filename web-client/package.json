@@ -80,6 +80,7 @@
     "ember-resources": "^7.1.0",
     "ember-source": "~7.3.0-alpha.5",
     "nvp.ui": "^0.9.2",
+    "qrcode-generator": "^2.0.4",
     "reactiveweb": "^1.9.3"
   },
   "volta": {

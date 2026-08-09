@@ -9,6 +9,13 @@ import type { ReactiveDataDocument } from '@warp-drive/core/reactive';
 import type { Future } from '@warp-drive/core/request';
 import type { BillingStatus, Link } from '#app/data/types';
 
+/**
+ * Only paying accounts get unwatermarked QR codes.
+ */
+function isWatermarked(billing: BillingStatus) {
+  return !billing.hasActiveSubscription;
+}
+
 interface Signature {
   Args: {
     billing: Future<ReactiveDataDocument<BillingStatus>>;
@@ -31,32 +38,35 @@ const Dashboard: TOC<Signature> = <template>
             again.</p>
         </:error>
 
-        <:content as |doc|>
+        <:content as |billingDoc|>
           <div class="dashboard-grid">
-            <SubscriptionCard @billing={{doc.data}} />
-            <UsageCard @billing={{doc.data}} />
+            <SubscriptionCard @billing={{billingDoc.data}} />
+            <UsageCard @billing={{billingDoc.data}} />
           </div>
+
+          <section class="dashboard-card surface">
+            <h2>Your links</h2>
+
+            <Request @request={{@links}}>
+              <:loading>
+                <p class="muted">Loading your links…</p>
+              </:loading>
+
+              <:error>
+                <p class="warning">Could not load your links. Refresh to try
+                  again.</p>
+              </:error>
+
+              <:content as |linksDoc|>
+                <LinksTable
+                  @links={{linksDoc.data}}
+                  @watermark={{isWatermarked billingDoc.data}}
+                />
+              </:content>
+            </Request>
+          </section>
         </:content>
       </Request>
-
-      <section class="dashboard-card surface">
-        <h2>Your links</h2>
-
-        <Request @request={{@links}}>
-          <:loading>
-            <p class="muted">Loading your links…</p>
-          </:loading>
-
-          <:error>
-            <p class="warning">Could not load your links. Refresh to try
-              again.</p>
-          </:error>
-
-          <:content as |doc|>
-            <LinksTable @links={{doc.data}} />
-          </:content>
-        </Request>
-      </section>
     </div>
   </main>
 
