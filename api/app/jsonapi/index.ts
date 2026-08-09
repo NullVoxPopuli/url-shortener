@@ -46,7 +46,9 @@ type PageNotFound = { url: string };
 type FallbackNotFound = { message: string };
 
 export const jsonapi = {
-  empty: (): Response => ({ data: {} }),
+  // JSON:API's empty document: `data: null` (an empty object is not a
+  // valid resource — clients' caches reject it for missing id/type)
+  empty: (): Response => ({ data: null }),
 
   // https://jsonapi.org/examples/#error-objects
   errors: (builder: (builder: typeof createError) => void) => {

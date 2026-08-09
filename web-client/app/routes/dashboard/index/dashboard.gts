@@ -1,6 +1,6 @@
 import { Request } from '@warp-drive/ember';
 
-import { LinksTable } from './links-table';
+import { LinksTable } from '../links-table';
 import { SubscriptionCard } from './subscription-card';
 import { UsageCard } from './usage-card';
 

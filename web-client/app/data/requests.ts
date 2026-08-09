@@ -35,6 +35,16 @@ export function getLinks() {
   });
 }
 
+export function deleteLink(id: string) {
+  return withReactiveResponse<null>({
+    url: `${config.apiOrigin}/v1/links/${id}`,
+    method: 'DELETE',
+    op: 'deleteRecord',
+    credentials: 'include',
+    headers: jsonapiHeaders(),
+  });
+}
+
 export function createLink(originalUrl: string) {
   return withReactiveResponse<Link>({
     url: `${config.apiOrigin}/v1/links`,

@@ -40,6 +40,7 @@ export interface BillingStatus {
 export interface Link {
   id: string;
   shortUrl: string;
+  original: string;
   visits: number;
   createdAt: string;
   updatedAt: string;

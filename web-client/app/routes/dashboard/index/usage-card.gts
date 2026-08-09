@@ -1,6 +1,6 @@
 import { htmlSafe } from '@ember/template';
 
-import { formatUtcDateTime } from './format';
+import { formatUtcDateTime } from '../format';
 
 import type { TOC } from '@ember/component/template-only';
 import type { BillingStatus } from '#app/data/types';

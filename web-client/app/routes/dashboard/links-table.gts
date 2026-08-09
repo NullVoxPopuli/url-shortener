@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
+import { fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 
 import { formatDate } from './format';
@@ -50,6 +51,12 @@ interface Signature {
   Args: {
     links: Link[];
     watermark: boolean;
+    /**
+     * When provided, an Actions column with a Delete button appears
+     * (the link-management page passes this; the overview does not).
+     */
+    onDelete?: (link: Link) => unknown;
+    isDeleting?: boolean;
   };
 }
 
@@ -63,6 +70,9 @@ export const LinksTable: TOC<Signature> = <template>
           <th scope="col">Visits</th>
           <th scope="col">Created</th>
           <th scope="col">Expires</th>
+          {{#if @onDelete}}
+            <th scope="col">Actions</th>
+          {{/if}}
         </tr>
       </thead>
       <tbody>
@@ -74,6 +84,21 @@ export const LinksTable: TOC<Signature> = <template>
                 target="_blank"
                 rel="noopener noreferrer"
               >{{link.shortUrl}}</a>
+              <details class="link-details">
+                <summary>Details</summary>
+                <dl>
+                  <div class="link-details-row">
+                    <dt>Original URL</dt>
+                    <dd>
+                      <a
+                        href={{link.original}}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >{{link.original}}</a>
+                    </dd>
+                  </div>
+                </dl>
+              </details>
             </td>
             <td>
               <QrDisclosure @data={{link.shortUrl}} @watermark={{@watermark}} />
@@ -81,6 +106,18 @@ export const LinksTable: TOC<Signature> = <template>
             <td>{{link.visits}}</td>
             <td>{{formatDate link.createdAt}}</td>
             <td>{{formatDate link.expiresAt}}</td>
+            {{#if @onDelete}}
+              <td>
+                <button
+                  type="button"
+                  class="delete-button"
+                  disabled={{@isDeleting}}
+                  {{on "click" (fn @onDelete link)}}
+                >
+                  Delete
+                </button>
+              </td>
+            {{/if}}
           </tr>
         {{/each}}
       </tbody>
@@ -116,6 +153,53 @@ export const LinksTable: TOC<Signature> = <template>
 
     .links-table tbody tr:last-child td {
       border-bottom: none;
+    }
+
+    .delete-button {
+      color: var(--color-danger);
+      background: none;
+      border: var(--border-width) var(--border-style) var(--border-color);
+      border-radius: var(--radius);
+      padding: var(--padding-1) var(--padding-2);
+      cursor: pointer;
+    }
+
+    .delete-button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .link-details {
+      margin-top: var(--gap-1);
+      font-size: 0.85rem;
+    }
+
+    .link-details summary {
+      cursor: pointer;
+      opacity: 0.7;
+    }
+
+    .link-details dl {
+      margin: var(--gap-2) 0 0;
+      display: grid;
+      gap: var(--gap-2);
+    }
+
+    .link-details-row {
+      display: grid;
+      gap: var(--gap-1);
+    }
+
+    .link-details dt {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.7;
+    }
+
+    .link-details dd {
+      margin: 0;
+      overflow-wrap: anywhere;
     }
   </style>
 </template>;

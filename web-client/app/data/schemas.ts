@@ -18,6 +18,7 @@ export const SCHEMAS = [
     type: 'link',
     fields: [
       { kind: 'field', name: 'shortUrl' },
+      { kind: 'field', name: 'original' },
       { kind: 'field', name: 'visits' },
       { kind: 'field', name: 'createdAt' },
       { kind: 'field', name: 'updatedAt' },

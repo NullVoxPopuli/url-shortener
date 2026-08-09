@@ -4,7 +4,7 @@ import { on } from '@ember/modifier';
 
 import { openBillingPortal } from '#app/data/billing';
 
-import { formatDate } from './format';
+import { formatDate } from '../format';
 
 import type { BillingStatus } from '#app/data/types';
 

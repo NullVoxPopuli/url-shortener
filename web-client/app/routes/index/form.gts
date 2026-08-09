@@ -5,24 +5,10 @@ import { service } from '@ember/service';
 
 import { Button } from 'nvp.ui';
 
+import { messageFrom } from '#app/data/errors';
 import { createLink } from '#app/data/requests';
 
 import type { Store } from '@warp-drive/core';
-
-function messageFrom(error: unknown): string {
-  if (error && typeof error === 'object') {
-    const maybe = error as {
-      errors?: Array<{ title?: string; detail?: string }>;
-      message?: string;
-    };
-    const first = maybe.errors?.[0];
-
-    if (first?.detail ?? first?.title) return first.detail ?? first.title ?? '';
-    if (maybe.message) return maybe.message;
-  }
-
-  return 'Something went wrong. Try again.';
-}
 
 export class ShortenURLForm extends Component {
   @service declare store: Store;
