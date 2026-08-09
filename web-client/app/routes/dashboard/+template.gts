@@ -1,4 +1,4 @@
-import Dashboard from './dashboard/index';
+import Dashboard from './dashboard';
 
 <template>
   {{! @glint-expect-error - route templates do not have typed @model }}

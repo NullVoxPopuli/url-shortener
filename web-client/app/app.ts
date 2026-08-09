@@ -28,8 +28,6 @@ function customLayout(globbed: Record<string, unknown>) {
   return result;
 }
 
-console.log(customLayout(routes));
-
 export default class App extends Application {
   modules = {
     ...import.meta.glob('./router.ts', { eager: true }),
