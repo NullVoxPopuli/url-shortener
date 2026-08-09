@@ -2,7 +2,7 @@ import { Hero } from 'ember-primitives/layout/hero';
 
 import config from '#config';
 
-import { ShortenURLForm } from './components/form';
+import { ShortenURLForm } from './form';
 
 const docsOrigin = config.docsOrigin;
 

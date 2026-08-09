@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { service } from '@ember/service';
 
 import config from '#config';
+
 import type CurrentUserService from '#services/current-user';
 
 const docsOrigin = config.docsOrigin;

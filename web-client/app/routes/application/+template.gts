@@ -6,9 +6,9 @@ import { pageTitle } from 'ember-page-title';
 import { StickyFooter } from 'ember-primitives';
 import { Header as NvpHeader, Shell, ThemeToggle } from 'nvp.ui';
 
-import { Footer } from './components/footer';
-import HeaderAuthActions from './components/header-auth-actions';
-import HeaderLinks from './components/header-links';
+import { Footer } from './footer';
+import HeaderAuthActions from './header-auth-actions';
+import HeaderLinks from './header-links';
 
 function handleScroll(event: Event) {
   const scrollContainer = event.currentTarget as HTMLElement;

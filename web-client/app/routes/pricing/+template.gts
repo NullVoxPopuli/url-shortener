@@ -1,4 +1,4 @@
-import Pricing from './pricing/index';
+import Pricing from './pricing';
 
 <template>
   {{! @glint-expect-error - route templates do not have typed @model }}
