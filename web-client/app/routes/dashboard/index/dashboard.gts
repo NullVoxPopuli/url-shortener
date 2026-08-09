@@ -24,8 +24,7 @@ interface Signature {
 }
 
 const Dashboard: TOC<Signature> = <template>
-  <main class="dashboard-page">
-    <div class="dashboard-shell">
+  <div class="dashboard-shell">
       <h1>Dashboard</h1>
 
       <Request @request={{@billing}}>
@@ -67,17 +66,9 @@ const Dashboard: TOC<Signature> = <template>
           </section>
         </:content>
       </Request>
-    </div>
-  </main>
+  </div>
 
   <style scoped>
-    .dashboard-page {
-      min-height: calc(100dvh - 3.5rem);
-      padding: 5rem 1rem 2rem;
-      background: var(--color-page-background);
-      color: var(--color-text);
-    }
-
     .dashboard-shell {
       width: min(100%, 56rem);
       margin: 0 auto;

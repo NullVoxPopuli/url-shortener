@@ -2,12 +2,14 @@ import { Hero } from 'ember-primitives/layout/hero';
 
 import config from '#config';
 
+import { SiteChrome } from '../application/site-chrome';
 import { ShortenURLForm } from './form';
 
 const docsOrigin = config.docsOrigin;
 
 <template>
-  <Hero>
+  <SiteChrome>
+    <Hero>
     <div class="hero-content">
       <h1>nvp.gg</h1>
       <em>The professional, <a href={{docsOrigin}}>API-first</a>, user-friendly, URL shortener</em>
@@ -16,7 +18,8 @@ const docsOrigin = config.docsOrigin;
 
       <em>5.3×10<sup>36</sup>&nbsp;(5.3 undecillion) Possible Links</em>
     </div>
-  </Hero>
+    </Hero>
+  </SiteChrome>
 
   <style scoped>
     .hero-content {

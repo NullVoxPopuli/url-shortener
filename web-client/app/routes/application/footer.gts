@@ -1,4 +1,5 @@
 import { ExternalLink } from 'ember-primitives/components/external-link';
+
 import config from '#config';
 
 const docsOrigin = config.docsOrigin;

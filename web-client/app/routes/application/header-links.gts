@@ -7,16 +7,28 @@ import type CurrentUserService from '#services/current-user';
 
 const docsOrigin = config.docsOrigin;
 
-export default class HeaderLinks extends Component {
+interface Signature {
+  Args: {
+    /**
+     * In the dashboard's ApplicationShell, Home/Dashboard live in the
+     * sidebar instead of the header.
+     */
+    hideAppLinks?: boolean;
+  };
+}
+
+export default class HeaderLinks extends Component<Signature> {
   @service declare currentUser: CurrentUserService;
 
   <template>
-    {{#if this.currentUser.isAuthenticated}}
-      <a href="/">Home</a>
-      <span aria-hidden="true">|</span>
-      <a href="/dashboard">Dashboard</a>
-      <span aria-hidden="true">|</span>
-    {{/if}}
+    {{#unless @hideAppLinks}}
+      {{#if this.currentUser.isAuthenticated}}
+        <a href="/">Home</a>
+        <span aria-hidden="true">|</span>
+        <a href="/dashboard">Dashboard</a>
+        <span aria-hidden="true">|</span>
+      {{/if}}
+    {{/unless}}
     <a href={{docsOrigin}}>API Documentation</a>
     <span aria-hidden="true">|</span>
     <a href="/pricing">Pricing</a>

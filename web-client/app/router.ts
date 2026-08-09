@@ -17,6 +17,10 @@ Router.map(function () {
     this.route('logout');
     this.route('signup');
   });
-  this.route('dashboard');
+  /**
+   * The logged-in area: everything under /dashboard renders inside
+   * the ApplicationShell (see routes/dashboard/+template.gts).
+   */
+  this.route('dashboard', function () {});
   this.route('pricing');
 });
