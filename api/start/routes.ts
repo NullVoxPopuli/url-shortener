@@ -24,12 +24,18 @@ router
     version('v1', () => {
       let links = () => import('#controllers/api/v1/links');
       let billing = () => import('#controllers/api/v1/billing');
+      let accounts = () => import('#controllers/api/v1/accounts');
+      let users = () => import('#controllers/api/v1/users');
 
       router.get('links', [links, 'index']);
       router.post('links', [links, 'create']);
       // Links are not updatable (for now?)
       router.get('links/:id', [links, 'show']);
       router.delete('links/:id', [links, 'delete']);
+      router.get('links/:id/visits', [links, 'visits']);
+
+      router.get('accounts/:id', [accounts, 'show']);
+      router.get('users/:id', [users, 'show']);
 
       router.post('billing/checkout', [billing, 'checkout']);
       router.post('billing/portal', [billing, 'portal']);

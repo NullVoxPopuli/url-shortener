@@ -1,4 +1,4 @@
-import { relationship, assertWellFormedLinkData, clientFor } from '#tests/jsonapi';
+import { assertWellFormedLinkData, clientFor } from '#tests/jsonapi';
 import { changedRecords } from '#tests/db';
 import Link from '#models/link';
 import { test } from '@japa/runner';

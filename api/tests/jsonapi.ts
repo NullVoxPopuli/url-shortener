@@ -55,11 +55,21 @@ export function assertWellFormedLinkData(data: any) {
   assert.include(attr(data, 'shortUrl'), `https://${DOMAIN}`);
   assert.ok(attr(data, 'shortUrl').startsWith(`https://${DOMAIN}`));
 
-  /**
-   * Deliberately no `relationships`: account/user have no public
-   * endpoints, so the payload does not advertise them.
-   */
-  assert.notProperty(data, 'relationships');
+  hasLinkedRelationship(data, 'ownedBy', 'account');
+  hasLinkedRelationship(data, 'createdBy', 'user');
+}
+
+/**
+ * Modern JSON:API relationship: identifier linkage AND a related
+ * link (clients in linksMode require `links.related`).
+ */
+export function hasLinkedRelationship(resource: any, name: string, type: string) {
+  let r = relationship(resource, name);
+
+  assert.strictEqual(r.data.type, type);
+  assert.ok(r.data.id, `relationship ${name} has an id`);
+  assert.ok(r.links?.related, `relationship ${name} has links.related`);
+  assert.include(r.links.related, `/v1/${type}s/${r.data.id}`);
 }
 
 export function assertUnauthorized(response: ApiResponse) {

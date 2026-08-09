@@ -18,6 +18,8 @@ export async function showLink(context: HttpContext) {
       scopes.visibleTo(user);
       scopes.notExpired();
     })
+    .preload('ownedBy')
+    .preload('createdBy')
     .where('id', id)
     .first();
 

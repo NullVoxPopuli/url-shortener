@@ -23,6 +23,47 @@ export const SCHEMAS = [
       { kind: 'field', name: 'createdAt' },
       { kind: 'field', name: 'updatedAt' },
       { kind: 'field', name: 'expiresAt' },
+      {
+        kind: 'belongsTo',
+        name: 'ownedBy',
+        type: 'account',
+        options: { async: false, inverse: null, linksMode: true },
+      },
+      {
+        kind: 'belongsTo',
+        name: 'createdBy',
+        type: 'user',
+        options: { async: false, inverse: null, linksMode: true },
+      },
+    ],
+  }),
+  withDefaults({
+    type: 'account',
+    fields: [
+      { kind: 'field', name: 'name' },
+      { kind: 'field', name: 'isFree' },
+      { kind: 'field', name: 'createdAt' },
+      { kind: 'field', name: 'updatedAt' },
+      {
+        kind: 'belongsTo',
+        name: 'admin',
+        type: 'user',
+        options: { async: false, inverse: null, linksMode: true },
+      },
+    ],
+  }),
+  withDefaults({
+    type: 'user',
+    fields: [
+      { kind: 'field', name: 'name' },
+      { kind: 'field', name: 'createdAt' },
+      { kind: 'field', name: 'updatedAt' },
+      {
+        kind: 'belongsTo',
+        name: 'account',
+        type: 'account',
+        options: { async: false, inverse: null, linksMode: true },
+      },
     ],
   }),
 ];

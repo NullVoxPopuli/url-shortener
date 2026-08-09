@@ -6,10 +6,13 @@ export async function listLinks(context: HttpContext) {
   let { auth, response } = context;
 
   let user = await auth.authenticate();
-  let links = await Link.query().withScopes((scopes) => {
-    scopes.visibleTo(user);
-    scopes.notExpired();
-  });
+  let links = await Link.query()
+    .withScopes((scopes) => {
+      scopes.visibleTo(user);
+      scopes.notExpired();
+    })
+    .preload('ownedBy')
+    .preload('createdBy');
 
   response.status(200);
   return render.links(links);

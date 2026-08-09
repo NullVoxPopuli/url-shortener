@@ -25,6 +25,10 @@ function isExhausted(billing: BillingStatus) {
   return billing.usage.remaining === 0;
 }
 
+function errorMessage(error: unknown) {
+  return messageFrom(error);
+}
+
 interface Signature {
   Args: {
     billing: Future<ReactiveDataDocument<BillingStatus>>;
@@ -104,9 +108,10 @@ export default class LinkManager extends Component<Signature> {
               <p class="muted">Loading your links…</p>
             </:loading>
 
-            <:error>
+            <:error as |error|>
               <p class="warning">Could not load your links. Refresh to try
                 again.</p>
+              <p class="warning">{{errorMessage error}}</p>
             </:error>
 
             <:content as |linksDoc linksState|>

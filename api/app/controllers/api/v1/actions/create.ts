@@ -86,6 +86,7 @@ async function createUnmeteredLink(url: URL): Promise<Link> {
   link.owned_by = glimdownOwner.id;
   link.created_by = glimdownOwner.id;
   await link.save();
+  await loadRelations(link);
 
   return link;
 }
@@ -96,6 +97,21 @@ async function createMeteredLink(user: User, url: URL): Promise<Link> {
   link.owned_by = user.account_id;
   link.created_by = user.id;
   await link.save();
+  await loadRelations(link);
 
   return link;
+}
+
+/**
+ * So the response can sideload (`included`) the related resources.
+ * The glimdown pseudo-owner may not have rows; that is fine — the
+ * renderer skips relations that are not loaded.
+ */
+async function loadRelations(link: Link) {
+  try {
+    await link.load('ownedBy');
+    await link.load('createdBy');
+  } catch {
+    // no rows to load; renderer handles absence
+  }
 }

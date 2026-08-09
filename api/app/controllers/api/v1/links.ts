@@ -4,6 +4,7 @@ import { createLink } from './actions/create.js';
 import { deleteLink } from './actions/delete.js';
 import { showLink } from './actions/show.js';
 import { listLinks } from './actions/list.js';
+import { listVisits } from './actions/visits.js';
 
 export default class LinksController {
   /**
@@ -48,5 +49,15 @@ export default class LinksController {
    */
   async index(context: HttpContext) {
     return authenticatedAction(context, listLinks);
+  }
+
+  /**
+   * @visits
+   * @operationId getLinkVisits
+   * @summary list visits for a link
+   * @description Lists recorded visits ("clicks") for one of the caller's links, most recent first.
+   */
+  async visits(context: HttpContext) {
+    return authenticatedAction(context, listVisits);
   }
 }

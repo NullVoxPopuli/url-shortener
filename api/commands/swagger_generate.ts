@@ -84,6 +84,16 @@ const SWAGGER_SCHEMAS = {
       },
     },
   },
+  NotFound: {
+    description: 'Not Found',
+    content: {
+      [mimeType]: {
+        schema: {
+          $ref: '#/components/schemas/Error',
+        },
+      },
+    },
+  },
   UnsupportedMediaType: {
     description: 'Unsupported Media Type',
     content: {
