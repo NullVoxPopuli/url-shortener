@@ -5,6 +5,7 @@ import { render } from '#jsonapi/data';
 import { glimdownOwner } from '#consts';
 import type User from '#models/user';
 import Account from '#models/account';
+import { quotaForAccount } from '#services/link_quota';
 
 export async function createLink(context: HttpContext) {
   let { request, response } = context;
@@ -58,7 +59,8 @@ export async function createLink(context: HttpContext) {
   }
 
   let account = await Account.find(user.account_id);
-  let canCreate = account?.isFree || account?.hasActiveSubscription;
+  let quota = account ? await quotaForAccount(account) : null;
+  let canCreate = quota && (quota.remaining === null || quota.remaining > 0);
   if (canCreate) {
     let link = await createMeteredLink(user, parsed);
 
@@ -68,9 +70,9 @@ export async function createLink(context: HttpContext) {
 
   return jsonapi.errors((error) => {
     error({
-      status: 402,
-      title: 'Payment required',
-      detail: 'A subscription is required to create links',
+        status: 402,
+        title: 'Payment required',
+        detail: quota?.remaining === 0 ? 'Monthly link limit reached' : 'An account is required to create links',
     });
   });
 }

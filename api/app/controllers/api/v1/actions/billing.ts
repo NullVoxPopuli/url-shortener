@@ -5,6 +5,8 @@ import type { Response } from '#jsonapi';
 import Account from '#models/account';
 import { stripe } from '#services/stripe';
 import { getOrCreateStripeCustomerIdForAccount } from '#services/stripe_sync';
+import { quotaForAccount } from '#services/link_quota';
+import { PLANS } from '#services/plans';
 
 function mustBeAccountAdmin(params: { userId: string; account: Account }) {
   const { userId, account } = params;
@@ -50,6 +52,9 @@ export async function billingCheckout(context: HttpContext): Promise<Response> {
   if ('error' in actor) return actor.error;
 
   const { user, account } = actor;
+  const requestedPlan = context.request.input('plan');
+  const plan = PLANS.find((candidate) => candidate.key === requestedPlan) ?? PLANS[0];
+  const priceId = plan.stripePriceId;
 
   if (account.hasActiveSubscription) {
     return {
@@ -79,7 +84,7 @@ export async function billingCheckout(context: HttpContext): Promise<Response> {
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     customer: customerId,
-    line_items: [{ price: env.get('STRIPE_PRICE_ID'), quantity: 1 }],
+    line_items: [{ price: priceId, quantity: 1 }],
     success_url: successUrl.toString(),
     cancel_url: env.get('STRIPE_CANCEL_URL'),
     // Helps you correlate sessions to your own data when debugging.
@@ -105,6 +110,7 @@ export async function billingStatus(context: HttpContext): Promise<Response> {
   if ('error' in actor) return actor.error;
 
   const { account } = actor;
+  const quota = await quotaForAccount(account);
 
   return {
     data: {
@@ -120,8 +126,19 @@ export async function billingStatus(context: HttpContext): Promise<Response> {
           priceId: account.stripePriceId,
           currentPeriodStart: account.stripeCurrentPeriodStart,
           currentPeriodEnd: account.stripeCurrentPeriodEnd,
-          cancelAtPeriodEnd: account.stripeCancelAtPeriodEnd,
-          paymentMethod: {
+        cancelAtPeriodEnd: account.stripeCancelAtPeriodEnd,
+        plan: quota.plan,
+        usage: {
+          used: quota.used,
+          remaining: quota.remaining,
+          periodStart: quota.periodStart,
+          periodEnd: quota.periodEnd,
+        },
+        availablePlans: PLANS.map((plan) => ({
+          ...plan,
+          stripePriceId: plan.stripePriceId,
+        })),
+        paymentMethod: {
             brand: account.stripePaymentMethodBrand,
             last4: account.stripePaymentMethodLast4,
           },

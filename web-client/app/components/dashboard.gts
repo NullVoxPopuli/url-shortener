@@ -14,10 +14,13 @@ export default class Dashboard extends Component {
       <div class="dashboard-grid">
         <section>
           <h2>Subscription</h2>
-          {{#if this.dashboard.billing.isFree}}
+          {{#if this.dashboard.isFree}}
             <p>Free account</p>
+          {{else if this.dashboard.hasNoSubscription}}
+            <p>No subscription</p>
           {{else}}
-            <p>{{this.dashboard.billing.stripe.subscriptionStatus}}</p>
+            <p>{{this.dashboard.billing.plan.name}}</p>
+            <p>{{this.dashboard.billing.plan.monthlyLinkLimit}} links per month</p>
             <p>
               Current period:
               {{this.dashboard.billing.stripe.currentPeriodStart}}
@@ -32,9 +35,15 @@ export default class Dashboard extends Component {
 
         <section>
           <h2>Links</h2>
-          <p>{{this.dashboard.links.length}} links made</p>
+          <p>{{this.dashboard.billing.usage.used}} of {{this.dashboard.billing.plan.monthlyLinkLimit}} links used this month</p>
+          {{#if this.dashboard.billing.usage.remaining}}
+            <p>{{this.dashboard.billing.usage.remaining}} links remaining this month</p>
+          {{else}}
+            <p>Unlimited links</p>
+          {{/if}}
         </section>
       </div>
+      <a href="/pricing">View pricing and plans</a>
     </section>
   </main>
 

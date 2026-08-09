@@ -18,4 +18,5 @@ Router.map(function () {
     this.route('signup');
   });
   this.route('dashboard');
+  this.route('pricing');
 });

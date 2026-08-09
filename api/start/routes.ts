@@ -105,8 +105,10 @@ router
  * - the redirect
  * - home
  */
-router.group(() => {
-  router.get('/:id', [() => import('#controllers/redirect'), 'findLink']);
-  router.get('/', [() => import('#controllers/home'), 'index']);
-  router.post('/', [() => import('#controllers/home'), 'createLink']);
-});
+router
+  .group(() => {
+    router.get('/:id', [() => import('#controllers/redirect'), 'findLink']);
+    router.get('/', [() => import('#controllers/home'), 'index']);
+    router.post('/', [() => import('#controllers/home'), 'createLink']);
+  })
+  .domain(DOMAIN);
