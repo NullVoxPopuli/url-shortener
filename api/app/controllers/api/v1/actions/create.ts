@@ -70,9 +70,12 @@ export async function createLink(context: HttpContext) {
 
   return jsonapi.errors((error) => {
     error({
-        status: 402,
-        title: 'Payment required',
-        detail: quota?.remaining === 0 ? 'Monthly link limit reached' : 'An account is required to create links',
+      status: 402,
+      title: 'Payment required',
+      detail:
+        quota?.remaining === 0
+          ? 'Monthly link limit reached'
+          : 'An account is required to create links',
     });
   });
 }

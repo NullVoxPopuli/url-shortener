@@ -1,5 +1,6 @@
-import Dashboard from '#components/dashboard';
+import Dashboard from './dashboard/index';
 
 <template>
-  <Dashboard />
+  {{! @glint-expect-error - route templates do not have typed @model }}
+  <Dashboard @billing={{@model.billing}} @links={{@model.links}} />
 </template>

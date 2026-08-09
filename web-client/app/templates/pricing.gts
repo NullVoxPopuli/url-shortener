@@ -1,5 +1,6 @@
-import Pricing from '#components/pricing';
+import Pricing from './pricing/index';
 
 <template>
-  <Pricing />
+  {{! @glint-expect-error - route templates do not have typed @model }}
+  <Pricing @billing={{@model.billing}} />
 </template>

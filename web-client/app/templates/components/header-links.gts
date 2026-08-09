@@ -18,6 +18,6 @@ export default class HeaderLinks extends Component {
     {{/if}}
     <a href={{docsOrigin}}>API Documentation</a>
     <span aria-hidden="true">|</span>
-    <a href={{docsOrigin}}>Pricing</a>
+    <a href="/pricing">Pricing</a>
   </template>
 }

@@ -7,6 +7,7 @@ export function link(link: Link): DataResponse {
 
   return {
     data: {
+      type: 'link',
       id: link.id,
       attributes: {
         shortUrl,
@@ -16,8 +17,8 @@ export function link(link: Link): DataResponse {
         expiresAt: link.expiresAt,
       },
       relationships: {
-        ownedBy: { type: 'account', id: link.owned_by },
-        createdBy: { type: 'user', id: link.created_by },
+        ownedBy: { data: { type: 'account', id: link.owned_by } },
+        createdBy: { data: { type: 'user', id: link.created_by } },
       },
     },
   };

@@ -2,11 +2,7 @@ import { defineConfig } from '@adonisjs/cors';
 
 import { APP_ORIGIN, DOMAIN } from '#start/env';
 
-const allowedOrigins = [
-  APP_ORIGIN,
-  `http://app.${DOMAIN}`,
-  `https://app.${DOMAIN}`,
-];
+const allowedOrigins = [APP_ORIGIN, `http://app.${DOMAIN}`, `https://app.${DOMAIN}`];
 
 /**
  * Configuration options to tweak the CORS policy. The following

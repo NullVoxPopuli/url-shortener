@@ -126,7 +126,8 @@ export async function billingStatus(context: HttpContext): Promise<Response> {
           priceId: account.stripePriceId,
           currentPeriodStart: account.stripeCurrentPeriodStart,
           currentPeriodEnd: account.stripeCurrentPeriodEnd,
-        cancelAtPeriodEnd: account.stripeCancelAtPeriodEnd,
+          cancelAtPeriodEnd: account.stripeCancelAtPeriodEnd,
+        },
         plan: quota.plan,
         usage: {
           used: quota.used,
@@ -134,16 +135,12 @@ export async function billingStatus(context: HttpContext): Promise<Response> {
           periodStart: quota.periodStart,
           periodEnd: quota.periodEnd,
         },
-        availablePlans: PLANS.map((plan) => ({
-          ...plan,
-          stripePriceId: plan.stripePriceId,
-        })),
+        availablePlans: PLANS.map((plan) => ({ ...plan })),
         paymentMethod: {
-            brand: account.stripePaymentMethodBrand,
-            last4: account.stripePaymentMethodLast4,
-          },
-          lastSyncedAt: account.stripeLastSyncedAt?.toISO() ?? null,
+          brand: account.stripePaymentMethodBrand,
+          last4: account.stripePaymentMethodLast4,
         },
+        lastSyncedAt: account.stripeLastSyncedAt?.toISO() ?? null,
       },
     },
   };
