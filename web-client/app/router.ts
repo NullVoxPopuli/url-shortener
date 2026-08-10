@@ -27,4 +27,5 @@ Router.map(function () {
     this.route('domains');
   });
   this.route('pricing');
+  this.route('join', { path: '/join/:token' });
 });

@@ -4,6 +4,7 @@ import LinkVisit from '#models/link_visit';
 import logger from '@adonisjs/core/services/logger';
 import type { HttpContext } from '@adonisjs/core/http';
 import { compressedUUID } from '@nullvoxpopuli/url-compression';
+import { DOMAIN } from '#start/env';
 import CustomLink from '#models/custom_link';
 
 export default class LinksController {
@@ -14,6 +15,7 @@ export default class LinksController {
    */
   async findLink({ view, request, response }: HttpContext) {
     const { id } = request.params();
+    const hostname = request.hostname();
 
     let link: Link | undefined;
 
@@ -21,7 +23,7 @@ export default class LinksController {
      * Probably a UUID
      */
     if (id.length === 36) {
-      link = await this.getBestResult(id);
+      link = await this.getBestResult(id, hostname);
     }
 
     if (!link) {
@@ -34,7 +36,7 @@ export default class LinksController {
       }
 
       if (uuid) {
-        link = await this.getBestResult(uuid);
+        link = await this.getBestResult(uuid, hostname);
       }
     }
 
@@ -82,8 +84,20 @@ export default class LinksController {
     }
   }
 
-  async getBestResult(id: string) {
-    let link = await Link.query().preload('ownedBy').where('id', '=', id).first();
+  /**
+   * On the default short domain, only default-domain links resolve;
+   * on a custom domain, only that domain's links resolve.
+   */
+  async getBestResult(id: string, hostname?: string | null) {
+    let query = Link.query().preload('ownedBy').where('id', '=', id);
+
+    if (!hostname || hostname === DOMAIN) {
+      query = query.whereNull('domain');
+    } else {
+      query = query.where('domain', hostname);
+    }
+
+    let link = await query.first();
 
     if (!link) {
       return;

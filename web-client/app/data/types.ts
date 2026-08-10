@@ -40,10 +40,58 @@ export interface BillingStatus {
 export interface Link {
   id: string;
   shortUrl: string;
+  domain: string | null;
   original: string;
   visits: number;
   createdAt: string;
   updatedAt: string;
   expiresAt: string | null;
   [Type]: 'link';
+}
+
+export interface ApiUser {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string | null;
+  [Type]: 'user';
+}
+
+export interface ApiAccount {
+  id: string;
+  name: string;
+  isFree: boolean | null;
+  createdAt: string;
+  updatedAt: string | null;
+  admin: ApiUser;
+  [Type]: 'account';
+}
+
+export interface Membership {
+  id: string;
+  role: 'admin' | 'member';
+  createdAt: string;
+  user: ApiUser;
+  account: ApiAccount;
+  [Type]: 'membership';
+}
+
+export interface Invitation {
+  id: string;
+  role: 'admin' | 'member';
+  token: string;
+  acceptUrl: string;
+  createdAt: string;
+  expiresAt: string;
+  acceptedAt: string | null;
+  account: ApiAccount;
+  [Type]: 'invitation';
+}
+
+export interface CustomDomain {
+  id: string;
+  hostname: string;
+  createdAt: string;
+  account: ApiAccount;
+  [Type]: 'custom-domain';
 }

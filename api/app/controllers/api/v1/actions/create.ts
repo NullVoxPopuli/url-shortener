@@ -6,6 +6,7 @@ import { glimdownOwner } from '#consts';
 import type User from '#models/user';
 import Account from '#models/account';
 import { quotaForAccount } from '#services/link_quota';
+import CustomDomain from '#models/custom_domain';
 
 export async function createLink(context: HttpContext) {
   let { request, response } = context;
@@ -62,7 +63,22 @@ export async function createLink(context: HttpContext) {
   let quota = account ? await quotaForAccount(account) : null;
   let canCreate = quota && (quota.remaining === null || quota.remaining > 0);
   if (canCreate) {
-    let link = await createMeteredLink(user, parsed);
+    let requestedDomain = data.domain ? String(data.domain).trim().toLowerCase() : null;
+
+    if (requestedDomain) {
+      let owned = await CustomDomain.query()
+        .where('account_id', user.account_id)
+        .where('hostname', requestedDomain)
+        .first();
+
+      if (!owned) {
+        return jsonapi.unprocessableContent(
+          `${requestedDomain} is not one of your account's custom domains`
+        );
+      }
+    }
+
+    let link = await createMeteredLink(user, parsed, requestedDomain);
 
     response.status(201);
     return render.link(link);
@@ -91,9 +107,14 @@ async function createUnmeteredLink(url: URL): Promise<Link> {
   return link;
 }
 
-async function createMeteredLink(user: User, url: URL): Promise<Link> {
+async function createMeteredLink(
+  user: User,
+  url: URL,
+  domain: string | null = null
+): Promise<Link> {
   let link = new Link();
   link.original = url.toString();
+  link.domain = domain;
   link.owned_by = user.account_id;
   link.created_by = user.id;
   await link.save();

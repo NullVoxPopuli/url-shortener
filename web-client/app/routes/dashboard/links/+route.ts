@@ -1,7 +1,7 @@
 import Route from '@ember/routing/route';
 import { service } from '@ember/service';
 
-import { getBillingStatus, getLinks } from '#app/data/requests';
+import { getBillingStatus, getDomains, getLinks } from '#app/data/requests';
 
 import type { Store } from '@warp-drive/core';
 
@@ -12,6 +12,7 @@ export default class DashboardLinksRoute extends Route {
     return {
       billing: this.store.request(getBillingStatus()),
       links: this.store.request(getLinks()),
+      domains: this.store.request(getDomains()),
     };
   }
 }

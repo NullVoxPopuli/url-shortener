@@ -2,6 +2,7 @@ import { ApplicationShell, Navigation, NavigationList, ThemeToggle } from 'nvp.u
 
 import HeaderAuthActions from '../application/header-auth-actions';
 import HeaderLinks from '../application/header-links';
+import { AccountSwitcher } from './account-switcher';
 import { SidebarLink } from './sidebar-link';
 
 <template>
@@ -27,6 +28,7 @@ import { SidebarLink } from './sidebar-link';
     </:headerLeft>
 
     <:headerRight>
+      <AccountSwitcher />
       <HeaderAuthActions />
       <ThemeToggle />
     </:headerRight>

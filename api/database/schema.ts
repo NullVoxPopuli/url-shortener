@@ -7,6 +7,44 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class AccountInvitationSchema extends BaseModel {
+  static $columns = ['acceptedAt', 'acceptedBy', 'accountId', 'createdAt', 'expiresAt', 'id', 'invitedBy', 'role', 'token'] as const
+  $columns = AccountInvitationSchema.$columns
+  @column.dateTime()
+  declare acceptedAt: DateTime | null
+  @column()
+  declare acceptedBy: string | null
+  @column()
+  declare accountId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare expiresAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare invitedBy: string
+  @column()
+  declare role: string
+  @column()
+  declare token: string
+}
+
+export class AccountMembershipSchema extends BaseModel {
+  static $columns = ['accountId', 'createdAt', 'id', 'role', 'userId'] as const
+  $columns = AccountMembershipSchema.$columns
+  @column()
+  declare accountId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare role: string
+  @column()
+  declare userId: string
+}
+
 export class AccountSchema extends BaseModel {
   static $columns = ['adminId', 'createdAt', 'id', 'isFree', 'name', 'stripeCancelAtPeriodEnd', 'stripeCurrentPeriodEnd', 'stripeCurrentPeriodStart', 'stripeCustomerId', 'stripeLastSyncedAt', 'stripePaymentMethodBrand', 'stripePaymentMethodLast4', 'stripePriceId', 'stripeSubscriptionId', 'stripeSubscriptionStatus', 'updatedAt'] as const
   $columns = AccountSchema.$columns
@@ -69,6 +107,19 @@ export class AuthAccessTokenSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class CustomDomainSchema extends BaseModel {
+  static $columns = ['accountId', 'createdAt', 'hostname', 'id'] as const
+  $columns = CustomDomainSchema.$columns
+  @column()
+  declare accountId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare hostname: string
+  @column({ isPrimary: true })
+  declare id: number
+}
+
 export class CustomLinkSchema extends BaseModel {
   static $columns = ['createdAt', 'id', 'linkId', 'name', 'updatedAt'] as const
   $columns = CustomLinkSchema.$columns
@@ -100,12 +151,14 @@ export class LinkVisitSchema extends BaseModel {
 }
 
 export class LinkSchema extends BaseModel {
-  static $columns = ['createdAt', 'createdBy', 'expiresAt', 'id', 'original', 'ownedBy', 'updatedAt', 'visits'] as const
+  static $columns = ['createdAt', 'createdBy', 'domain', 'expiresAt', 'id', 'original', 'ownedBy', 'updatedAt', 'visits'] as const
   $columns = LinkSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
   declare createdBy: string
+  @column()
+  declare domain: string | null
   @column.dateTime()
   declare expiresAt: DateTime | null
   @column({ isPrimary: true })
@@ -145,7 +198,7 @@ export class StripeWebhookEventSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['accountId', 'createdAt', 'id', 'name', 'oauthGithubId', 'oauthGithubToken', 'oauthGoogleId', 'oauthGoogleToken', 'oauthTwitterId', 'oauthTwitterToken', 'updatedAt'] as const
+  static $columns = ['accountId', 'createdAt', 'id', 'isStaff', 'name', 'oauthGithubId', 'oauthGithubToken', 'oauthGoogleId', 'oauthGoogleToken', 'oauthTwitterId', 'oauthTwitterToken', 'updatedAt'] as const
   $columns = UserSchema.$columns
   @column()
   declare accountId: string | null
@@ -153,6 +206,8 @@ export class UserSchema extends BaseModel {
   declare createdAt: DateTime
   @column({ isPrimary: true })
   declare id: string
+  @column()
+  declare isStaff: boolean
   @column()
   declare name: string | null
   @column()

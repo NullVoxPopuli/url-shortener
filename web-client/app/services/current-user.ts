@@ -5,9 +5,18 @@ import { getPromiseState } from 'reactiveweb/get-promise-state';
 
 import config from '#config';
 
+export interface CurrentUserMembership {
+  accountId: string;
+  accountName: string;
+  role: 'admin' | 'member';
+}
+
 interface CurrentUserData {
   id: string | number;
   name: string;
+  isStaff: boolean;
+  accountId: string;
+  memberships: CurrentUserMembership[];
 }
 
 interface CurrentUserResponse {
@@ -32,6 +41,22 @@ export default class CurrentUserService extends Service {
 
   get isAuthenticated() {
     return Boolean(this.user)
+  }
+
+  get accountId() {
+    return this.user?.accountId ?? null;
+  }
+
+  get memberships() {
+    return this.user?.memberships ?? [];
+  }
+
+  get activeMembership() {
+    return this.memberships.find((m) => m.accountId === this.accountId) ?? null;
+  }
+
+  get isAdminOfActiveAccount() {
+    return this.activeMembership?.role === 'admin';
   }
 
   async refresh() {

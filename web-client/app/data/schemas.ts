@@ -18,6 +18,7 @@ export const SCHEMAS = [
     type: 'link',
     fields: [
       { kind: 'field', name: 'shortUrl' },
+      { kind: 'field', name: 'domain' },
       { kind: 'field', name: 'original' },
       { kind: 'field', name: 'visits' },
       { kind: 'field', name: 'createdAt' },
@@ -58,6 +59,55 @@ export const SCHEMAS = [
       { kind: 'field', name: 'name' },
       { kind: 'field', name: 'createdAt' },
       { kind: 'field', name: 'updatedAt' },
+      {
+        kind: 'belongsTo',
+        name: 'account',
+        type: 'account',
+        options: { async: false, inverse: null, linksMode: true },
+      },
+    ],
+  }),
+  withDefaults({
+    type: 'membership',
+    fields: [
+      { kind: 'field', name: 'role' },
+      { kind: 'field', name: 'createdAt' },
+      {
+        kind: 'belongsTo',
+        name: 'user',
+        type: 'user',
+        options: { async: false, inverse: null, linksMode: true },
+      },
+      {
+        kind: 'belongsTo',
+        name: 'account',
+        type: 'account',
+        options: { async: false, inverse: null, linksMode: true },
+      },
+    ],
+  }),
+  withDefaults({
+    type: 'custom-domain',
+    fields: [
+      { kind: 'field', name: 'hostname' },
+      { kind: 'field', name: 'createdAt' },
+      {
+        kind: 'belongsTo',
+        name: 'account',
+        type: 'account',
+        options: { async: false, inverse: null, linksMode: true },
+      },
+    ],
+  }),
+  withDefaults({
+    type: 'invitation',
+    fields: [
+      { kind: 'field', name: 'role' },
+      { kind: 'field', name: 'token' },
+      { kind: 'field', name: 'acceptUrl' },
+      { kind: 'field', name: 'createdAt' },
+      { kind: 'field', name: 'expiresAt' },
+      { kind: 'field', name: 'acceptedAt' },
       {
         kind: 'belongsTo',
         name: 'account',

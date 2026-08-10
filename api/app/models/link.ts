@@ -13,6 +13,12 @@ export default class Link extends BaseModel {
   @column()
   declare original: string;
 
+  /**
+   * null = the default short domain
+   */
+  @column()
+  declare domain: string | null;
+
   @column()
   declare visits: number;
 

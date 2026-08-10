@@ -19,7 +19,7 @@ function includedFor(link: Link) {
 }
 
 export function link(link: Link): DataResponse {
-  let shortUrl = `https://${DOMAIN}/${link.encodedId}`;
+  let shortUrl = `https://${link.domain ?? DOMAIN}/${link.encodedId}`;
   let included = includedFor(link);
 
   return {
@@ -29,6 +29,7 @@ export function link(link: Link): DataResponse {
       id: link.id,
       attributes: {
         shortUrl,
+        domain: link.domain,
         original: link.original,
         visits: link.visits,
         createdAt: link.createdAt,

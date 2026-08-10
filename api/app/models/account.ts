@@ -2,6 +2,7 @@ import { DateTime } from 'luxon';
 import { randomUUID } from 'node:crypto';
 import { beforeCreate, BaseModel, column, hasMany, belongsTo } from '@adonisjs/lucid/orm';
 import User from './user.js';
+import AccountMembership from './account_membership.js';
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations';
 
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set([
@@ -33,6 +34,9 @@ export default class Account extends BaseModel {
 
   @column({ columnName: 'is_free' })
   declare isFree: boolean;
+
+  @hasMany(() => AccountMembership, { foreignKey: 'account_id' })
+  declare memberships: HasMany<typeof AccountMembership>;
 
   @column({ columnName: 'stripe_customer_id' })
   declare stripeCustomerId: string | null;

@@ -6,6 +6,7 @@ import Account from '#models/account';
 import User from '#models/user';
 import { faker } from '@faker-js/faker';
 import Link from '#models/link';
+import AccountMembership from '#models/account_membership';
 
 export async function changedRecords(klass: typeof BaseModel, fn: () => unknown) {
   let beforeAll = await klass.all();
@@ -52,6 +53,9 @@ export async function createNewAccount(options?: {
     user.save();
     account.save();
   });
+
+  // mirror signup: the creator is an admin member of their account
+  await AccountMembership.ensure({ accountId: account.id, userId: user.id, role: 'admin' });
 
   return { user, account };
 }

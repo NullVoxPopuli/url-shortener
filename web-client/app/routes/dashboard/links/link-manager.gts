@@ -15,7 +15,7 @@ import { LinksTable } from '../links-table';
 import type { Store } from '@warp-drive/core';
 import type { ReactiveDataDocument } from '@warp-drive/core/reactive';
 import type { Future } from '@warp-drive/core/request';
-import type { BillingStatus, Link } from '#app/data/types';
+import type { BillingStatus, CustomDomain, Link } from '#app/data/types';
 
 function isWatermarked(billing: BillingStatus) {
   return !billing.hasActiveSubscription;
@@ -33,6 +33,7 @@ interface Signature {
   Args: {
     billing: Future<ReactiveDataDocument<BillingStatus>>;
     links: Future<ReactiveDataDocument<Link[]>>;
+    domains: Future<ReactiveDataDocument<CustomDomain[]>>;
   };
 }
 
@@ -51,8 +52,12 @@ export default class LinkManager extends Component<Signature> {
     event.preventDefault();
 
     const form = event.currentTarget as HTMLFormElement;
-    const value = new FormData(form).get('url');
+    const formData = new FormData(form);
+    const value = formData.get('url');
     const url = typeof value === 'string' ? value.trim() : '';
+    const domainValue = formData.get('domain');
+    const domain =
+      typeof domainValue === 'string' && domainValue !== '' ? domainValue : null;
 
     if (!url) return;
 
@@ -60,7 +65,7 @@ export default class LinkManager extends Component<Signature> {
     this.error = null;
 
     try {
-      await this.store.request(createLink(url));
+      await this.store.request(createLink(url, domain));
       await Promise.all(refresh.map((fn) => fn()));
       form.reset();
     } catch (error) {
@@ -140,6 +145,23 @@ export default class LinkManager extends Component<Signature> {
                           required
                         >
                       </label>
+                      <Request @request={{@domains}}>
+                        <:content as |domainsDoc|>
+                          {{#if domainsDoc.data.length}}
+                            <label>
+                              <span class="visually-hidden">Domain</span>
+                              <select name="domain">
+                                <option value="">Default domain</option>
+                                {{#each domainsDoc.data as |domain|}}
+                                  <option
+                                    value={{domain.hostname}}
+                                  >{{domain.hostname}}</option>
+                                {{/each}}
+                              </select>
+                            </label>
+                          {{/if}}
+                        </:content>
+                      </Request>
                       <Button
                         type="submit"
                         @variant="primary"
@@ -213,8 +235,17 @@ export default class LinkManager extends Component<Signature> {
         gap: var(--gap-2);
       }
 
-      .create-form label {
+      .create-form label:first-child {
         flex: 1;
+      }
+
+      .create-form select {
+        height: 100%;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius);
+        border: var(--border-width) var(--border-style) var(--border-color);
+        background: var(--color-page-background);
+        color: var(--color-text);
       }
 
       .create-form input {

@@ -130,7 +130,7 @@ export const jsonapi = {
       });
     });
   },
-  notFound: (params: EntityNotFound | PageNotFound | FallbackNotFound) => {
+  notFound: (params: EntityNotFound | PageNotFound | FallbackNotFound): ErrorResponse => {
     if ('kind' in params && 'id') {
       let { kind, id } = params;
 

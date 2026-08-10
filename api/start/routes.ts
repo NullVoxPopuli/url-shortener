@@ -35,7 +35,26 @@ router
       router.get('links/:id/visits', [links, 'visits']);
 
       router.get('accounts/:id', [accounts, 'show']);
+      router.get('accounts/:id/memberships', [accounts, 'memberships']);
+      router.get('accounts/:id/invitations', [accounts, 'invitations']);
+      router.post('accounts/:id/invitations', [accounts, 'invite']);
       router.get('users/:id', [users, 'show']);
+
+      let memberships = () => import('#controllers/api/v1/memberships');
+      let invitations = () => import('#controllers/api/v1/invitations');
+      let me = () => import('#controllers/api/v1/me');
+
+      router.post('me/account', [me, 'switchAccount']);
+
+      let domains = () => import('#controllers/api/v1/domains');
+
+      router.get('domains', [domains, 'index']);
+      router.post('domains', [domains, 'create']);
+      router.delete('domains/:id', [domains, 'delete']);
+
+      router.delete('memberships/:id', [memberships, 'delete']);
+      router.post('invitations/accept', [invitations, 'accept']);
+      router.delete('invitations/:id', [invitations, 'delete']);
 
       router.post('billing/checkout', [billing, 'checkout']);
       router.post('billing/portal', [billing, 'portal']);
@@ -118,3 +137,11 @@ router
     router.post('/', [() => import('#controllers/home'), 'createLink']);
   })
   .domain(DOMAIN);
+
+/**
+ * Custom-domain hosts match none of the registered domains above, so
+ * they fall through to this domainless group: short links only.
+ */
+router.group(() => {
+  router.get('/:id', [() => import('#controllers/redirect'), 'findLink']);
+});

@@ -4,6 +4,7 @@ import { beforeCreate, BaseModel, belongsTo, column, hasMany } from '@adonisjs/l
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations';
 import Account from './account.js';
 import Link from './link.js';
+import AccountMembership from './account_membership.js';
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens';
 
 export default class User extends BaseModel {
@@ -29,6 +30,12 @@ export default class User extends BaseModel {
 
   @hasMany(() => Link, { foreignKey: 'created_by' })
   declare links: HasMany<typeof Link>;
+
+  @column({ columnName: 'is_staff', consume: (value) => Boolean(value) })
+  declare isStaff: boolean;
+
+  @hasMany(() => AccountMembership, { foreignKey: 'user_id' })
+  declare memberships: HasMany<typeof AccountMembership>;
 
   @column()
   declare oauth_github_id: string;
