@@ -73,15 +73,17 @@ export function assertWellFormedLinkData(data: any) {
 }
 
 /**
- * Modern JSON:API relationship: identifier linkage (WarpDrive's
- * linksMode reads `data` and peeks the included resource from the
- * cache — relationship links are optional).
+ * Modern JSON:API relationship: identifier linkage AND a related
+ * link — WarpDrive's JSONAPICache validates (in dev mode) that every
+ * linksMode belongsTo carries `links.related`, on primary data and
+ * included resources alike.
  */
 export function hasLinkedRelationship(resource: any, name: string, type: string) {
   let r = relationship(resource, name);
 
   assert.strictEqual(r.data.type, type);
   assert.ok(r.data.id, `relationship ${name} has an id`);
+  assert.ok(r.links?.related, `relationship ${name} has links.related`);
 }
 
 export function assertUnauthorized(response: ApiResponse) {

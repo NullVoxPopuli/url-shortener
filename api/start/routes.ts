@@ -27,14 +27,16 @@ router
       let accounts = () => import('#controllers/api/v1/accounts');
       let users = () => import('#controllers/api/v1/users');
 
-      // Named per jsonapi-adonis' `<type>.<action>` convention so the
-      // LinkBuilder can generate self/related links for these routes.
+      // Every route is named per jsonapi-adonis' `<type>.<action>`
+      // convention: the LinkBuilder derives its namespace from the
+      // SERVING route's name (unnamed route → no links in the whole
+      // document) and only emits links whose named routes exist.
       router.get('links', [links, 'index']).as('link.index');
-      router.post('links', [links, 'create']);
+      router.post('links', [links, 'create']).as('link.store');
       // Links are not updatable (for now?)
       router.get('links/:id', [links, 'show']).as('link.show');
-      router.delete('links/:id', [links, 'delete']);
-      router.get('links/:id/visits', [links, 'visits']);
+      router.delete('links/:id', [links, 'delete']).as('link.destroy');
+      router.get('links/:id/visits', [links, 'visits']).as('visit.index');
 
       let linkRelationships = () => import('#controllers/api/v1/link_relationships');
 
@@ -45,12 +47,12 @@ router
       //       otherwise shadow it.
       router.get('links/:id/:relation', [linkRelationships, 'related']).as('link.related');
 
-      router.post('accounts', [accounts, 'create']);
-      router.get('accounts/:id', [accounts, 'show']);
-      router.get('accounts/:id/memberships', [accounts, 'memberships']);
-      router.get('accounts/:id/invitations', [accounts, 'invitations']);
-      router.post('accounts/:id/invitations', [accounts, 'invite']);
-      router.get('users/:id', [users, 'show']);
+      router.post('accounts', [accounts, 'create']).as('account.store');
+      router.get('accounts/:id', [accounts, 'show']).as('account.show');
+      router.get('accounts/:id/memberships', [accounts, 'memberships']).as('membership.index');
+      router.get('accounts/:id/invitations', [accounts, 'invitations']).as('invitation.index');
+      router.post('accounts/:id/invitations', [accounts, 'invite']).as('invitation.store');
+      router.get('users/:id', [users, 'show']).as('user.show');
 
       let memberships = () => import('#controllers/api/v1/memberships');
       let invitations = () => import('#controllers/api/v1/invitations');
@@ -62,13 +64,27 @@ router
       router.post('api-keys', [apiKeys, 'create']);
       router.delete('api-keys/:id', [apiKeys, 'delete']);
 
-      router.get('domains', [domains, 'index']);
-      router.post('domains', [domains, 'create']);
-      router.delete('domains/:id', [domains, 'delete']);
+      router.get('domains', [domains, 'index']).as('custom-domain.index');
+      router.post('domains', [domains, 'create']).as('custom-domain.store');
+      router.delete('domains/:id', [domains, 'delete']).as('custom-domain.destroy');
 
-      router.delete('memberships/:id', [memberships, 'delete']);
-      router.post('invitations/accept', [invitations, 'accept']);
-      router.delete('invitations/:id', [invitations, 'delete']);
+      router.delete('memberships/:id', [memberships, 'delete']).as('membership.destroy');
+      // accepting renders the resulting membership, hence the name
+      router.post('invitations/accept', [invitations, 'accept']).as('membership.store');
+      router.delete('invitations/:id', [invitations, 'delete']).as('invitation.destroy');
+
+      /**
+       * The `related` link targets every document advertises
+       * (WarpDrive's linksMode requires them). Registered after the
+       * literal segments above so `:relation` never shadows them.
+       */
+      let related = () => import('#controllers/api/v1/related');
+
+      router.get('accounts/:id/:relation', [related, 'account']).as('account.related');
+      router.get('users/:id/:relation', [related, 'user']).as('user.related');
+      router.get('memberships/:id/:relation', [related, 'membership']).as('membership.related');
+      router.get('invitations/:id/:relation', [related, 'invitation']).as('invitation.related');
+      router.get('domains/:id/:relation', [related, 'domain']).as('custom-domain.related');
 
       router.post('billing/checkout', [billing, 'checkout']);
       router.post('billing/portal', [billing, 'portal']);
