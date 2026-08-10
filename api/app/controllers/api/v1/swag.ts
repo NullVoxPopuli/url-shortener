@@ -1,15 +1,33 @@
 import { mimeType } from '#jsonapi';
 import { componentSchemaRef, dynamicSegment, jsonapiRef } from '#openapi';
+import { DOMAIN } from '#start/env';
 import type { OpenAPIObject } from 'openapi3-ts/oas31';
+
+/**
+ * Account-scoped endpoints operate on this account (one you belong
+ * to); without it, your personal account is used.
+ */
+const accountParam = {
+  name: 'account',
+  in: 'query' as const,
+  required: false,
+  schema: { type: 'string' as const, format: 'uuid' },
+  description:
+    'The account to operate on — any account you belong to. Defaults to your personal account.',
+};
+
+/**
+ * Session auth lives on the apex domain, not api.
+ */
+const authServers = [{ url: `https://${DOMAIN}`, description: 'Auth origin (session cookies)' }];
 
 const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
   paths: {
     '/v1/links': {
       get: {
         summary: 'List links',
-        description:
-          "Lists the account's links. Account-scoped endpoints (links, billing, domains) accept an optional `?account=<id>` — an account you belong to; without it, your personal account is used.",
-        parameters: [],
+        description: "Lists the account's links.",
+        parameters: [accountParam],
         responses: {
           200: {
             description: 'Success',
@@ -31,13 +49,15 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       },
       post: {
         summary: 'Create links',
-        description: 'Create a new short link belonging to your authenticated user',
+        description:
+          'Creates a short link on the account. Body: { "originalUrl": "https://..." } and optionally { "domain": "..." } — one of the account\'s custom domains.',
+        parameters: [accountParam],
       },
     },
     '/v1/links/{id}': {
       get: {
         summary: 'Show link',
-        parameters: [dynamicSegment('id')],
+        parameters: [dynamicSegment('id'), accountParam],
         responses: {
           200: {
             description: 'OK',
@@ -69,17 +89,17 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
         },
       },
       delete: {
-        parameters: [dynamicSegment('id')],
+        parameters: [dynamicSegment('id'), accountParam],
         summary: 'Delete link',
-        description: 'Delete a link owned by your authenticated user',
+        description: "Deletes one of the account's links. 404 when there is nothing to delete.",
       },
     },
     '/v1/links/{id}/visits': {
       get: {
         summary: 'List visits for a link',
         description:
-          'Lists recorded visits ("clicks") for a link owned by your authenticated user, most recent first. Each visit records when it happened, the referrer, and the user agent.',
-        parameters: [dynamicSegment('id')],
+          'Lists recorded visits ("clicks") for one of the account\'s links, most recent first. Each visit records when it happened, the referrer, and the user agent.',
+        parameters: [dynamicSegment('id'), accountParam],
         responses: {
           200: {
             description: 'Success',
@@ -210,7 +230,8 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
     '/v1/domains': {
       get: {
         summary: 'List custom domains',
-        description: "Lists the active account's custom domains.",
+        description: "Lists the account's custom domains.",
+        parameters: [accountParam],
         responses: {
           401: componentSchemaRef('Unauthenticated'),
           415: componentSchemaRef('UnsupportedMediaType'),
@@ -220,6 +241,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
         summary: 'Add a custom domain',
         description:
           'Adds a custom domain for link creation (account admins only). Body: { "hostname": "links.example.com" }. Gated by the plan\'s domain limit (402 when full). Short links can then be created with a "domain" property.',
+        parameters: [accountParam],
       },
     },
     '/v1/domains/{id}': {
@@ -227,6 +249,123 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
         summary: 'Remove a custom domain',
         description: 'Removes a custom domain (account admins only). Links on it stop resolving.',
         parameters: [dynamicSegment('id')],
+      },
+    },
+    '/v1/billing/status': {
+      get: {
+        summary: 'Billing status',
+        description:
+          "The account's plan, usage (links used/remaining this period), Stripe subscription state, and the available plans.",
+        parameters: [accountParam],
+        responses: {
+          200: {
+            description: 'OK',
+            content: {
+              [mimeType]: {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { $ref: jsonapiRef('definitions/resource') },
+                  },
+                  example: {
+                    data: {
+                      type: 'billing-status',
+                      id: 'account-uuid',
+                      attributes: {
+                        hasActiveSubscription: false,
+                        plan: { key: 'none', name: 'No subscription', monthlyLinkLimit: 5 },
+                        usage: { used: 2, remaining: 3 },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: componentSchemaRef('Unauthenticated'),
+          404: componentSchemaRef('NotFound'),
+          415: componentSchemaRef('UnsupportedMediaType'),
+        },
+      },
+    },
+    '/v1/billing/checkout': {
+      post: {
+        summary: 'Start a Stripe Checkout session',
+        description:
+          'Starts a subscription checkout for the account (account admins only). Body: { "plan": "side-hobby" | "hobby" | "project" }. Returns the Stripe-hosted checkout URL to redirect the browser to. 409 when a subscription is already active.',
+        parameters: [accountParam],
+      },
+    },
+    '/v1/billing/portal': {
+      post: {
+        summary: 'Open the Stripe billing portal',
+        description:
+          'Creates a Stripe billing-portal session for the account (account admins only) — plan changes and cancellation happen there. Returns the portal URL to redirect the browser to.',
+        parameters: [accountParam],
+      },
+    },
+    '/v1/billing/success': {
+      get: {
+        summary: 'Checkout success redirect',
+        description:
+          'Where Stripe Checkout sends the browser after payment. Syncs the subscription eagerly (no webhook wait), then redirects to the app. Not called directly.',
+      },
+    },
+    '/_/auth/github': {
+      get: {
+        summary: 'Start GitHub OAuth',
+        description: 'Redirects the browser to GitHub to sign in. The only supported login method.',
+        servers: authServers,
+      },
+    },
+    '/_/auth/callback/github': {
+      get: {
+        summary: 'GitHub OAuth callback',
+        description:
+          'GitHub redirects here after authorization; establishes the session cookie and redirects to the app. Not called directly.',
+        servers: authServers,
+      },
+    },
+    '/_/auth/me': {
+      get: {
+        summary: 'Current session',
+        description:
+          'Who is signed in (plain JSON, not { json:api }): user id/name, staff flag, personal account id, and account memberships. Returns { "authenticated": false } for anonymous callers.',
+        servers: authServers,
+        responses: {
+          200: {
+            description: 'OK',
+            content: {
+              'application/json': {
+                schema: { type: 'object' },
+                example: {
+                  authenticated: true,
+                  user: {
+                    id: 'user-uuid',
+                    name: 'NullVoxPopuli',
+                    isStaff: false,
+                    personalAccountId: 'account-uuid',
+                    memberships: [
+                      {
+                        accountId: 'account-uuid',
+                        accountName: 'NullVoxPopuli',
+                        isPersonal: true,
+                        role: 'admin',
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    '/_/auth/logout': {
+      get: {
+        summary: 'Log out',
+        description: 'Ends the session and redirects the browser to the app.',
+        servers: authServers,
       },
     },
     '/v1/users/{id}': {
