@@ -70,7 +70,7 @@ export async function maybeAuthenticateWithScope(
       return {
         response: jsonapi.notFound({
           kind: 'Account',
-          id: String(context.request.input('account')),
+          id: String(context.request.input('accountId')),
         }),
       };
     }
@@ -105,7 +105,7 @@ export async function maybeAuthenticateWithScope(
     };
   }
 
-  let requested = context.request.input('account');
+  let requested = context.request.input('accountId');
 
   if (requested && String(requested) !== membership.account_id) {
     return {

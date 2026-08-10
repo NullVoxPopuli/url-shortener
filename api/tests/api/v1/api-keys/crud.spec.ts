@@ -309,14 +309,14 @@ test.group('API keys: bearer authentication', (group) => {
     const token = await makeKey(client, user, ['links:read']);
 
     const crossAccount = await client
-      .get(`http://${API_DOMAIN}/v1/links?account=${other.account.id}`)
+      .get(`http://${API_DOMAIN}/v1/links?accountId=${other.account.id}`)
       .headers(jsonHeaders)
       .bearerToken(token);
 
     crossAccount.assertStatus(404);
 
     const own = await client
-      .get(`http://${API_DOMAIN}/v1/links?account=${account.id}`)
+      .get(`http://${API_DOMAIN}/v1/links?accountId=${account.id}`)
       .headers(jsonHeaders)
       .bearerToken(token);
 

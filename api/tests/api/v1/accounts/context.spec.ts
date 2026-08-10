@@ -14,12 +14,12 @@ const jsonHeaders = {
 
 const listLinks = (client: ApiClient, user: User, accountId?: string) =>
   client
-    .get(`http://${API_DOMAIN}/v1/links${accountId ? `?account=${accountId}` : ''}`)
+    .get(`http://${API_DOMAIN}/v1/links${accountId ? `?accountId=${accountId}` : ''}`)
     .headers(jsonHeaders)
     .withGuard('web')
     .loginAs(user);
 
-test.group('Account context (?account=)', (group) => {
+test.group('Account context (?accountId=)', (group) => {
   setup(group);
 
   test('defaults to the personal account', async ({ client }) => {
@@ -68,7 +68,7 @@ test.group('Account context (?account=)', (group) => {
     await AccountMembership.ensure({ accountId: team.account.id, userId: user.id });
 
     const response = await client
-      .get(`http://${API_DOMAIN}/v1/billing/status?account=${team.account.id}`)
+      .get(`http://${API_DOMAIN}/v1/billing/status?accountId=${team.account.id}`)
       .headers(jsonHeaders)
       .withGuard('web')
       .loginAs(user);

@@ -11,7 +11,12 @@ import { membershipFor } from './team.js';
  * pure client-side URL concern, never a database write.
  */
 export async function accountContext(context: HttpContext, user: User): Promise<Account | null> {
-  let requested = context.request.input('account');
+  /**
+   * `accountId`, not `account`: the spec reserves simple lowercase
+   * names for itself — implementation-specific query params must
+   * contain a non a-z character.
+   */
+  let requested = context.request.input('accountId');
 
   if (!requested || requested === user.account_id) {
     return Account.find(user.account_id);

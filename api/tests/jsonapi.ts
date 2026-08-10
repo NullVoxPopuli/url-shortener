@@ -69,7 +69,6 @@ export function hasLinkedRelationship(resource: any, name: string, type: string)
   assert.strictEqual(r.data.type, type);
   assert.ok(r.data.id, `relationship ${name} has an id`);
   assert.ok(r.links?.related, `relationship ${name} has links.related`);
-  assert.include(r.links.related, `/v1/${type}s/${r.data.id}`);
 }
 
 export function assertUnauthorized(response: ApiResponse) {

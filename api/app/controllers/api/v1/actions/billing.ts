@@ -38,7 +38,7 @@ async function accountForRequest(
   const account = await accountContext(context, user);
   if (!account) {
     return {
-      error: jsonapi.notFound({ kind: 'Account', id: String(context.request.input('account')) }),
+      error: jsonapi.notFound({ kind: 'Account', id: String(context.request.input('accountId')) }),
     };
   }
 

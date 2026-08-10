@@ -21,7 +21,7 @@ export async function listDomains(context: HttpContext): Promise<Response> {
   let contextAccount = await accountContext(context, user);
 
   if (!contextAccount) {
-    return jsonapi.notFound({ kind: 'Account', id: String(request.input('account')) });
+    return jsonapi.notFound({ kind: 'Account', id: String(request.input('accountId')) });
   }
 
   let domains = await CustomDomain.query()
@@ -41,7 +41,7 @@ export async function createDomain(context: HttpContext): Promise<Response> {
   let account = await accountContext(context, user);
 
   if (!account) {
-    return jsonapi.notFound({ kind: 'Account', id: String(request.input('account')) });
+    return jsonapi.notFound({ kind: 'Account', id: String(request.input('accountId')) });
   }
 
   let membership = await membershipFor(user.id, account.id);
@@ -105,7 +105,7 @@ export async function deleteDomain(context: HttpContext): Promise<Response> {
   let account = await accountContext(context, user);
 
   if (!account) {
-    return jsonapi.notFound({ kind: 'Account', id: String(request.input('account')) });
+    return jsonapi.notFound({ kind: 'Account', id: String(request.input('accountId')) });
   }
 
   let membership = await membershipFor(user.id, account.id);

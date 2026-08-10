@@ -27,12 +27,23 @@ router
       let accounts = () => import('#controllers/api/v1/accounts');
       let users = () => import('#controllers/api/v1/users');
 
-      router.get('links', [links, 'index']);
+      // Named per jsonapi-adonis' `<type>.<action>` convention so the
+      // LinkBuilder can generate self/related links for these routes.
+      router.get('links', [links, 'index']).as('link.index');
       router.post('links', [links, 'create']);
       // Links are not updatable (for now?)
-      router.get('links/:id', [links, 'show']);
+      router.get('links/:id', [links, 'show']).as('link.show');
       router.delete('links/:id', [links, 'delete']);
       router.get('links/:id/visits', [links, 'visits']);
+
+      let linkRelationships = () => import('#controllers/api/v1/link_relationships');
+
+      router
+        .get('links/:id/relationships/:relation', [linkRelationships, 'show'])
+        .as('link.relationships.show');
+      // NOTE: must stay below `links/:id/visits` — `:relation` would
+      //       otherwise shadow it.
+      router.get('links/:id/:relation', [linkRelationships, 'related']).as('link.related');
 
       router.post('accounts', [accounts, 'create']);
       router.get('accounts/:id', [accounts, 'show']);

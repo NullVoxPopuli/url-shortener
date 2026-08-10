@@ -15,7 +15,11 @@ export default defineConfig({
   | will be scanned automatically from the "./commands" directory.
   |
   */
-  commands: [() => import('@adonisjs/core/commands'), () => import('@adonisjs/lucid/commands')],
+  commands: [
+    () => import('@adonisjs/core/commands'),
+    () => import('@adonisjs/lucid/commands'),
+    () => import('@evoactivity/jsonapi-adonis/commands'),
+  ],
 
   /*
   |--------------------------------------------------------------------------
@@ -42,6 +46,7 @@ export default defineConfig({
     () => import('@adonisjs/ally/ally_provider'),
     () => import('@adonisjs/static/static_provider'),
     () => import('@adonisjs/limiter/limiter_provider'),
+    () => import('@evoactivity/jsonapi-adonis/provider'),
   ],
 
   /*

@@ -44,7 +44,8 @@
     "#tests/*": "./tests/*.js",
     "#utils/*": "./utils/*.js",
     "#config/*": "./config/*.js",
-    "#generated/*": "./.adonisjs/server/*.js"
+    "#generated/*": "./.adonisjs/server/*.js",
+    "#resources/*": "./app/resources/*.js"
   },
   "devDependencies": {
     "@adonisjs/assembler": "^8.4.0",
@@ -87,6 +88,7 @@
     "@adonisjs/lucid": "^22.4.2",
     "@adonisjs/session": "^8.1.0",
     "@adonisjs/static": "^2.0.1",
+    "@evoactivity/jsonapi-adonis": "^0.2.0",
     "@nullvoxpopuli/url-compression": "workspace:^",
     "@vinejs/vine": "^4.4.0",
     "common-tags": "^1.8.2",

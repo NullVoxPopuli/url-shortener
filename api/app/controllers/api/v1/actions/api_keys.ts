@@ -26,7 +26,7 @@ async function membershipContext(context: HttpContext) {
       ok: false as const,
       response: jsonapi.notFound({
         kind: 'Account',
-        id: String(context.request.input('account')),
+        id: String(context.request.input('accountId')),
       }),
     };
   }
