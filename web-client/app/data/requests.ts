@@ -11,6 +11,15 @@ import type {
   Membership,
 } from '#app/data/types';
 
+function url(path: string, params: Record<string, string | undefined>) {
+  const qs = Object.entries(params)
+    .filter(([, value]) => value)
+    .map(([key, value]) => `${key}=${value}`)
+    .join('&');
+
+  return `${config.apiOrigin}${path}${qs ? `?${qs}` : ''}`;
+}
+
 function jsonapiHeaders() {
   return new Headers({
     Accept: 'application/vnd.api+json',
@@ -20,7 +29,7 @@ function jsonapiHeaders() {
 
 export function getBillingStatus(accountId?: string) {
   return withReactiveResponse<BillingStatus>({
-    url: `${config.apiOrigin}/v1/billing/status${accountId ? `?account=${accountId}` : ''}`,
+    url: url('/v1/billing/status', { accountId }),
     method: 'GET',
     op: 'query',
     credentials: 'include',
@@ -33,7 +42,7 @@ export function getBillingStatus(accountId?: string) {
 
 export function getLinks(accountId?: string) {
   return withReactiveResponse<Link[]>({
-    url: `${config.apiOrigin}/v1/links${accountId ? `?account=${accountId}` : ''}`,
+    url: url('/v1/links', { accountId, include: 'ownedBy,createdBy' }),
     method: 'GET',
     op: 'query',
     credentials: 'include',
@@ -44,7 +53,7 @@ export function getLinks(accountId?: string) {
 
 export function deleteLink(id: string, accountId?: string) {
   return withReactiveResponse<null>({
-    url: `${config.apiOrigin}/v1/links/${id}${accountId ? `?account=${accountId}` : ''}`,
+    url: url(`/v1/links/${id}`, { accountId }),
     method: 'DELETE',
     op: 'deleteRecord',
     credentials: 'include',
@@ -58,18 +67,23 @@ export function createLink(
   accountId?: string
 ) {
   return withReactiveResponse<Link>({
-    url: `${config.apiOrigin}/v1/links${accountId ? `?account=${accountId}` : ''}`,
+    url: url('/v1/links', { accountId, include: 'ownedBy,createdBy' }),
     method: 'POST',
     op: 'createRecord',
     credentials: 'include',
     headers: jsonapiHeaders(),
-    body: JSON.stringify(domain ? { originalUrl, domain } : { originalUrl }),
+    body: JSON.stringify({
+      data: {
+        type: 'link',
+        attributes: domain ? { original: originalUrl, domain } : { original: originalUrl },
+      },
+    }),
   });
 }
 
 export function getMemberships(accountId: string) {
   return withReactiveResponse<Membership[]>({
-    url: `${config.apiOrigin}/v1/accounts/${accountId}/memberships`,
+    url: url(`/v1/accounts/${accountId}/memberships`, { include: 'user,account.admin' }),
     method: 'GET',
     op: 'query',
     credentials: 'include',
@@ -80,7 +94,7 @@ export function getMemberships(accountId: string) {
 
 export function getInvitations(accountId: string) {
   return withReactiveResponse<Invitation[]>({
-    url: `${config.apiOrigin}/v1/accounts/${accountId}/invitations`,
+    url: url(`/v1/accounts/${accountId}/invitations`, { include: 'account.admin' }),
     method: 'GET',
     op: 'query',
     credentials: 'include',
@@ -91,7 +105,7 @@ export function getInvitations(accountId: string) {
 
 export function createInvitation(accountId: string) {
   return withReactiveResponse<Invitation>({
-    url: `${config.apiOrigin}/v1/accounts/${accountId}/invitations`,
+    url: url(`/v1/accounts/${accountId}/invitations`, { include: 'account.admin' }),
     method: 'POST',
     op: 'createRecord',
     credentials: 'include',
@@ -111,7 +125,7 @@ export function revokeInvitation(id: string) {
 
 export function acceptInvitation(token: string) {
   return withReactiveResponse<Membership>({
-    url: `${config.apiOrigin}/v1/invitations/accept`,
+    url: url('/v1/invitations/accept', { include: 'user,account.admin' }),
     method: 'POST',
     op: 'createRecord',
     credentials: 'include',
@@ -133,7 +147,7 @@ export function removeMembership(id: string) {
 
 export function getApiKeys(accountId?: string) {
   return withReactiveResponse<ApiKey[]>({
-    url: `${config.apiOrigin}/v1/api-keys${accountId ? `?account=${accountId}` : ''}`,
+    url: url('/v1/api-keys', { accountId }),
     method: 'GET',
     op: 'query',
     credentials: 'include',
@@ -147,7 +161,7 @@ export function createApiKey(
   accountId?: string
 ) {
   return withReactiveResponse<ApiKey>({
-    url: `${config.apiOrigin}/v1/api-keys${accountId ? `?account=${accountId}` : ''}`,
+    url: url('/v1/api-keys', { accountId }),
     method: 'POST',
     op: 'createRecord',
     credentials: 'include',
@@ -158,7 +172,7 @@ export function createApiKey(
 
 export function revokeApiKey(id: string, accountId?: string) {
   return withReactiveResponse<null>({
-    url: `${config.apiOrigin}/v1/api-keys/${id}${accountId ? `?account=${accountId}` : ''}`,
+    url: url(`/v1/api-keys/${id}`, { accountId }),
     method: 'DELETE',
     op: 'deleteRecord',
     credentials: 'include',
@@ -168,7 +182,7 @@ export function revokeApiKey(id: string, accountId?: string) {
 
 export function getDomains(accountId?: string) {
   return withReactiveResponse<CustomDomain[]>({
-    url: `${config.apiOrigin}/v1/domains${accountId ? `?account=${accountId}` : ''}`,
+    url: url('/v1/domains', { accountId, include: 'account.admin' }),
     method: 'GET',
     op: 'query',
     credentials: 'include',
@@ -179,18 +193,18 @@ export function getDomains(accountId?: string) {
 
 export function createDomain(hostname: string, accountId?: string) {
   return withReactiveResponse<CustomDomain>({
-    url: `${config.apiOrigin}/v1/domains${accountId ? `?account=${accountId}` : ''}`,
+    url: url('/v1/domains', { accountId, include: 'account.admin' }),
     method: 'POST',
     op: 'createRecord',
     credentials: 'include',
     headers: jsonapiHeaders(),
-    body: JSON.stringify({ hostname }),
+    body: JSON.stringify({ data: { type: 'custom-domain', attributes: { hostname } } }),
   });
 }
 
 export function deleteDomain(id: string, accountId?: string) {
   return withReactiveResponse<null>({
-    url: `${config.apiOrigin}/v1/domains/${id}${accountId ? `?account=${accountId}` : ''}`,
+    url: url(`/v1/domains/${id}`, { accountId }),
     method: 'DELETE',
     op: 'deleteRecord',
     credentials: 'include',

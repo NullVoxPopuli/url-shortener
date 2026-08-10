@@ -5,12 +5,13 @@ import type User from '#models/user';
 import { API_DOMAIN } from '#start/env';
 import { createLink, createNewAccount } from '#tests/db';
 import { setup } from '#tests/helpers';
+import { linkDoc } from '#tests/jsonapi';
 import { NO_SUBSCRIPTION_PLAN } from '#services/plans';
 
 const post = (user: User, client: ApiClient, body = {}) =>
   client
     .post(`http://${API_DOMAIN}/v1/links`)
-    .json(body)
+    .json(linkDoc(body))
     .header('Accept', 'application/vnd.api+json')
     .header('Content-Type', 'application/vnd.api+json')
     .withGuard('web')

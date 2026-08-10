@@ -1,9 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http';
-import type { Response } from '#jsonapi';
 import Account from '#models/account';
 import AccountMembership from '#models/account_membership';
 import { jsonapi } from '#jsonapi';
-import { render } from '#jsonapi/data';
 import { planFor } from '#services/plans';
 
 /**
@@ -11,12 +9,13 @@ import { planFor } from '#services/plans';
  * account plan: side-hobby 1, hobby 2, project 3, unpaid 0,
  * staff/legacy-free unlimited.
  */
-export async function createAccount(context: HttpContext): Promise<Response> {
-  let { auth, request, response } = context;
+export async function createAccount(context: HttpContext) {
+  let { auth, response } = context;
 
   let user = await auth.use('web').authenticate();
 
-  let name = String(request.input('name') ?? '').trim();
+  let input = await context.jsonApi.deserialize(Account);
+  let name = String(input.attributes.name ?? '').trim();
 
   if (name.length < 2 || name.length > 64) {
     return jsonapi.unprocessableContent('An account name of 2-64 characters is required');
@@ -51,9 +50,9 @@ export async function createAccount(context: HttpContext): Promise<Response> {
 
   await AccountMembership.ensure({ accountId: account.id, userId: user.id, role: 'admin' });
 
-  await account.load('admin');
+  let fresh = await context.jsonApi.query(Account).where('id', account.id).firstOrFail();
 
   response.status(201);
 
-  return render.account(account);
+  return context.jsonApi.render(fresh);
 }

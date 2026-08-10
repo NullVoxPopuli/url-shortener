@@ -1,10 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http';
-import type { Response } from '#jsonapi';
 import Account from '#models/account';
 import AccountInvitation from '#models/account_invitation';
 import AccountMembership from '#models/account_membership';
 import { jsonapi } from '#jsonapi';
-import { render } from '#jsonapi/data';
 import { membershipFor, teamCapacity } from '#services/team';
 
 /**
@@ -32,23 +30,20 @@ async function accountForMember(context: HttpContext, options?: { admin?: boolea
   return { ok: true as const, user, account, membership };
 }
 
-export async function listMemberships(context: HttpContext): Promise<Response> {
+export async function listMemberships(context: HttpContext) {
   let actor = await accountForMember(context);
 
   if (!actor.ok) return actor.error;
 
-  let memberships = await AccountMembership.query()
+  let memberships = await context.jsonApi
+    .query(AccountMembership)
     .where('account_id', actor.account.id)
-    .preload('user')
-    .preload('account', (query) => query.preload('admin'))
     .orderBy('created_at', 'asc');
 
-  context.response.status(200);
-
-  return render.memberships(memberships);
+  return context.jsonApi.render(memberships);
 }
 
-export async function createInvitation(context: HttpContext): Promise<Response> {
+export async function createInvitation(context: HttpContext) {
   let actor = await accountForMember(context, { admin: true });
 
   if (!actor.ok) return actor.error;
@@ -74,30 +69,33 @@ export async function createInvitation(context: HttpContext): Promise<Response> 
     role: 'member',
   });
 
-  await invitation.load('account', (query) => query.preload('admin'));
+  // Re-fetch through the include-aware query so ?include= paths are
+  // preloaded for the compound document.
+  let fresh = await context.jsonApi
+    .query(AccountInvitation)
+    .where('id', invitation.id)
+    .firstOrFail();
 
   context.response.status(201);
 
-  return render.invitation(invitation);
+  return context.jsonApi.render(fresh);
 }
 
-export async function listInvitations(context: HttpContext): Promise<Response> {
+export async function listInvitations(context: HttpContext) {
   let actor = await accountForMember(context, { admin: true });
 
   if (!actor.ok) return actor.error;
 
-  let all = await AccountInvitation.query()
+  let all = await context.jsonApi
+    .query(AccountInvitation)
     .where('account_id', actor.account.id)
     .whereNull('accepted_at')
-    .preload('account', (query) => query.preload('admin'))
     .orderBy('created_at', 'desc');
 
-  context.response.status(200);
-
-  return render.invitations(all.filter((invitation) => invitation.isPending));
+  return context.jsonApi.render(all.filter((invitation) => invitation.isPending));
 }
 
-export async function revokeInvitation(context: HttpContext): Promise<Response> {
+export async function revokeInvitation(context: HttpContext) {
   let { auth, request, response } = context;
 
   let user = await auth.use('web').authenticate();
@@ -120,7 +118,7 @@ export async function revokeInvitation(context: HttpContext): Promise<Response> 
   return jsonapi.notFound({ kind: 'Invitation', id });
 }
 
-export async function acceptInvitation(context: HttpContext): Promise<Response> {
+export async function acceptInvitation(context: HttpContext) {
   let { auth, request, response } = context;
 
   let user = await auth.use('web').authenticate();
@@ -138,11 +136,12 @@ export async function acceptInvitation(context: HttpContext): Promise<Response> 
   let existing = await membershipFor(user.id, invitation.account_id);
 
   if (existing) {
-    await existing.load('user');
-    await existing.load('account', (query) => query.preload('admin'));
-    response.status(200);
+    let fresh = await context.jsonApi
+      .query(AccountMembership)
+      .where('id', existing.id)
+      .firstOrFail();
 
-    return render.membership(existing);
+    return context.jsonApi.render(fresh);
   }
 
   if (!invitation.isPending) {
@@ -182,15 +181,17 @@ export async function acceptInvitation(context: HttpContext): Promise<Response> 
   invitation.accepted_by = user.id;
   await invitation.save();
 
-  await membership.load('user');
-  await membership.load('account', (query) => query.preload('admin'));
+  let fresh = await context.jsonApi
+    .query(AccountMembership)
+    .where('id', membership.id)
+    .firstOrFail();
 
   response.status(201);
 
-  return render.membership(membership);
+  return context.jsonApi.render(fresh);
 }
 
-export async function removeMembership(context: HttpContext): Promise<Response> {
+export async function removeMembership(context: HttpContext) {
   let { auth, request, response } = context;
 
   let user = await auth.use('web').authenticate();

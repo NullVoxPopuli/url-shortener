@@ -7,6 +7,7 @@ import AccountMembership from '#models/account_membership';
 import { API_DOMAIN } from '#start/env';
 import { createNewAccount } from '#tests/db';
 import { setup } from '#tests/helpers';
+import { linkDoc } from '#tests/jsonapi';
 import { overridePlan } from '#services/plan_override';
 
 const jsonHeaders = {
@@ -245,7 +246,7 @@ test.group('API keys: bearer authentication', (group) => {
 
     const created = await client
       .post(`http://${API_DOMAIN}/v1/links`)
-      .json({ originalUrl: 'https://emberjs.com' })
+      .json(linkDoc({ originalUrl: 'https://emberjs.com' }))
       .headers(jsonHeaders)
       .bearerToken(token);
 
@@ -261,7 +262,7 @@ test.group('API keys: bearer authentication', (group) => {
 
     const created = await client
       .post(`http://${API_DOMAIN}/v1/links`)
-      .json({ originalUrl: 'https://emberjs.com' })
+      .json(linkDoc({ originalUrl: 'https://emberjs.com' }))
       .headers(jsonHeaders)
       .bearerToken(token);
 

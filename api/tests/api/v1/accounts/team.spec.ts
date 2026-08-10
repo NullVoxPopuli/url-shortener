@@ -17,7 +17,7 @@ const jsonHeaders = {
 
 const getMemberships = (client: ApiClient, accountId: string, user?: User) => {
   const request = client
-    .get(`http://${API_DOMAIN}/v1/accounts/${accountId}/memberships`)
+    .get(`http://${API_DOMAIN}/v1/accounts/${accountId}/memberships?include=user`)
     .headers(jsonHeaders);
 
   return user ? request.withGuard('web').loginAs(user) : request;

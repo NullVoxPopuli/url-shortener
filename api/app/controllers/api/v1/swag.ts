@@ -7,7 +7,7 @@ import type { OpenAPIObject } from 'openapi3-ts/oas31';
  * to); without it, your personal account is used.
  */
 const accountParam = {
-  name: 'account',
+  name: 'accountId',
   in: 'query' as const,
   required: false,
   schema: { type: 'string' as const, format: 'uuid' },
@@ -15,14 +15,27 @@ const accountParam = {
     'The account to operate on — any account you belong to. Defaults to your personal account.',
 };
 
+/**
+ * Compound-document sideloading, per the spec: nothing is included
+ * unless asked for. Unknown paths are a 400.
+ */
+const includeParam = (paths: string) => ({
+  name: 'include',
+  in: 'query' as const,
+  required: false,
+  schema: { type: 'string' as const },
+  description: `Comma-separated relationship paths to sideload into \`included\` (e.g. \`${paths}\`). Unknown paths are a 400.`,
+});
+
 const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
   paths: {
     '/v1/links': {
       get: {
         summary: 'List links',
-        description: "Lists the account's links. Accepts an API key with the `links:read` scope.",
+        description:
+          "Lists the account's links. Accepts an API key with the `links:read` scope. Supports `sort` (e.g. `-createdAt`), `page[number]`/`page[size]`, and `fields[link]` sparse fieldsets.",
         security: [{ apiKey: [] }],
-        parameters: [accountParam],
+        parameters: [accountParam, includeParam('ownedBy,createdBy')],
         responses: {
           200: {
             description: 'Success',
@@ -45,9 +58,9 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       post: {
         summary: 'Create links',
         description:
-          'Creates a short link on the account. Body: { "originalUrl": "https://..." } and optionally { "domain": "..." } — one of the account\'s custom domains. Accepts an API key with the `links:write` scope.',
+          'Creates a short link on the account. Body is a { json:api } resource document: { "data": { "type": "link", "attributes": { "original": "https://...", "domain": "optional-custom-domain" } } }. Accepts an API key with the `links:write` scope.',
         security: [{ apiKey: [] }],
-        parameters: [accountParam],
+        parameters: [accountParam, includeParam('ownedBy,createdBy')],
       },
     },
     '/v1/links/{id}': {
@@ -56,7 +69,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
         description:
           "Shows one of the account's links. Accepts an API key with the `links:read` scope.",
         security: [{ apiKey: [] }],
-        parameters: [dynamicSegment('id'), accountParam],
+        parameters: [dynamicSegment('id'), accountParam, includeParam('ownedBy,createdBy')],
         responses: {
           200: {
             description: 'OK',
@@ -139,7 +152,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       post: {
         summary: 'Create an additional account',
         description:
-          'Creates an additional (non-personal) account with you as admin. Body: { "name": "..." }. Gated by your personal account\'s plan: side-hobby 1, hobby 2, project 3, unpaid 0 (402 when full).',
+          'Creates an additional (non-personal) account with you as admin. Body is a { json:api } resource document: { "data": { "type": "account", "attributes": { "name": "..." } } }. Gated by your personal account\'s plan: side-hobby 1, hobby 2, project 3, unpaid 0 (402 when full).',
       },
     },
     '/v1/accounts/{id}': {
@@ -180,8 +193,8 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
     '/v1/accounts/{id}/memberships': {
       get: {
         summary: 'List account members',
-        description: 'Lists the members of an account you belong to, with user info included.',
-        parameters: [dynamicSegment('id')],
+        description: 'Lists the members of an account you belong to.',
+        parameters: [dynamicSegment('id'), includeParam('user,account.admin')],
         responses: {
           401: componentSchemaRef('Unauthenticated'),
           404: componentSchemaRef('NotFound'),
@@ -193,7 +206,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       get: {
         summary: 'List pending invitations',
         description: 'Lists pending invitations (account admins only).',
-        parameters: [dynamicSegment('id')],
+        parameters: [dynamicSegment('id'), includeParam('account.admin')],
         responses: {
           401: componentSchemaRef('Unauthenticated'),
           404: componentSchemaRef('NotFound'),
@@ -259,7 +272,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       get: {
         summary: 'List custom domains',
         description: "Lists the account's custom domains.",
-        parameters: [accountParam],
+        parameters: [accountParam, includeParam('account.admin')],
         responses: {
           401: componentSchemaRef('Unauthenticated'),
           415: componentSchemaRef('UnsupportedMediaType'),
@@ -268,7 +281,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       post: {
         summary: 'Add a custom domain',
         description:
-          'Adds a custom domain for link creation (account admins only). Body: { "hostname": "links.example.com" }. Gated by the plan\'s domain limit (402 when full). Short links can then be created with a "domain" property.',
+          'Adds a custom domain for link creation (account admins only). Body is a { json:api } resource document: { "data": { "type": "custom-domain", "attributes": { "hostname": "links.example.com" } } }. Gated by the plan\'s domain limit (402 when full). Short links can then be created with a "domain" property.',
         parameters: [accountParam],
       },
     },

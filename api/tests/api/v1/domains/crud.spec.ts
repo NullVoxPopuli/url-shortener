@@ -6,6 +6,7 @@ import CustomDomain from '#models/custom_domain';
 import { API_DOMAIN } from '#start/env';
 import { createLink, createNewAccount } from '#tests/db';
 import { setup } from '#tests/helpers';
+import { doc, linkDoc } from '#tests/jsonapi';
 import { overridePlan } from '#services/plan_override';
 
 const jsonHeaders = {
@@ -16,7 +17,7 @@ const jsonHeaders = {
 const addDomain = (client: ApiClient, user: User, hostname: string) =>
   client
     .post(`http://${API_DOMAIN}/v1/domains`)
-    .json({ hostname })
+    .json(doc('custom-domain', { hostname }))
     .headers(jsonHeaders)
     .withGuard('web')
     .loginAs(user);
@@ -24,7 +25,7 @@ const addDomain = (client: ApiClient, user: User, hostname: string) =>
 const postLink = (client: ApiClient, user: User, body: Record<string, unknown>) =>
   client
     .post(`http://${API_DOMAIN}/v1/links`)
-    .json(body)
+    .json(linkDoc(body))
     .headers(jsonHeaders)
     .withGuard('web')
     .loginAs(user);

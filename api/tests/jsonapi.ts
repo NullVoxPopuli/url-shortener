@@ -2,6 +2,19 @@ import { assert } from 'chai';
 import { DOMAIN } from '#start/env';
 import type { ApiClient, ApiResponse } from '@japa/api-client';
 
+/** A minimal JSON:API resource document for write requests. */
+export function doc(type: string, attributes: Record<string, unknown>) {
+  return { data: { type, attributes } };
+}
+
+export function linkDoc(body: { originalUrl?: unknown; domain?: unknown }) {
+  let attributes: Record<string, unknown> = { original: body.originalUrl };
+
+  if (body.domain !== undefined) attributes.domain = body.domain;
+
+  return doc('link', attributes);
+}
+
 export function clientFor(client: ApiClient, url: string) {
   return {
     post: (body = {}) => {
@@ -60,15 +73,15 @@ export function assertWellFormedLinkData(data: any) {
 }
 
 /**
- * Modern JSON:API relationship: identifier linkage AND a related
- * link (clients in linksMode require `links.related`).
+ * Modern JSON:API relationship: identifier linkage (WarpDrive's
+ * linksMode reads `data` and peeks the included resource from the
+ * cache — relationship links are optional).
  */
 export function hasLinkedRelationship(resource: any, name: string, type: string) {
   let r = relationship(resource, name);
 
   assert.strictEqual(r.data.type, type);
   assert.ok(r.data.id, `relationship ${name} has an id`);
-  assert.ok(r.links?.related, `relationship ${name} has links.related`);
 }
 
 export function assertUnauthorized(response: ApiResponse) {

@@ -1,9 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http';
-import type { Response } from '#jsonapi';
 import CustomDomain from '#models/custom_domain';
 import { accountContext } from '#services/account_context';
 import { jsonapi } from '#jsonapi';
-import { render } from '#jsonapi/data';
 import { planFor } from '#services/plans';
 import { DOMAIN } from '#start/env';
 import { membershipFor } from '#services/team';
@@ -14,8 +12,8 @@ import { membershipFor } from '#services/team';
  */
 const HOSTNAME_PATTERN = /^(?!-)[a-z0-9-]{1,63}(?<!-)(\.(?!-)[a-z0-9-]{1,63}(?<!-))+$/;
 
-export async function listDomains(context: HttpContext): Promise<Response> {
-  let { auth, request, response } = context;
+export async function listDomains(context: HttpContext) {
+  let { auth, request } = context;
 
   let user = await auth.use('web').authenticate();
   let contextAccount = await accountContext(context, user);
@@ -24,17 +22,15 @@ export async function listDomains(context: HttpContext): Promise<Response> {
     return jsonapi.notFound({ kind: 'Account', id: String(request.input('accountId')) });
   }
 
-  let domains = await CustomDomain.query()
+  let domains = await context.jsonApi
+    .query(CustomDomain)
     .where('account_id', contextAccount.id)
-    .preload('account', (query) => query.preload('admin'))
     .orderBy('created_at', 'asc');
 
-  response.status(200);
-
-  return render.customDomains(domains);
+  return context.jsonApi.render(domains);
 }
 
-export async function createDomain(context: HttpContext): Promise<Response> {
+export async function createDomain(context: HttpContext) {
   let { auth, request, response } = context;
 
   let user = await auth.use('web').authenticate();
@@ -52,7 +48,8 @@ export async function createDomain(context: HttpContext): Promise<Response> {
 
   let plan = planFor(account);
 
-  let hostname = String(request.input('hostname') ?? '')
+  let input = await context.jsonApi.deserialize(CustomDomain);
+  let hostname = String(input.attributes.hostname ?? '')
     .trim()
     .toLowerCase();
 
@@ -89,14 +86,14 @@ export async function createDomain(context: HttpContext): Promise<Response> {
 
   let domain = await CustomDomain.create({ account_id: account.id, hostname });
 
-  await domain.load('account', (query) => query.preload('admin'));
+  let fresh = await context.jsonApi.query(CustomDomain).where('id', domain.id).firstOrFail();
 
   response.status(201);
 
-  return render.customDomain(domain);
+  return context.jsonApi.render(fresh);
 }
 
-export async function deleteDomain(context: HttpContext): Promise<Response> {
+export async function deleteDomain(context: HttpContext) {
   let { auth, request, response } = context;
 
   let user = await auth.use('web').authenticate();

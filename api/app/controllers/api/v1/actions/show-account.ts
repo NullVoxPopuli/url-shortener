@@ -1,11 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import Account from '#models/account';
 import { jsonapi } from '#jsonapi';
-import { render } from '#jsonapi/data';
 import { membershipFor } from '#services/team';
 
 export async function showAccount(context: HttpContext) {
-  let { auth, request, response } = context;
+  let { auth, request } = context;
 
   let user = await auth.use('web').authenticate();
   let id = request.param('id');
@@ -20,13 +19,11 @@ export async function showAccount(context: HttpContext) {
     return jsonapi.notFound({ kind: 'Account', id });
   }
 
-  let account = await Account.query().preload('admin').where('id', id).first();
+  let account = await context.jsonApi.query(Account).where('id', id).first();
 
   if (!account) {
     return jsonapi.notFound({ kind: 'Account', id });
   }
 
-  response.status(200);
-
-  return render.account(account);
+  return context.jsonApi.render(account);
 }

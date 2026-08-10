@@ -1,4 +1,4 @@
-import { assertWellFormedLinkData, clientFor } from '#tests/jsonapi';
+import { assertWellFormedLinkData, clientFor, linkDoc } from '#tests/jsonapi';
 import { changedRecords } from '#tests/db';
 import Link from '#models/link';
 import { test } from '@japa/runner';
@@ -12,7 +12,7 @@ test.group('POST [unauthenticated]', (group) => {
   setup(group);
 
   test('Error: no url', async ({ client }) => {
-    let response = await clientFor(client, ENDPOINT).post({});
+    let response = await clientFor(client, ENDPOINT).post(linkDoc({}));
 
     response.assertStatus(422);
     response.assertBody({
@@ -26,7 +26,7 @@ test.group('POST [unauthenticated]', (group) => {
   });
 
   test('Error: missing url', async ({ client }) => {
-    let response = await clientFor(client, ENDPOINT).post({ originalUrl: '' });
+    let response = await clientFor(client, ENDPOINT).post(linkDoc({ originalUrl: '' }));
 
     response.assertStatus(422);
     response.assertBody({
@@ -40,7 +40,7 @@ test.group('POST [unauthenticated]', (group) => {
   });
 
   test('Error: malformed url', async ({ client }) => {
-    let response = await clientFor(client, ENDPOINT).post({ originalUrl: 'abcd' });
+    let response = await clientFor(client, ENDPOINT).post(linkDoc({ originalUrl: 'abcd' }));
 
     response.assertStatus(422);
     response.assertBody({
@@ -54,7 +54,9 @@ test.group('POST [unauthenticated]', (group) => {
   });
 
   test('Error: any non-glimdown.com URL requires authentication', async ({ client }) => {
-    let response = await clientFor(client, ENDPOINT).post({ originalUrl: 'https://google.com' });
+    let response = await clientFor(client, ENDPOINT).post(
+      linkDoc({ originalUrl: 'https://google.com' })
+    );
 
     response.assertStatus(401);
     response.assertBody({
@@ -71,9 +73,11 @@ test.group('POST [unauthenticated]', (group) => {
   test('Success: URLs from glimdown.com are always allowed', async ({ client }) => {
     let data: any;
     await changedRecords(Link, async () => {
-      let response = await clientFor(client, ENDPOINT).post({
-        originalUrl: 'https://glimdown.com',
-      });
+      let response = await clientFor(client, ENDPOINT).post(
+        linkDoc({
+          originalUrl: 'https://glimdown.com',
+        })
+      );
 
       response.assertStatus(201);
 
@@ -86,9 +90,11 @@ test.group('POST [unauthenticated]', (group) => {
   test('Success: URLs from repl.nvp.gg are always allowed', async ({ client }) => {
     let data: any;
     await changedRecords(Link, async () => {
-      let response = await clientFor(client, ENDPOINT).post({
-        originalUrl: 'https://repl.nvp.gg',
-      });
+      let response = await clientFor(client, ENDPOINT).post(
+        linkDoc({
+          originalUrl: 'https://repl.nvp.gg',
+        })
+      );
 
       response.assertStatus(201);
 
@@ -101,9 +107,11 @@ test.group('POST [unauthenticated]', (group) => {
   test('Success: URLs from limber.glimdown.com are always allowed', async ({ client }) => {
     let data: any;
     await changedRecords(Link, async () => {
-      let response = await clientFor(client, ENDPOINT).post({
-        originalUrl: 'https://limber.glimdown.com',
-      });
+      let response = await clientFor(client, ENDPOINT).post(
+        linkDoc({
+          originalUrl: 'https://limber.glimdown.com',
+        })
+      );
 
       response.assertStatus(201);
 
@@ -130,13 +138,13 @@ test.group('POST [unauthenticated]', (group) => {
     let url = 'https://limber.glimdown.com';
 
     {
-      let response = await clientFor(client, ENDPOINT).post({ originalUrl: url });
+      let response = await clientFor(client, ENDPOINT).post(linkDoc({ originalUrl: url }));
       response.assertStatus(201);
 
       first = response.body().data;
     }
     {
-      let response = await clientFor(client, ENDPOINT).post({ originalUrl: url });
+      let response = await clientFor(client, ENDPOINT).post(linkDoc({ originalUrl: url }));
       response.assertStatus(201);
 
       second = response.body().data;
@@ -159,13 +167,13 @@ test.group('POST [unauthenticated]', (group) => {
     let url = 'https://repl.nvp.gg';
 
     {
-      let response = await clientFor(client, ENDPOINT).post({ originalUrl: url });
+      let response = await clientFor(client, ENDPOINT).post(linkDoc({ originalUrl: url }));
       response.assertStatus(201);
 
       first = response.body().data;
     }
     {
-      let response = await clientFor(client, ENDPOINT).post({ originalUrl: url });
+      let response = await clientFor(client, ENDPOINT).post(linkDoc({ originalUrl: url }));
       response.assertStatus(201);
 
       second = response.body().data;

@@ -1,17 +1,32 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import { jsonapi } from '#jsonapi';
 import Link from '#models/link';
-import { render } from '#jsonapi/data';
 import { glimdownOwner } from '#consts';
 import type User from '#models/user';
 import { quotaForAccount } from '#services/link_quota';
 import { maybeAuthenticateWithScope } from '#services/api_keys';
 import CustomDomain from '#models/custom_domain';
 
+/**
+ * The { json:api } entry point: unpacks the resource document, then
+ * defers to the shared creation flow (the SSR home form calls
+ * createLinkFromValues directly with its flat form body).
+ */
 export async function createLink(context: HttpContext) {
-  let { request, response } = context;
-  let data = request.body();
-  let originalUrl = data.originalUrl;
+  let input = await context.jsonApi.deserialize(Link);
+
+  return createLinkFromValues(context, {
+    original: input.attributes.original ? String(input.attributes.original) : '',
+    domain: input.attributes.domain ? String(input.attributes.domain) : null,
+  });
+}
+
+export async function createLinkFromValues(
+  context: HttpContext,
+  values: { original: string; domain?: string | null }
+) {
+  let { response } = context;
+  let originalUrl = values.original;
 
   if (!originalUrl) {
     return jsonapi.errors((error) => {
@@ -48,7 +63,7 @@ export async function createLink(context: HttpContext) {
       let link = await createUnmeteredLink(parsed);
 
       response.status(201);
-      return render.link(link);
+      return renderFresh(context, link);
     }
 
     return jsonapi.errors((error) => {
@@ -64,7 +79,7 @@ export async function createLink(context: HttpContext) {
   let quota = await quotaForAccount(account);
   let canCreate = quota.remaining === null || quota.remaining > 0;
   if (canCreate) {
-    let requestedDomain = data.domain ? String(data.domain).trim().toLowerCase() : null;
+    let requestedDomain = values.domain ? String(values.domain).trim().toLowerCase() : null;
 
     if (requestedDomain) {
       let owned = await CustomDomain.query()
@@ -82,7 +97,7 @@ export async function createLink(context: HttpContext) {
     let link = await createMeteredLink(user, account.id, parsed, requestedDomain);
 
     response.status(201);
-    return render.link(link);
+    return renderFresh(context, link);
   }
 
   return jsonapi.errors((error) => {
@@ -100,7 +115,6 @@ async function createUnmeteredLink(url: URL): Promise<Link> {
   link.owned_by = glimdownOwner.id;
   link.created_by = glimdownOwner.id;
   await link.save();
-  await loadRelations(link);
 
   return link;
 }
@@ -117,21 +131,17 @@ async function createMeteredLink(
   link.owned_by = accountId;
   link.created_by = user.id;
   await link.save();
-  await loadRelations(link);
 
   return link;
 }
 
 /**
- * So the response can sideload (`included`) the related resources.
- * The glimdown pseudo-owner may not have rows; that is fine — the
- * renderer skips relations that are not loaded.
+ * Re-fetch through the include-aware query so the response honours
+ * ?include= paths. The glimdown pseudo-owner may not have rows to
+ * preload; the builder skips relations that are not loaded.
  */
-async function loadRelations(link: Link) {
-  try {
-    await link.load('ownedBy');
-    await link.load('createdBy');
-  } catch {
-    // no rows to load; renderer handles absence
-  }
+async function renderFresh(context: HttpContext, link: Link) {
+  let fresh = await context.jsonApi.query(Link).where('id', link.id).first();
+
+  return context.jsonApi.render(fresh ?? link);
 }

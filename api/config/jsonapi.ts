@@ -7,6 +7,10 @@ export default defineConfig({
    */
   resources: [
     () => import('#resources/link_resource'),
+    () => import('#resources/membership_resource'),
+    () => import('#resources/invitation_resource'),
+    () => import('#resources/visit_resource'),
+    () => import('#resources/custom_domain_resource'),
     () => import('#resources/account_resource'),
     () => import('#resources/user_resource'),
   ],

@@ -2,7 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http';
 import type { Response } from '#jsonapi';
 import AccountMembership from '#models/account_membership';
 import { jsonapi } from '#jsonapi';
-import { render } from '#jsonapi/data';
+import { apiKey, apiKeys } from '#jsonapi/api_key';
 import { accountContext } from '#services/account_context';
 import { API_KEY_SCOPES, apiKeyCapacity } from '#services/api_keys';
 import { membershipFor } from '#services/team';
@@ -55,7 +55,7 @@ export async function listApiKeys(context: HttpContext): Promise<Response> {
 
   context.response.status(200);
 
-  return render.apiKeys(keys, capacity);
+  return apiKeys(keys, capacity);
 }
 
 export async function createApiKey(context: HttpContext): Promise<Response> {
@@ -131,7 +131,7 @@ export async function createApiKey(context: HttpContext): Promise<Response> {
 
   response.status(201);
 
-  return render.apiKey(key, { secret: key.value!.release() });
+  return apiKey(key, { secret: key.value!.release() });
 }
 
 export async function revokeApiKey(context: HttpContext): Promise<Response> {

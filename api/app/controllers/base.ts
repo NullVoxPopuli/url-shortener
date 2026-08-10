@@ -1,10 +1,11 @@
 import { jsonapi } from '#jsonapi';
 import type { HttpContext } from '@adonisjs/core/http';
 import type { Response } from '#jsonapi';
+import type { Document } from '@evoactivity/jsonapi-adonis';
 
 export async function htmlAction(
   context: HttpContext,
-  callback: (context: HttpContext) => Promise<Response>
+  callback: (context: HttpContext) => Promise<Response | Document>
 ) {
   let { response } = context;
 

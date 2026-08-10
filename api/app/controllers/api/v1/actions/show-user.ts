@@ -2,15 +2,14 @@ import type { HttpContext } from '@adonisjs/core/http';
 import AccountMembership from '#models/account_membership';
 import User from '#models/user';
 import { jsonapi } from '#jsonapi';
-import { render } from '#jsonapi/data';
 
 export async function showUser(context: HttpContext) {
-  let { auth, request, response } = context;
+  let { auth, request } = context;
 
   let user = await auth.use('web').authenticate();
   let id = request.param('id');
 
-  let target = await User.query().preload('account').where('id', id).first();
+  let target = await context.jsonApi.query(User).where('id', id).first();
 
   /**
    * Users are visible when they share at least one account with the
@@ -23,9 +22,7 @@ export async function showUser(context: HttpContext) {
     return jsonapi.notFound({ kind: 'User', id });
   }
 
-  response.status(200);
-
-  return render.user(target);
+  return context.jsonApi.render(target);
 }
 
 async function sharesAnAccount(a: string, b: string) {

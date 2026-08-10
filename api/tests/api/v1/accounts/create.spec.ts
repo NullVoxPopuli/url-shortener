@@ -7,6 +7,7 @@ import AccountMembership from '#models/account_membership';
 import { API_DOMAIN } from '#start/env';
 import { createNewAccount } from '#tests/db';
 import { setup } from '#tests/helpers';
+import { doc } from '#tests/jsonapi';
 import { overridePlan } from '#services/plan_override';
 
 const jsonHeaders = {
@@ -17,7 +18,7 @@ const jsonHeaders = {
 const create = (client: ApiClient, user: User, name: string) =>
   client
     .post(`http://${API_DOMAIN}/v1/accounts`)
-    .json({ name })
+    .json(doc('account', { name }))
     .headers(jsonHeaders)
     .withGuard('web')
     .loginAs(user);
