@@ -24,7 +24,6 @@
   },
   "imports": {
     "#consts": "./app/consts.js",
-    "#jsonapi": "./app/jsonapi/index.js",
     "#jsonapi/*": "./app/jsonapi/*.js",
     "#openapi": "./app/openapi.js",
     "#controllers/*": "./app/controllers/*.js",

@@ -1,8 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http';
-import { jsonapi } from '#jsonapi';
 import Link from '#models/link';
 import { glimdownOwner } from '#consts';
 import type User from '#models/user';
+import { notAuthenticated, paymentRequired, unprocessable } from '#exceptions/api_errors';
 import { quotaForAccount } from '#services/link_quota';
 import { maybeAuthenticateWithScope } from '#services/api_keys';
 import CustomDomain from '#models/custom_domain';
@@ -29,29 +29,17 @@ export async function createLinkFromValues(
   let originalUrl = values.original;
 
   if (!originalUrl) {
-    return jsonapi.errors((error) => {
-      error({
-        status: 422,
-        title: 'Missing URL',
-      });
-    });
+    throw unprocessable('Missing URL');
   }
 
   if (!URL.canParse(originalUrl)) {
-    return jsonapi.errors((error) => {
-      error({
-        status: 422,
-        title: 'Cannot parse URL, check the URL',
-      });
-    });
+    throw unprocessable('Cannot parse URL, check the URL');
   }
 
   let parsed = new URL(originalUrl);
   let isGlimdown = parsed.host.endsWith('glimdown.com') || parsed.host.endsWith('repl.nvp.gg');
 
   let authed = await maybeAuthenticateWithScope(context, 'links:write');
-
-  if (authed && 'response' in authed) return authed.response;
 
   if (!authed) {
     /**
@@ -66,13 +54,7 @@ export async function createLinkFromValues(
       return renderFresh(context, link);
     }
 
-    return jsonapi.errors((error) => {
-      error({
-        status: 401,
-        title: 'Authentication required',
-        detail: 'You are not logged in and / or did not provide an API key.',
-      });
-    });
+    throw notAuthenticated('You are not logged in and / or did not provide an API key.');
   }
 
   let { user, account } = authed;
@@ -88,9 +70,7 @@ export async function createLinkFromValues(
         .first();
 
       if (!owned) {
-        return jsonapi.unprocessableContent(
-          `${requestedDomain} is not one of your account's custom domains`
-        );
+        throw unprocessable(`${requestedDomain} is not one of your account's custom domains`);
       }
     }
 
@@ -100,13 +80,7 @@ export async function createLinkFromValues(
     return renderFresh(context, link);
   }
 
-  return jsonapi.errors((error) => {
-    error({
-      status: 402,
-      title: 'Payment required',
-      detail: 'Monthly link limit reached',
-    });
-  });
+  throw paymentRequired('Payment required', 'Monthly link limit reached');
 }
 
 async function createUnmeteredLink(url: URL): Promise<Link> {

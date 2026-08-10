@@ -4,7 +4,7 @@ import AccountInvitation from '#models/account_invitation';
 import AccountMembership from '#models/account_membership';
 import CustomDomain from '#models/custom_domain';
 import User from '#models/user';
-import { jsonapi } from '#jsonapi';
+import { notFound } from '#exceptions/api_errors';
 import { membershipFor } from '#services/team';
 import { action } from '../base.js';
 
@@ -27,7 +27,7 @@ export default class RelatedController {
       let account = membership ? await Account.find(id) : null;
 
       if (!account) {
-        return jsonapi.notFound({ kind: 'Account', id });
+        throw notFound('Account', id);
       }
 
       return context.jsonApi.renderRelated(account, context.request.param('relation'));
@@ -44,7 +44,7 @@ export default class RelatedController {
         target && (target.id === user.id || (await sharesAnAccount(user.id, target.id)));
 
       if (!target || !visible) {
-        return jsonapi.notFound({ kind: 'User', id });
+        throw notFound('User', id);
       }
 
       return context.jsonApi.renderRelated(target, context.request.param('relation'));
@@ -60,7 +60,7 @@ export default class RelatedController {
       let callers = membership ? await membershipFor(user.id, membership.account_id) : null;
 
       if (!membership || !callers) {
-        return jsonapi.notFound({ kind: 'Membership', id });
+        throw notFound('Membership', id);
       }
 
       return context.jsonApi.renderRelated(membership, context.request.param('relation'));
@@ -76,7 +76,7 @@ export default class RelatedController {
       let callers = invitation ? await membershipFor(user.id, invitation.account_id) : null;
 
       if (!invitation || callers?.role !== 'admin') {
-        return jsonapi.notFound({ kind: 'Invitation', id });
+        throw notFound('Invitation', id);
       }
 
       return context.jsonApi.renderRelated(invitation, context.request.param('relation'));
@@ -92,7 +92,7 @@ export default class RelatedController {
       let callers = domain ? await membershipFor(user.id, domain.account_id) : null;
 
       if (!domain || !callers) {
-        return jsonapi.notFound({ kind: 'CustomDomain', id });
+        throw notFound('CustomDomain', id);
       }
 
       return context.jsonApi.renderRelated(domain, context.request.param('relation'));

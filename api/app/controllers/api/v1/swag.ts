@@ -1,4 +1,4 @@
-import { mimeType } from '#jsonapi';
+import { JSON_API_MEDIA_TYPE as mimeType } from '@evoactivity/jsonapi-adonis';
 import { componentSchemaRef, dynamicSegment, jsonapiRef } from '#openapi';
 import type { OpenAPIObject } from 'openapi3-ts/oas31';
 

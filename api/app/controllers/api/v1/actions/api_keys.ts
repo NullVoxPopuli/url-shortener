@@ -1,7 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http';
-import type { Response } from '#jsonapi';
 import AccountMembership from '#models/account_membership';
-import { jsonapi } from '#jsonapi';
+import { notFound, paymentRequired, unprocessable } from '#exceptions/api_errors';
 import { apiKey, apiKeys } from '#jsonapi/api_key';
 import { accountContext } from '#services/account_context';
 import { API_KEY_SCOPES, apiKeyCapacity } from '#services/api_keys';
@@ -22,33 +21,20 @@ async function membershipContext(context: HttpContext) {
   let account = await accountContext(context, user);
 
   if (!account) {
-    return {
-      ok: false as const,
-      response: jsonapi.notFound({
-        kind: 'Account',
-        id: String(context.request.input('accountId')),
-      }),
-    };
+    throw notFound('Account', String(context.request.input('accountId')));
   }
 
   let membership = await membershipFor(user.id, account.id);
 
   if (!membership) {
-    return {
-      ok: false as const,
-      response: jsonapi.notFound({ kind: 'Account', id: account.id }),
-    };
+    throw notFound('Account', account.id);
   }
 
-  return { ok: true as const, account, membership };
+  return { account, membership };
 }
 
-export async function listApiKeys(context: HttpContext): Promise<Response> {
-  let resolved = await membershipContext(context);
-
-  if (!resolved.ok) return resolved.response;
-
-  let { account, membership } = resolved;
+export async function listApiKeys(context: HttpContext) {
+  let { account, membership } = await membershipContext(context);
 
   let keys = await AccountMembership.apiKeys.all(membership);
   let capacity = await apiKeyCapacity(account);
@@ -58,26 +44,20 @@ export async function listApiKeys(context: HttpContext): Promise<Response> {
   return apiKeys(keys, capacity);
 }
 
-export async function createApiKey(context: HttpContext): Promise<Response> {
-  let resolved = await membershipContext(context);
-
-  if (!resolved.ok) return resolved.response;
-
-  let { account, membership } = resolved;
+export async function createApiKey(context: HttpContext) {
+  let { account, membership } = await membershipContext(context);
   let { request, response } = context;
 
   let name = String(request.input('name') ?? '').trim();
 
   if (!name || name.length > MAX_NAME_LENGTH) {
-    return jsonapi.unprocessableContent(
-      `A name is required (at most ${MAX_NAME_LENGTH} characters).`
-    );
+    throw unprocessable(`A name is required (at most ${MAX_NAME_LENGTH} characters).`);
   }
 
   let rawScopes = request.input('scopes');
 
   if (!Array.isArray(rawScopes) || rawScopes.length === 0) {
-    return jsonapi.unprocessableContent(
+    throw unprocessable(
       `"scopes" must be a non-empty array. Valid scopes: ${API_KEY_SCOPES.join(', ')}`
     );
   }
@@ -86,7 +66,7 @@ export async function createApiKey(context: HttpContext): Promise<Response> {
 
   for (let raw of new Set(rawScopes.map(String))) {
     if (!API_KEY_SCOPES.includes(raw as ApiKeyScope)) {
-      return jsonapi.unprocessableContent(
+      throw unprocessable(
         `"${raw}" is not a valid scope. Valid scopes: ${API_KEY_SCOPES.join(', ')}`
       );
     }
@@ -101,7 +81,7 @@ export async function createApiKey(context: HttpContext): Promise<Response> {
     let days = Number(rawDays);
 
     if (!Number.isInteger(days) || days < 1 || days > MAX_EXPIRES_IN_DAYS) {
-      return jsonapi.unprocessableContent(
+      throw unprocessable(
         `"expiresInDays" must be a whole number between 1 and ${MAX_EXPIRES_IN_DAYS}.`
       );
     }
@@ -112,16 +92,12 @@ export async function createApiKey(context: HttpContext): Promise<Response> {
   let capacity = await apiKeyCapacity(account);
 
   if (capacity.remaining !== null && capacity.remaining <= 0) {
-    return jsonapi.errors((error) => {
-      error({
-        status: 402,
-        title: 'API key limit reached',
-        detail:
-          capacity.limit === 0
-            ? 'Your plan does not include API keys. Upgrade to create one.'
-            : `Your plan includes ${capacity.limit} API key(s).`,
-      });
-    });
+    throw paymentRequired(
+      'API key limit reached',
+      capacity.limit === 0
+        ? 'Your plan does not include API keys. Upgrade to create one.'
+        : `Your plan includes ${capacity.limit} API key(s).`
+    );
   }
 
   let key = await AccountMembership.apiKeys.create(membership, scopes, {
@@ -134,24 +110,20 @@ export async function createApiKey(context: HttpContext): Promise<Response> {
   return apiKey(key, { secret: key.value!.release() });
 }
 
-export async function revokeApiKey(context: HttpContext): Promise<Response> {
-  let resolved = await membershipContext(context);
-
-  if (!resolved.ok) return resolved.response;
-
-  let { membership } = resolved;
+export async function revokeApiKey(context: HttpContext) {
+  let { membership } = await membershipContext(context);
   let rawId = context.request.param('id');
   let id = Number(rawId);
 
   let key = Number.isInteger(id) ? await AccountMembership.apiKeys.find(membership, id) : null;
 
   if (!key) {
-    return jsonapi.notFound({ kind: 'ApiKey', id: String(rawId) });
+    throw notFound('ApiKey', String(rawId));
   }
 
   await AccountMembership.apiKeys.delete(membership, key.identifier);
 
   context.response.status(200);
 
-  return jsonapi.empty();
+  return context.jsonApi.render(null);
 }

@@ -41,7 +41,7 @@ test.group('POST /v1/links [quota]', (group) => {
 
     let { errors } = response.body();
 
-    assert.strictEqual(errors[0].status, 402);
+    assert.strictEqual(errors[0].status, '402');
     assert.strictEqual(errors[0].detail, 'Monthly link limit reached');
   });
 

@@ -15,11 +15,11 @@ test.group('POST [unauthenticated]', (group) => {
     let response = await clientFor(client, ENDPOINT).post(linkDoc({}));
 
     response.assertStatus(422);
-    response.assertBody({
+    response.assertBodyContains({
       errors: [
         {
-          status: 422,
-          title: 'Missing URL',
+          status: '422',
+          detail: 'Missing URL',
         },
       ],
     });
@@ -29,11 +29,11 @@ test.group('POST [unauthenticated]', (group) => {
     let response = await clientFor(client, ENDPOINT).post(linkDoc({ originalUrl: '' }));
 
     response.assertStatus(422);
-    response.assertBody({
+    response.assertBodyContains({
       errors: [
         {
-          status: 422,
-          title: 'Missing URL',
+          status: '422',
+          detail: 'Missing URL',
         },
       ],
     });
@@ -43,11 +43,11 @@ test.group('POST [unauthenticated]', (group) => {
     let response = await clientFor(client, ENDPOINT).post(linkDoc({ originalUrl: 'abcd' }));
 
     response.assertStatus(422);
-    response.assertBody({
+    response.assertBodyContains({
       errors: [
         {
-          status: 422,
-          title: 'Cannot parse URL, check the URL',
+          status: '422',
+          detail: 'Cannot parse URL, check the URL',
         },
       ],
     });
@@ -59,11 +59,11 @@ test.group('POST [unauthenticated]', (group) => {
     );
 
     response.assertStatus(401);
-    response.assertBody({
+    response.assertBodyContains({
       errors: [
         {
-          status: 401,
-          title: 'Authentication required',
+          status: '401',
+          title: 'Unauthorized',
           detail: 'You are not logged in and / or did not provide an API key.',
         },
       ],

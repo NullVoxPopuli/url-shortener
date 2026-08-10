@@ -25,11 +25,11 @@ test.group('POST [authenticated session]', (group) => {
     let response = await post(user, client, {});
 
     response.assertStatus(422);
-    response.assertBody({
+    response.assertBodyContains({
       errors: [
         {
-          status: 422,
-          title: 'Missing URL',
+          status: '422',
+          detail: 'Missing URL',
         },
       ],
     });
@@ -40,11 +40,11 @@ test.group('POST [authenticated session]', (group) => {
     let response = await post(user, client, { originalUrl: '' });
 
     response.assertStatus(422);
-    response.assertBody({
+    response.assertBodyContains({
       errors: [
         {
-          status: 422,
-          title: 'Missing URL',
+          status: '422',
+          detail: 'Missing URL',
         },
       ],
     });
@@ -55,11 +55,11 @@ test.group('POST [authenticated session]', (group) => {
     let response = await post(user, client, { originalUrl: 'abcd' });
 
     response.assertStatus(422);
-    response.assertBody({
+    response.assertBodyContains({
       errors: [
         {
-          status: 422,
-          title: 'Cannot parse URL, check the URL',
+          status: '422',
+          detail: 'Cannot parse URL, check the URL',
         },
       ],
     });

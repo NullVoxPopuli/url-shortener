@@ -35,10 +35,10 @@ test.group('SHOW [authenticated session]', (group) => {
     let response = await show(user, client, id);
 
     response.assertStatus(422);
-    response.assertBody({
+    response.assertBodyContains({
       errors: [
         {
-          status: 422,
+          status: '422',
           title: `Unprocessable Content`,
           detail: `ID received is not a valid UUID`,
         },
@@ -52,10 +52,10 @@ test.group('SHOW [authenticated session]', (group) => {
     let response = await show(user, client, id);
 
     response.assertStatus(404);
-    response.assertBody({
+    response.assertBodyContains({
       errors: [
         {
-          status: 404,
+          status: '404',
           title: `Link was not found`,
           detail: `Tried to find a Link via ${id}, but could not find anything.`,
         },
@@ -70,10 +70,10 @@ test.group('SHOW [authenticated session]', (group) => {
     let response = await show(neerdowell.user, client, link.id);
 
     response.assertStatus(404);
-    response.assertBody({
+    response.assertBodyContains({
       errors: [
         {
-          status: 404,
+          status: '404',
           title: `Link was not found`,
           detail: `Tried to find a Link via ${link.id}, but could not find anything.`,
         },

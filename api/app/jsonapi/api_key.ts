@@ -1,5 +1,4 @@
 import type { AccessToken } from '@adonisjs/auth/access_tokens';
-import type { DataResponse } from '#jsonapi';
 
 function data(key: AccessToken, secret?: string) {
   return {
@@ -20,11 +19,11 @@ function data(key: AccessToken, secret?: string) {
   };
 }
 
-export function apiKey(key: AccessToken, options?: { secret?: string }): DataResponse {
+export function apiKey(key: AccessToken, options?: { secret?: string }) {
   return { data: data(key, options?.secret) };
 }
 
-export function apiKeys(list: AccessToken[], meta?: unknown): DataResponse {
+export function apiKeys(list: AccessToken[], meta?: unknown) {
   return {
     ...(meta ? { meta } : {}),
     data: list.map((key) => data(key)),

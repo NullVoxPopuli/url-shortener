@@ -2,7 +2,8 @@ import type { HttpContext } from '@adonisjs/core/http';
 import Account from '#models/account';
 import AccountInvitation from '#models/account_invitation';
 import AccountMembership from '#models/account_membership';
-import { jsonapi } from '#jsonapi';
+import { notFound, paymentRequired } from '#exceptions/api_errors';
+import { JsonApiException } from '@evoactivity/jsonapi-adonis';
 import { membershipFor, teamCapacity } from '#services/team';
 
 /**
@@ -18,22 +19,20 @@ async function accountForMember(context: HttpContext, options?: { admin?: boolea
   let membership = await membershipFor(user.id, id);
 
   if (!membership || (options?.admin && membership.role !== 'admin')) {
-    return { ok: false as const, error: jsonapi.notFound({ kind: 'Account', id }) };
+    throw notFound('Account', id);
   }
 
   let account = await Account.find(id);
 
   if (!account) {
-    return { ok: false as const, error: jsonapi.notFound({ kind: 'Account', id }) };
+    throw notFound('Account', id);
   }
 
-  return { ok: true as const, user, account, membership };
+  return { user, account, membership };
 }
 
 export async function listMemberships(context: HttpContext) {
   let actor = await accountForMember(context);
-
-  if (!actor.ok) return actor.error;
 
   let memberships = await context.jsonApi
     .query(AccountMembership)
@@ -46,21 +45,15 @@ export async function listMemberships(context: HttpContext) {
 export async function createInvitation(context: HttpContext) {
   let actor = await accountForMember(context, { admin: true });
 
-  if (!actor.ok) return actor.error;
-
   let capacity = await teamCapacity(actor.account);
 
   if (capacity.remaining !== null && capacity.remaining <= 0) {
-    return jsonapi.errors((error) => {
-      error({
-        status: 402,
-        title: 'Teammate limit reached',
-        detail:
-          capacity.limit === 0
-            ? 'Your plan does not include teammates. Upgrade to invite people.'
-            : `Your plan includes ${capacity.limit} teammate(s); counting pending invitations, the team is full.`,
-      });
-    });
+    throw paymentRequired(
+      'Teammate limit reached',
+      capacity.limit === 0
+        ? 'Your plan does not include teammates. Upgrade to invite people.'
+        : `Your plan includes ${capacity.limit} teammate(s); counting pending invitations, the team is full.`
+    );
   }
 
   let invitation = await AccountInvitation.create({
@@ -83,8 +76,6 @@ export async function createInvitation(context: HttpContext) {
 
 export async function listInvitations(context: HttpContext) {
   let actor = await accountForMember(context, { admin: true });
-
-  if (!actor.ok) return actor.error;
 
   let all = await context.jsonApi
     .query(AccountInvitation)
@@ -111,11 +102,11 @@ export async function revokeInvitation(context: HttpContext) {
 
       response.status(200);
 
-      return jsonapi.empty();
+      return context.jsonApi.render(null);
     }
   }
 
-  return jsonapi.notFound({ kind: 'Invitation', id });
+  throw notFound('Invitation', id);
 }
 
 export async function acceptInvitation(context: HttpContext) {
@@ -127,7 +118,7 @@ export async function acceptInvitation(context: HttpContext) {
   let invitation = token ? await AccountInvitation.findBy({ token }) : null;
 
   if (!invitation) {
-    return jsonapi.notFound({ message: 'Invitation was not found or has expired' });
+    throw expiredInvitation();
   }
 
   /**
@@ -145,13 +136,13 @@ export async function acceptInvitation(context: HttpContext) {
   }
 
   if (!invitation.isPending) {
-    return jsonapi.notFound({ message: 'Invitation was not found or has expired' });
+    throw expiredInvitation();
   }
 
   let account = await Account.find(invitation.account_id);
 
   if (!account) {
-    return jsonapi.notFound({ message: 'Invitation was not found or has expired' });
+    throw expiredInvitation();
   }
 
   let capacity = await teamCapacity(account);
@@ -162,13 +153,7 @@ export async function acceptInvitation(context: HttpContext) {
    * invitations were accepted first.
    */
   if (capacity.limit !== null && capacity.teammates >= capacity.limit) {
-    return jsonapi.errors((error) => {
-      error({
-        status: 402,
-        title: 'Team is full',
-        detail: "This account's plan has no room for more teammates.",
-      });
-    });
+    throw paymentRequired('Team is full', "This account's plan has no room for more teammates.");
   }
 
   let membership = await AccountMembership.create({
@@ -216,9 +201,16 @@ export async function removeMembership(context: HttpContext) {
 
       response.status(200);
 
-      return jsonapi.empty();
+      return context.jsonApi.render(null);
     }
   }
 
-  return jsonapi.notFound({ kind: 'Membership', id });
+  throw notFound('Membership', id);
+}
+
+function expiredInvitation() {
+  return new JsonApiException(
+    { title: 'Invitation was not found or has expired' },
+    { status: 404 }
+  );
 }

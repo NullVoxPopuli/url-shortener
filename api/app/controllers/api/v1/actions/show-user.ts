@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import AccountMembership from '#models/account_membership';
 import User from '#models/user';
-import { jsonapi } from '#jsonapi';
+import { notFound } from '#exceptions/api_errors';
 
 export async function showUser(context: HttpContext) {
   let { auth, request } = context;
@@ -19,7 +19,7 @@ export async function showUser(context: HttpContext) {
   let visible = target && (target.id === user.id || (await sharesAnAccount(user.id, target.id)));
 
   if (!target || !visible) {
-    return jsonapi.notFound({ kind: 'User', id });
+    throw notFound('User', id);
   }
 
   return context.jsonApi.render(target);

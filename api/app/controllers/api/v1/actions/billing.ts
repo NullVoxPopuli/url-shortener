@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import env from '#start/env';
-import { jsonapi } from '#jsonapi';
-import type { Response } from '#jsonapi';
+import { notAuthorized, notFound } from '#exceptions/api_errors';
+import { JsonApiException } from '@evoactivity/jsonapi-adonis';
 import type Account from '#models/account';
 import { accountContext } from '#services/account_context';
 import { stripe } from '#services/stripe';
@@ -14,19 +14,11 @@ function mustBeAccountAdmin(params: { userId: string; account: Account }) {
   return account.admin_id === userId;
 }
 
-type Actor = { user: { id: string }; account: Account } | { error: Response };
-
 /**
- * Shared prologue for the billing actions.
- *
- * Auth failures throw E_UNAUTHORIZED_ACCESS, which `action()` converts
- * to a jsonapi 401 — expected failures are returned as jsonapi payloads,
- * per the actions/ convention.
+ * Shared prologue for the billing actions. Failures throw and render
+ * as JSON:API error documents in the action wrapper.
  */
-async function accountForRequest(
-  context: HttpContext,
-  options?: { admin?: boolean }
-): Promise<Actor> {
+async function accountForRequest(context: HttpContext, options?: { admin?: boolean }) {
   const { auth } = context;
 
   /**
@@ -37,38 +29,31 @@ async function accountForRequest(
 
   const account = await accountContext(context, user);
   if (!account) {
-    return {
-      error: jsonapi.notFound({ kind: 'Account', id: String(context.request.input('accountId')) }),
-    };
+    throw notFound('Account', String(context.request.input('accountId')));
   }
 
   if (options?.admin && !mustBeAccountAdmin({ userId: user.id, account })) {
-    return { error: jsonapi.notAuthorized({ stack: 'Only the account admin can manage billing' }) };
+    throw notAuthorized('Only the account admin can manage billing');
   }
 
   return { user, account };
 }
 
-export async function billingCheckout(context: HttpContext): Promise<Response> {
-  const actor = await accountForRequest(context, { admin: true });
-  if ('error' in actor) return actor.error;
-
-  const { user, account } = actor;
+export async function billingCheckout(context: HttpContext) {
+  const { user, account } = await accountForRequest(context, { admin: true });
   const requestedPlan = context.request.input('plan');
   const plan = PLANS.find((candidate) => candidate.key === requestedPlan) ?? PLANS[0];
   const priceId = plan.stripePriceId;
 
   if (account.hasActiveSubscription) {
-    return {
-      errors: [
-        {
-          status: 409,
-          title: 'Subscription already active',
-          detail:
-            'This account already has an active subscription. Use the billing portal to manage it.',
-        },
-      ],
-    };
+    throw new JsonApiException(
+      {
+        title: 'Subscription already active',
+        detail:
+          'This account already has an active subscription. Use the billing portal to manage it.',
+      },
+      { status: 409 }
+    );
   }
 
   // The success handler redirects to `return_to` after syncing; without it
@@ -107,11 +92,8 @@ export async function billingCheckout(context: HttpContext): Promise<Response> {
   };
 }
 
-export async function billingStatus(context: HttpContext): Promise<Response> {
-  const actor = await accountForRequest(context);
-  if ('error' in actor) return actor.error;
-
-  const { account } = actor;
+export async function billingStatus(context: HttpContext) {
+  const { account } = await accountForRequest(context);
   const quota = await quotaForAccount(account);
 
   return {
@@ -148,11 +130,8 @@ export async function billingStatus(context: HttpContext): Promise<Response> {
   };
 }
 
-export async function billingPortal(context: HttpContext): Promise<Response> {
-  const actor = await accountForRequest(context, { admin: true });
-  if ('error' in actor) return actor.error;
-
-  const { user, account } = actor;
+export async function billingPortal(context: HttpContext) {
+  const { user, account } = await accountForRequest(context, { admin: true });
 
   const customerId = await getOrCreateStripeCustomerIdForAccount({
     account,

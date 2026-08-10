@@ -3,10 +3,10 @@
 
     @each((error) in errors)
       <span class="error">
-        @if(error.title === "Authentication required")
+        @if(error.status === "401")
           Shortening that URL requires an account. Please login.
         @else
-          {{ error.title }}
+          {{ error.detail || error.title }}
         @endif
       </span>
     @endeach

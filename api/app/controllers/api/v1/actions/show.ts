@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import Link from '#models/link';
-import { jsonapi } from '#jsonapi';
+import { notFound, unprocessable } from '#exceptions/api_errors';
 import { isUUID } from '#utils/uuid';
 import { authenticateWithScope } from '#services/api_keys';
 
@@ -8,14 +8,10 @@ export async function showLink(context: HttpContext) {
   let { request } = context;
   let id = request.param('id');
 
-  let authed = await authenticateWithScope(context, 'links:read');
-
-  if ('response' in authed) return authed.response;
-
-  let { account } = authed;
+  let { account } = await authenticateWithScope(context, 'links:read');
 
   if (!isUUID(id)) {
-    return jsonapi.unprocessableContent(`ID received is not a valid UUID`);
+    throw unprocessable('ID received is not a valid UUID');
   }
 
   let link = await context.jsonApi
@@ -28,7 +24,7 @@ export async function showLink(context: HttpContext) {
     .first();
 
   if (!link) {
-    return jsonapi.notFound({ id, kind: 'Link' });
+    throw notFound('Link', id);
   }
 
   return context.jsonApi.render(link);

@@ -92,6 +92,7 @@ export function assertUnauthorized(response: ApiResponse) {
   let body = response.body();
 
   assert.strictEqual(body.errors.length, 1);
-  assert.strictEqual(body.errors[0].status, 401);
-  assert.strictEqual(body.errors[0].title, 'Not Authenticated');
+  // JSON:API error `status` members are strings, per spec
+  assert.strictEqual(body.errors[0].status, '401');
+  assert.strictEqual(body.errors[0].title, 'Unauthorized');
 }

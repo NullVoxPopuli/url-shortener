@@ -2,8 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http';
 import Account from '#models/account';
 import AccountMembership from '#models/account_membership';
 import User from '#models/user';
-import { jsonapi } from '#jsonapi';
-import type { Response } from '#jsonapi';
+import { notAuthenticated, notAuthorized, notFound } from '#exceptions/api_errors';
 import { accountContext } from './account_context.js';
 import { planFor } from './plans.js';
 
@@ -45,34 +44,27 @@ type Authenticated = {
   viaApiKey: boolean;
 };
 
-type Failed = { response: Response };
-
 /**
  * Session-or-API-key authentication for the links endpoints.
  *
  * - Browser sessions have every scope and pick their account the
- *   usual way (the `account` input, membership-checked).
+ *   usual way (the `accountId` input, membership-checked).
  * - API keys must carry the required scope, and are pinned to their
- *   membership's account — an `account` input naming any other
+ *   membership's account — an `accountId` input naming any other
  *   account 404s.
  *
- * Returns null when no credentials were presented at all.
+ * Bad credentials throw; null means no credentials were presented.
  */
 export async function maybeAuthenticateWithScope(
   context: HttpContext,
   scope: ApiKeyScope
-): Promise<Authenticated | Failed | null> {
+): Promise<Authenticated | null> {
   if (await context.auth.use('web').check()) {
     let user = context.auth.use('web').user!;
     let account = await accountContext(context, user);
 
     if (!account) {
-      return {
-        response: jsonapi.notFound({
-          kind: 'Account',
-          id: String(context.request.input('accountId')),
-        }),
-      };
+      throw notFound('Account', String(context.request.input('accountId')));
     }
 
     return { user, account, membership: null, viaApiKey: false };
@@ -88,38 +80,26 @@ export async function maybeAuthenticateWithScope(
     .catch(() => null);
 
   if (!membership) {
-    return {
-      response: jsonapi.notAuthenticated({
-        stack: 'This API key is not valid (it may have been revoked or expired).',
-      }),
-    };
+    throw notAuthenticated('This API key is not valid (it may have been revoked or expired).');
   }
 
   let token = membership.currentAccessToken;
 
   if (!token.allows(scope)) {
-    return {
-      response: jsonapi.notAuthorized({
-        stack: `This API key does not have the "${scope}" scope.`,
-      }),
-    };
+    throw notAuthorized(`This API key does not have the "${scope}" scope.`);
   }
 
   let requested = context.request.input('accountId');
 
   if (requested && String(requested) !== membership.account_id) {
-    return {
-      response: jsonapi.notFound({ kind: 'Account', id: String(requested) }),
-    };
+    throw notFound('Account', String(requested));
   }
 
   let account = await Account.find(membership.account_id);
   let user = await User.find(membership.user_id);
 
   if (!account || !user) {
-    return {
-      response: jsonapi.notFound({ kind: 'Account', id: membership.account_id }),
-    };
+    throw notFound('Account', membership.account_id);
   }
 
   return { user, account, membership, viaApiKey: true };
@@ -132,14 +112,10 @@ export async function maybeAuthenticateWithScope(
 export async function authenticateWithScope(
   context: HttpContext,
   scope: ApiKeyScope
-): Promise<Authenticated | Failed> {
+): Promise<Authenticated> {
   let result = await maybeAuthenticateWithScope(context, scope);
 
   if (result) return result;
 
-  return {
-    response: jsonapi.notAuthenticated({
-      stack: 'Log in, or provide an API key via `Authorization: Bearer nvp_...`',
-    }),
-  };
+  throw notAuthenticated('Log in, or provide an API key via `Authorization: Bearer nvp_...`');
 }

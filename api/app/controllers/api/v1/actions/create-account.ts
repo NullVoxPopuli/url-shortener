@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import Account from '#models/account';
 import AccountMembership from '#models/account_membership';
-import { jsonapi } from '#jsonapi';
+import { paymentRequired, unprocessable } from '#exceptions/api_errors';
 import { planFor } from '#services/plans';
 
 /**
@@ -18,7 +18,7 @@ export async function createAccount(context: HttpContext) {
   let name = String(input.attributes.name ?? '').trim();
 
   if (name.length < 2 || name.length > 64) {
-    return jsonapi.unprocessableContent('An account name of 2-64 characters is required');
+    throw unprocessable('An account name of 2-64 characters is required');
   }
 
   let personal = await Account.findOrFail(user.account_id);
@@ -28,16 +28,12 @@ export async function createAccount(context: HttpContext) {
   let existing = await Account.query().where('admin_id', user.id).where('is_personal', false);
 
   if (limit !== null && existing.length >= limit) {
-    return jsonapi.errors((error) => {
-      error({
-        status: 402,
-        title: 'Additional account limit reached',
-        detail:
-          limit === 0
-            ? 'Your plan does not include additional accounts. Upgrade to create one.'
-            : `Your plan includes ${limit} additional account(s).`,
-      });
-    });
+    throw paymentRequired(
+      'Additional account limit reached',
+      limit === 0
+        ? 'Your plan does not include additional accounts. Upgrade to create one.'
+        : `Your plan includes ${limit} additional account(s).`
+    );
   }
 
   let account = new Account();

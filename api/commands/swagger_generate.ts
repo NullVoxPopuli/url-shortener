@@ -21,7 +21,9 @@ import { join } from 'node:path';
 import { merge } from 'ts-deepmerge';
 import v1 from '#controllers/api/v1/swag';
 import type { OpenAPIObject } from 'openapi3-ts/oas31';
-import { specName, mimeType } from '#jsonapi';
+import { JSON_API_MEDIA_TYPE as mimeType } from '@evoactivity/jsonapi-adonis';
+
+const specName = '{ json:api }';
 import { componentSchemaRef, jsonapiRef, ref } from '#openapi';
 import { DOMAIN } from '#start/env';
 
@@ -107,7 +109,8 @@ const SWAGGER_SCHEMAS = {
     schema: {
       type: 'object',
       properties: {
-        status: { type: 'integer' },
+        // per spec, the status member is a string
+        status: { type: 'string' },
         title: { type: 'string' },
         detail: { type: 'string' },
         source: { type: 'string' },

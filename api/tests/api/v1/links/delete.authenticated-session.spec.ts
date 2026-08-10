@@ -25,7 +25,7 @@ test.group('DELETE [authenticated session]', (group) => {
     let response = await del(client, user, link.id);
 
     response.assertStatus(200);
-    response.assertBody({ data: null });
+    response.assertBodyContains({ data: null });
 
     assert.isNull(await Link.find(link.id));
   });
