@@ -67,7 +67,7 @@ export default class TeamManager extends Component<Signature> {
   };
 
   remove = async (refresh: () => Promise<void>, membership: Membership) => {
-    let name = membership.user?.name ?? 'this member';
+    const name = membership.user?.name ?? 'this member';
 
     if (!window.confirm(`Remove ${name} from the account?`)) return;
 

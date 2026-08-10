@@ -51,8 +51,11 @@ test.group('Custom domains', (group) => {
     first.assertStatus(201);
     assert.strictEqual(first.body().data.attributes.hostname, 'go.example.com');
 
-    (await addDomain(client, user, 'l.example.org')).assertStatus(201);
-    (await addDomain(client, user, 'three.example.io')).assertStatus(402);
+    const second = await addDomain(client, user, 'l.example.org');
+    const third = await addDomain(client, user, 'three.example.io');
+
+    second.assertStatus(201);
+    third.assertStatus(402);
   });
 
   test('invalid + reserved hostnames are rejected', async ({ client }) => {
@@ -60,10 +63,11 @@ test.group('Custom domains', (group) => {
 
     await overridePlan(account, 'hobby');
 
-    (await addDomain(client, user, 'not a hostname')).assertStatus(422);
-    (await addDomain(client, user, 'https://example.com')).assertStatus(422);
-    (await addDomain(client, user, 'nvp.local')).assertStatus(422);
-    (await addDomain(client, user, 'sub.nvp.local')).assertStatus(422);
+    for (const hostname of ['not a hostname', 'https://example.com', 'nvp.local', 'sub.nvp.local']) {
+      const response = await addDomain(client, user, hostname);
+
+      response.assertStatus(422);
+    }
   });
 
   test('hostnames are globally unique', async ({ client }) => {
@@ -73,8 +77,11 @@ test.group('Custom domains', (group) => {
     await overridePlan(a.account, 'hobby');
     await overridePlan(b.account, 'hobby');
 
-    (await addDomain(client, a.user, 'taken.example.com')).assertStatus(201);
-    (await addDomain(client, b.user, 'taken.example.com')).assertStatus(422);
+    const first = await addDomain(client, a.user, 'taken.example.com');
+    const duplicate = await addDomain(client, b.user, 'taken.example.com');
+
+    first.assertStatus(201);
+    duplicate.assertStatus(422);
   });
 
   test('links can be created on an owned domain; shortUrl reflects it', async ({ client }) => {

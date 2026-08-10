@@ -1,4 +1,4 @@
-import Account from '#models/account';
+import type Account from '#models/account';
 import { FREE_PLAN, NO_SUBSCRIPTION_PLAN, PLANS } from './plans.js';
 
 export const OVERRIDABLE_PLAN_KEYS = [

@@ -147,6 +147,89 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
         },
       },
     },
+    '/v1/accounts/{id}/memberships': {
+      get: {
+        summary: 'List account members',
+        description:
+          'Lists the members of an account you belong to, with user info included.',
+        parameters: [dynamicSegment('id')],
+        responses: {
+          401: componentSchemaRef('Unauthenticated'),
+          404: componentSchemaRef('NotFound'),
+          415: componentSchemaRef('UnsupportedMediaType'),
+        },
+      },
+    },
+    '/v1/accounts/{id}/invitations': {
+      get: {
+        summary: 'List pending invitations',
+        description: 'Lists pending invitations (account admins only).',
+        parameters: [dynamicSegment('id')],
+        responses: {
+          401: componentSchemaRef('Unauthenticated'),
+          404: componentSchemaRef('NotFound'),
+          415: componentSchemaRef('UnsupportedMediaType'),
+        },
+      },
+      post: {
+        summary: 'Create an invitation',
+        description:
+          "Creates a shareable invitation link (account admins only). Gated by the plan's teammate limit (402 when full). The response's acceptUrl is the link to share.",
+        parameters: [dynamicSegment('id')],
+      },
+    },
+    '/v1/invitations/accept': {
+      post: {
+        summary: 'Accept an invitation',
+        description:
+          'Accepts an invitation token, joining its account as a member. Body: { "token": "..." }. Idempotent for existing members.',
+      },
+    },
+    '/v1/invitations/{id}': {
+      delete: {
+        summary: 'Revoke an invitation',
+        description: 'Revokes a pending invitation (account admins only).',
+        parameters: [dynamicSegment('id')],
+      },
+    },
+    '/v1/memberships/{id}': {
+      delete: {
+        summary: 'Remove a member',
+        description:
+          'Admins may remove anyone; members may remove themselves (leave). The account owner cannot be removed. When the removed member was active in that account, their active account falls back to their personal one.',
+        parameters: [dynamicSegment('id')],
+      },
+    },
+    '/v1/me/account': {
+      post: {
+        summary: 'Switch the active account',
+        description:
+          'Sets your active account to another account you belong to. Body: { "accountId": "..." }. All account-scoped endpoints (links, billing, domains, members) operate on the active account.',
+      },
+    },
+    '/v1/domains': {
+      get: {
+        summary: 'List custom domains',
+        description: "Lists the active account's custom domains.",
+        responses: {
+          401: componentSchemaRef('Unauthenticated'),
+          415: componentSchemaRef('UnsupportedMediaType'),
+        },
+      },
+      post: {
+        summary: 'Add a custom domain',
+        description:
+          'Adds a custom domain for link creation (account admins only). Body: { "hostname": "links.example.com" }. Gated by the plan\'s domain limit (402 when full). Short links can then be created with a "domain" property.',
+      },
+    },
+    '/v1/domains/{id}': {
+      delete: {
+        summary: 'Remove a custom domain',
+        description:
+          'Removes a custom domain (account admins only). Links on it stop resolving.',
+        parameters: [dynamicSegment('id')],
+      },
+    },
     '/v1/users/{id}': {
       get: {
         summary: 'Show user',

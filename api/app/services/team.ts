@@ -46,11 +46,9 @@ export async function resetActiveAccount(userId: string, lostAccountId: string) 
   if (!user || user.account_id !== lostAccountId) return;
 
   const personal = await Account.query().where('admin_id', user.id).first();
-  const fallback =
-    personal ??
-    (await AccountMembership.query().where('user_id', user.id).first())?.account_id;
+  const remaining = await AccountMembership.query().where('user_id', user.id).first();
 
-  const nextId = typeof fallback === 'string' ? fallback : fallback?.id;
+  const nextId = personal?.id ?? remaining?.account_id;
 
   if (nextId) {
     user.account_id = nextId;

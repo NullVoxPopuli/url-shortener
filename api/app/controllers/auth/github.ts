@@ -65,7 +65,7 @@ export default class GitHubController {
      * GitHub's user id is numeric; normalize so it stores and
      * compares as a clean string (not "199018.0").
      */
-    let githubId = String(parseInt(String(id), 10));
+    let githubId = String(Number.parseInt(String(id), 10));
 
     let user = await User.findBy({ oauth_github_id: githubId });
 
