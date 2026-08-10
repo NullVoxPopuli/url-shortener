@@ -1,6 +1,5 @@
 import { mimeType } from '#jsonapi';
 import { componentSchemaRef, dynamicSegment, jsonapiRef } from '#openapi';
-import { DOMAIN } from '#start/env';
 import type { OpenAPIObject } from 'openapi3-ts/oas31';
 
 /**
@@ -15,11 +14,6 @@ const accountParam = {
   description:
     'The account to operate on — any account you belong to. Defaults to your personal account.',
 };
-
-/**
- * Session auth lives on the apex domain, not api.
- */
-const authServers = [{ url: `https://${DOMAIN}`, description: 'Auth origin (session cookies)' }];
 
 const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
   paths: {
@@ -302,70 +296,6 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
         description:
           'Creates a Stripe billing-portal session for the account (account admins only) — plan changes and cancellation happen there. Returns the portal URL to redirect the browser to.',
         parameters: [accountParam],
-      },
-    },
-    '/v1/billing/success': {
-      get: {
-        summary: 'Checkout success redirect',
-        description:
-          'Where Stripe Checkout sends the browser after payment. Syncs the subscription eagerly (no webhook wait), then redirects to the app. Not called directly.',
-      },
-    },
-    '/_/auth/github': {
-      get: {
-        summary: 'Start GitHub OAuth',
-        description: 'Redirects the browser to GitHub to sign in. The only supported login method.',
-        servers: authServers,
-      },
-    },
-    '/_/auth/callback/github': {
-      get: {
-        summary: 'GitHub OAuth callback',
-        description:
-          'GitHub redirects here after authorization; establishes the session cookie and redirects to the app. Not called directly.',
-        servers: authServers,
-      },
-    },
-    '/_/auth/me': {
-      get: {
-        summary: 'Current session',
-        description:
-          'Who is signed in (plain JSON, not { json:api }): user id/name, staff flag, personal account id, and account memberships. Returns { "authenticated": false } for anonymous callers.',
-        servers: authServers,
-        responses: {
-          200: {
-            description: 'OK',
-            content: {
-              'application/json': {
-                schema: { type: 'object' },
-                example: {
-                  authenticated: true,
-                  user: {
-                    id: 'user-uuid',
-                    name: 'NullVoxPopuli',
-                    isStaff: false,
-                    personalAccountId: 'account-uuid',
-                    memberships: [
-                      {
-                        accountId: 'account-uuid',
-                        accountName: 'NullVoxPopuli',
-                        isPersonal: true,
-                        role: 'admin',
-                      },
-                    ],
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    '/_/auth/logout': {
-      get: {
-        summary: 'Log out',
-        description: 'Ends the session and redirects the browser to the app.',
-        servers: authServers,
       },
     },
     '/v1/users/{id}': {
