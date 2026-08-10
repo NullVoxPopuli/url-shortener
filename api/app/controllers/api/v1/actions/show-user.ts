@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http';
+import AccountMembership from '#models/account_membership';
 import User from '#models/user';
 import { jsonapi } from '#jsonapi';
 import { render } from '#jsonapi/data';
@@ -12,15 +13,31 @@ export async function showUser(context: HttpContext) {
   let target = await User.query().preload('account').where('id', id).first();
 
   /**
-   * Users are visible within their own account only (self today,
-   * teammates later); anything else is a 404, indistinguishable from
-   * a non-existent id.
+   * Users are visible when they share at least one account with the
+   * caller; anything else is a 404, indistinguishable from a
+   * non-existent id.
    */
-  if (!target || target.account_id !== user.account_id) {
+  let visible = target && (target.id === user.id || (await sharesAnAccount(user.id, target.id)));
+
+  if (!target || !visible) {
     return jsonapi.notFound({ kind: 'User', id });
   }
 
   response.status(200);
 
   return render.user(target);
+}
+
+async function sharesAnAccount(a: string, b: string) {
+  let mine = await AccountMembership.query().where('user_id', a);
+  let accountIds = mine.map((membership) => membership.account_id);
+
+  if (accountIds.length === 0) return false;
+
+  let shared = await AccountMembership.query()
+    .where('user_id', b)
+    .whereIn('account_id', accountIds)
+    .first();
+
+  return Boolean(shared);
 }

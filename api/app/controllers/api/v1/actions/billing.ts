@@ -2,7 +2,8 @@ import type { HttpContext } from '@adonisjs/core/http';
 import env from '#start/env';
 import { jsonapi } from '#jsonapi';
 import type { Response } from '#jsonapi';
-import Account from '#models/account';
+import type Account from '#models/account';
+import { accountContext } from '#services/account_context';
 import { stripe } from '#services/stripe';
 import { getOrCreateStripeCustomerIdForAccount } from '#services/stripe_sync';
 import { quotaForAccount } from '#services/link_quota';
@@ -35,9 +36,11 @@ async function accountForRequest(
     return { error: jsonapi.notAuthenticated({ stack: 'No user' }) };
   }
 
-  const account = await Account.find(user.account_id);
+  const account = await accountContext(context, user);
   if (!account) {
-    return { error: jsonapi.notFound({ kind: 'Account', id: user.account_id }) };
+    return {
+      error: jsonapi.notFound({ kind: 'Account', id: String(context.request.input('account')) }),
+    };
   }
 
   if (options?.admin && !mustBeAccountAdmin({ userId: user.id, account })) {

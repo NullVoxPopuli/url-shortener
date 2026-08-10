@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import type { Response } from '#jsonapi';
-import Account from '#models/account';
 import CustomDomain from '#models/custom_domain';
+import { accountContext } from '#services/account_context';
 import { jsonapi } from '#jsonapi';
 import { render } from '#jsonapi/data';
 import { planFor } from '#services/plans';
@@ -15,12 +15,17 @@ import { membershipFor } from '#services/team';
 const HOSTNAME_PATTERN = /^(?!-)[a-z0-9-]{1,63}(?<!-)(\.(?!-)[a-z0-9-]{1,63}(?<!-))+$/;
 
 export async function listDomains(context: HttpContext): Promise<Response> {
-  let { auth, response } = context;
+  let { auth, request, response } = context;
 
   let user = await auth.authenticate();
+  let contextAccount = await accountContext(context, user);
+
+  if (!contextAccount) {
+    return jsonapi.notFound({ kind: 'Account', id: String(request.input('account')) });
+  }
 
   let domains = await CustomDomain.query()
-    .where('account_id', user.account_id)
+    .where('account_id', contextAccount.id)
     .preload('account', (query) => query.preload('admin'))
     .orderBy('created_at', 'asc');
 
@@ -33,13 +38,18 @@ export async function createDomain(context: HttpContext): Promise<Response> {
   let { auth, request, response } = context;
 
   let user = await auth.authenticate();
-  let membership = await membershipFor(user.id, user.account_id);
+  let account = await accountContext(context, user);
+
+  if (!account) {
+    return jsonapi.notFound({ kind: 'Account', id: String(request.input('account')) });
+  }
+
+  let membership = await membershipFor(user.id, account.id);
 
   if (membership?.role !== 'admin') {
     return jsonapi.notAuthorized({ stack: 'Only account admins can manage domains' });
   }
 
-  let account = await Account.findOrFail(user.account_id);
   let plan = planFor(account);
 
   let hostname = String(request.input('hostname') ?? '')
@@ -90,17 +100,27 @@ export async function deleteDomain(context: HttpContext): Promise<Response> {
   let { auth, request, response } = context;
 
   let user = await auth.authenticate();
-  let membership = await membershipFor(user.id, user.account_id);
   let id = request.param('id');
 
-  if (membership?.role === 'admin') {
-    let domain = await CustomDomain.query()
-      .where('id', id)
-      .where('account_id', user.account_id)
-      .first();
+  let account = await accountContext(context, user);
 
-    await domain?.delete();
+  if (!account) {
+    return jsonapi.notFound({ kind: 'Account', id: String(request.input('account')) });
   }
+
+  let membership = await membershipFor(user.id, account.id);
+
+  if (membership?.role !== 'admin') {
+    return jsonapi.notAuthorized({ stack: 'Only account admins can manage domains' });
+  }
+
+  let domain = await CustomDomain.query().where('id', id).where('account_id', account.id).first();
+
+  if (!domain) {
+    return jsonapi.notFound({ kind: 'CustomDomain', id });
+  }
+
+  await domain.delete();
 
   response.status(200);
 

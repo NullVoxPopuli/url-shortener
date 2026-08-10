@@ -1,65 +1,58 @@
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
 import { on } from '@ember/modifier';
 import { service } from '@ember/service';
 
-import { switchAccount } from '#app/data/requests';
+import { shortAccountId } from '#utils/account';
 
-import type { Store } from '@warp-drive/core';
+import type RouterService from '@ember/routing/router-service';
 import type CurrentUserService from '#services/current-user';
 
-/**
- * Flips the ACTIVE account. A full page load afterward guarantees no
- * cached data from the previous account survives the switch.
- */
-export class AccountSwitcher extends Component {
-  @service declare currentUser: CurrentUserService;
-  @service declare store: Store;
+interface Signature {
+  Args: {
+    accountId: string;
+  };
+}
 
-  @tracked isWorking = false;
+/**
+ * The active account is the URL segment — switching is navigation,
+ * nothing more. Requests carry the account id, so cached data stays
+ * cleanly separated per account.
+ */
+export class AccountSwitcher extends Component<Signature> {
+  @service declare currentUser: CurrentUserService;
+  @service declare router: RouterService;
 
   get memberships() {
     return this.currentUser.memberships;
   }
 
-  get activeAccountId() {
-    return this.currentUser.accountId ?? '';
+  get showSwitcher() {
+    return this.memberships.length > 1;
   }
 
-  switch = async (event: Event) => {
+  switch = (event: Event) => {
     const accountId = (event.target as HTMLSelectElement).value;
 
-    if (!accountId || accountId === this.activeAccountId) return;
+    if (!accountId || accountId === this.args.accountId) return;
 
-    this.isWorking = true;
-
-    try {
-      await this.store.request(switchAccount(accountId));
-      window.location.assign('/dashboard');
-    } catch {
-      this.isWorking = false;
-    }
+    void this.router.transitionTo('dashboard', shortAccountId(accountId));
   };
 
   <template>
     {{#if this.showSwitcher}}
       <label class="account-switcher">
         <span class="visually-hidden">Active account</span>
-        <select disabled={{this.isWorking}} {{on "change" this.switch}}>
+        <select {{on "change" this.switch}}>
           {{#each this.memberships as |membership|}}
             <option
               value={{membership.accountId}}
-              selected={{eq membership.accountId this.activeAccountId}}
+              selected={{eq membership.accountId @accountId}}
             >{{membership.accountName}}</option>
           {{/each}}
         </select>
       </label>
     {{/if}}
   </template>
-
-  get showSwitcher() {
-    return this.memberships.length > 1;
-  }
 }
 
 function eq(a: string, b: string) {

@@ -4,16 +4,20 @@ import { service } from '@ember/service';
 import { getDomains } from '#app/data/requests';
 
 import type { Store } from '@warp-drive/core';
-import type CurrentUserService from '#services/current-user';
 
 export default class DashboardDomainsRoute extends Route {
-  @service declare currentUser: CurrentUserService;
   @service declare store: Store;
 
   model() {
+    const { accountId, isAdmin } = this.modelFor('dashboard') as {
+      accountId: string;
+      isAdmin: boolean;
+    };
+
     return {
-      isAdmin: this.currentUser.isAdminOfActiveAccount,
-      domains: this.store.request(getDomains()),
+      accountId,
+      isAdmin,
+      domains: this.store.request(getDomains(accountId)),
     };
   }
 }

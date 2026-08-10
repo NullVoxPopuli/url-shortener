@@ -7,7 +7,8 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
     '/v1/links': {
       get: {
         summary: 'List links',
-        description: 'Lists links belonging to your authenticated user',
+        description:
+          "Lists the account's links. Account-scoped endpoints (links, billing, domains) accept an optional `?account=<id>` — an account you belong to; without it, your personal account is used.",
         parameters: [],
         responses: {
           200: {
@@ -112,6 +113,13 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
         },
       },
     },
+    '/v1/accounts': {
+      post: {
+        summary: 'Create an additional account',
+        description:
+          'Creates an additional (non-personal) account with you as admin. Body: { "name": "..." }. Gated by your personal account\'s plan: side-hobby 1, hobby 2, project 3, unpaid 0 (402 when full).',
+      },
+    },
     '/v1/accounts/{id}': {
       get: {
         summary: 'Show account',
@@ -150,8 +158,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
     '/v1/accounts/{id}/memberships': {
       get: {
         summary: 'List account members',
-        description:
-          'Lists the members of an account you belong to, with user info included.',
+        description: 'Lists the members of an account you belong to, with user info included.',
         parameters: [dynamicSegment('id')],
         responses: {
           401: componentSchemaRef('Unauthenticated'),
@@ -200,13 +207,6 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
         parameters: [dynamicSegment('id')],
       },
     },
-    '/v1/me/account': {
-      post: {
-        summary: 'Switch the active account',
-        description:
-          'Sets your active account to another account you belong to. Body: { "accountId": "..." }. All account-scoped endpoints (links, billing, domains, members) operate on the active account.',
-      },
-    },
     '/v1/domains': {
       get: {
         summary: 'List custom domains',
@@ -225,8 +225,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
     '/v1/domains/{id}': {
       delete: {
         summary: 'Remove a custom domain',
-        description:
-          'Removes a custom domain (account admins only). Links on it stop resolving.',
+        description: 'Removes a custom domain (account admins only). Links on it stop resolving.',
         parameters: [dynamicSegment('id')],
       },
     },

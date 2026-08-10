@@ -28,9 +28,7 @@ export async function overridePlan(account: Account, planKey: string) {
     account.stripePriceId = null;
     account.stripeSubscriptionStatus = null;
   } else {
-    throw new Error(
-      `Unknown plan "${planKey}". Valid plans: ${OVERRIDABLE_PLAN_KEYS.join(', ')}`
-    );
+    throw new Error(`Unknown plan "${planKey}". Valid plans: ${OVERRIDABLE_PLAN_KEYS.join(', ')}`);
   }
 
   await account.save();

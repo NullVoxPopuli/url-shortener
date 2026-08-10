@@ -7,7 +7,12 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary();
 
-      table.uuid('account_id').notNullable().references('id').inTable('accounts').onDelete('CASCADE');
+      table
+        .uuid('account_id')
+        .notNullable()
+        .references('id')
+        .inTable('accounts')
+        .onDelete('CASCADE');
       table.uuid('invited_by').notNullable().references('id').inTable('users').onDelete('CASCADE');
 
       table.uuid('token').notNullable().unique();

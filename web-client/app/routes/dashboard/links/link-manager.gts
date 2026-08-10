@@ -31,6 +31,7 @@ function errorMessage(error: unknown) {
 
 interface Signature {
   Args: {
+    accountId: string;
     billing: Future<ReactiveDataDocument<BillingStatus>>;
     links: Future<ReactiveDataDocument<Link[]>>;
     domains: Future<ReactiveDataDocument<CustomDomain[]>>;
@@ -65,7 +66,7 @@ export default class LinkManager extends Component<Signature> {
     this.error = null;
 
     try {
-      await this.store.request(createLink(url, domain));
+      await this.store.request(createLink(url, domain, this.args.accountId));
       await Promise.all(refresh.map((fn) => fn()));
       form.reset();
     } catch (error) {
@@ -84,7 +85,7 @@ export default class LinkManager extends Component<Signature> {
     this.error = null;
 
     try {
-      await this.store.request(deleteLink(link.id));
+      await this.store.request(deleteLink(link.id, this.args.accountId));
       await Promise.all(refresh.map((fn) => fn()));
     } catch (error) {
       this.error = messageFrom(error);

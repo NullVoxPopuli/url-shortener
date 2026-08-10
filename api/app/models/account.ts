@@ -35,6 +35,9 @@ export default class Account extends BaseModel {
   @column({ columnName: 'is_free' })
   declare isFree: boolean;
 
+  @column({ columnName: 'is_personal', consume: (value) => Boolean(value) })
+  declare isPersonal: boolean;
+
   @hasMany(() => AccountMembership, { foreignKey: 'account_id' })
   declare memberships: HasMany<typeof AccountMembership>;
 

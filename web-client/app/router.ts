@@ -18,14 +18,17 @@ Router.map(function () {
     this.route('signup');
   });
   /**
-   * The logged-in area: everything under /dashboard renders inside
-   * the ApplicationShell (see routes/dashboard/+template.gts).
+   * The logged-in area: URL-scoped by account — /{account-id}/links
+   * etc. Switching accounts is purely a URL change (no server state).
+   * Renders inside the ApplicationShell (routes/dashboard/+template.gts).
    */
-  this.route('dashboard', function () {
+  this.route('dashboard', { path: '/:account_id' }, function () {
     this.route('links');
     this.route('users');
     this.route('domains');
   });
+  // legacy entry point: forwards to the personal account
+  this.route('dashboard-redirect', { path: '/dashboard' });
   this.route('pricing');
   this.route('join', { path: '/join/:token' });
 });

@@ -9,14 +9,19 @@ import { SidebarLink } from './sidebar-link';
   <ApplicationShell>
     <:nav>
       <Navigation>
-        <NavigationList @label="nvp.gg">
-          <li><SidebarLink @href="/dashboard">Dashboard</SidebarLink></li>
+        {{! @glint-expect-error - route templates do not have typed @model }}
+        <NavigationList @label={{@model.accountName}}>
+          {{! @glint-expect-error - route templates do not have typed @model }}
+          <li><SidebarLink @href="/{{@model.accountSlug}}">Dashboard</SidebarLink></li>
         </NavigationList>
 
         <NavigationList @label="Manage">
-          <li><SidebarLink @href="/dashboard/links">Links</SidebarLink></li>
-          <li><SidebarLink @href="/dashboard/users">Users</SidebarLink></li>
-          <li><SidebarLink @href="/dashboard/domains">Domains</SidebarLink></li>
+          {{! @glint-expect-error - route templates do not have typed @model }}
+          <li><SidebarLink @href="/{{@model.accountSlug}}/links">Links</SidebarLink></li>
+          {{! @glint-expect-error - route templates do not have typed @model }}
+          <li><SidebarLink @href="/{{@model.accountSlug}}/users">Users</SidebarLink></li>
+          {{! @glint-expect-error - route templates do not have typed @model }}
+          <li><SidebarLink @href="/{{@model.accountSlug}}/domains">Domains</SidebarLink></li>
         </NavigationList>
       </Navigation>
     </:nav>
@@ -28,7 +33,8 @@ import { SidebarLink } from './sidebar-link';
     </:headerLeft>
 
     <:headerRight>
-      <AccountSwitcher />
+      {{! @glint-expect-error - route templates do not have typed @model }}
+      <AccountSwitcher @accountId={{@model.accountId}} />
       <HeaderAuthActions />
       <ThemeToggle />
     </:headerRight>

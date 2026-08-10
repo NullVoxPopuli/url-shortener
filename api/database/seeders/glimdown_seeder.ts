@@ -25,6 +25,7 @@ export default class extends BaseSeeder {
           name: glimdownOwner.name,
           created_at: DateTime.utc().toSQLDate(),
           is_free: true,
+          is_personal: false,
         });
       }
 

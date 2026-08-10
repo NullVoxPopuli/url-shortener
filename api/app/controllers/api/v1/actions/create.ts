@@ -4,8 +4,8 @@ import Link from '#models/link';
 import { render } from '#jsonapi/data';
 import { glimdownOwner } from '#consts';
 import type User from '#models/user';
-import Account from '#models/account';
 import { quotaForAccount } from '#services/link_quota';
+import { accountContext } from '#services/account_context';
 import CustomDomain from '#models/custom_domain';
 
 export async function createLink(context: HttpContext) {
@@ -59,7 +59,7 @@ export async function createLink(context: HttpContext) {
     });
   }
 
-  let account = await Account.find(user.account_id);
+  let account = await accountContext(context, user);
   let quota = account ? await quotaForAccount(account) : null;
   let canCreate = quota && (quota.remaining === null || quota.remaining > 0);
   if (canCreate) {
@@ -67,7 +67,7 @@ export async function createLink(context: HttpContext) {
 
     if (requestedDomain) {
       let owned = await CustomDomain.query()
-        .where('account_id', user.account_id)
+        .where('account_id', account!.id)
         .where('hostname', requestedDomain)
         .first();
 
@@ -78,7 +78,7 @@ export async function createLink(context: HttpContext) {
       }
     }
 
-    let link = await createMeteredLink(user, parsed, requestedDomain);
+    let link = await createMeteredLink(user, account!.id, parsed, requestedDomain);
 
     response.status(201);
     return render.link(link);
@@ -109,13 +109,14 @@ async function createUnmeteredLink(url: URL): Promise<Link> {
 
 async function createMeteredLink(
   user: User,
+  accountId: string,
   url: URL,
   domain: string | null = null
 ): Promise<Link> {
   let link = new Link();
   link.original = url.toString();
   link.domain = domain;
-  link.owned_by = user.account_id;
+  link.owned_by = accountId;
   link.created_by = user.id;
   await link.save();
   await loadRelations(link);

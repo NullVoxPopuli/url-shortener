@@ -25,7 +25,7 @@ export default class HeaderLinks extends Component<Signature> {
       {{#if this.currentUser.isAuthenticated}}
         <a href="/">Home</a>
         <span aria-hidden="true">|</span>
-        <a href="/dashboard">Dashboard</a>
+        <a href="/{{this.currentUser.personalAccountSlug}}">Dashboard</a>
         <span aria-hidden="true">|</span>
       {{/if}}
     {{/unless}}

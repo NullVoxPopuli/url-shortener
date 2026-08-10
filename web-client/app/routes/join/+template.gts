@@ -11,7 +11,8 @@ import { SiteChrome } from '../application/site-chrome';
           <p>You've joined <strong>{{@model.accountName}}</strong>.</p>
           <p>Use the account switcher in the dashboard to hop between your
             accounts.</p>
-          <p><a href="/dashboard">Go to the dashboard</a></p>
+          {{! @glint-expect-error - route templates do not have typed @model }}
+          <p><a href="/{{@model.accountSlug}}">Go to the dashboard</a></p>
         {{else}}
           <h1>That didn't work</h1>
           {{! @glint-expect-error - route templates do not have typed @model }}

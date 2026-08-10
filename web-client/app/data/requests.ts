@@ -11,9 +11,9 @@ function jsonapiHeaders() {
   });
 }
 
-export function getBillingStatus() {
+export function getBillingStatus(accountId?: string) {
   return withReactiveResponse<BillingStatus>({
-    url: `${config.apiOrigin}/v1/billing/status`,
+    url: `${config.apiOrigin}/v1/billing/status${accountId ? `?account=${accountId}` : ''}`,
     method: 'GET',
     op: 'query',
     credentials: 'include',
@@ -24,9 +24,9 @@ export function getBillingStatus() {
   });
 }
 
-export function getLinks() {
+export function getLinks(accountId?: string) {
   return withReactiveResponse<Link[]>({
-    url: `${config.apiOrigin}/v1/links`,
+    url: `${config.apiOrigin}/v1/links${accountId ? `?account=${accountId}` : ''}`,
     method: 'GET',
     op: 'query',
     credentials: 'include',
@@ -35,9 +35,9 @@ export function getLinks() {
   });
 }
 
-export function deleteLink(id: string) {
+export function deleteLink(id: string, accountId?: string) {
   return withReactiveResponse<null>({
-    url: `${config.apiOrigin}/v1/links/${id}`,
+    url: `${config.apiOrigin}/v1/links/${id}${accountId ? `?account=${accountId}` : ''}`,
     method: 'DELETE',
     op: 'deleteRecord',
     credentials: 'include',
@@ -45,9 +45,13 @@ export function deleteLink(id: string) {
   });
 }
 
-export function createLink(originalUrl: string, domain?: string | null) {
+export function createLink(
+  originalUrl: string,
+  domain?: string | null,
+  accountId?: string
+) {
   return withReactiveResponse<Link>({
-    url: `${config.apiOrigin}/v1/links`,
+    url: `${config.apiOrigin}/v1/links${accountId ? `?account=${accountId}` : ''}`,
     method: 'POST',
     op: 'createRecord',
     credentials: 'include',
@@ -119,20 +123,10 @@ export function removeMembership(id: string) {
   });
 }
 
-export function switchAccount(accountId: string) {
-  return withReactiveResponse<null>({
-    url: `${config.apiOrigin}/v1/me/account`,
-    method: 'POST',
-    op: 'updateRecord',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-    body: JSON.stringify({ accountId }),
-  });
-}
 
-export function getDomains() {
+export function getDomains(accountId?: string) {
   return withReactiveResponse<CustomDomain[]>({
-    url: `${config.apiOrigin}/v1/domains`,
+    url: `${config.apiOrigin}/v1/domains${accountId ? `?account=${accountId}` : ''}`,
     method: 'GET',
     op: 'query',
     credentials: 'include',
@@ -141,9 +135,9 @@ export function getDomains() {
   });
 }
 
-export function createDomain(hostname: string) {
+export function createDomain(hostname: string, accountId?: string) {
   return withReactiveResponse<CustomDomain>({
-    url: `${config.apiOrigin}/v1/domains`,
+    url: `${config.apiOrigin}/v1/domains${accountId ? `?account=${accountId}` : ''}`,
     method: 'POST',
     op: 'createRecord',
     credentials: 'include',
@@ -152,9 +146,9 @@ export function createDomain(hostname: string) {
   });
 }
 
-export function deleteDomain(id: string) {
+export function deleteDomain(id: string, accountId?: string) {
   return withReactiveResponse<null>({
-    url: `${config.apiOrigin}/v1/domains/${id}`,
+    url: `${config.apiOrigin}/v1/domains/${id}${accountId ? `?account=${accountId}` : ''}`,
     method: 'DELETE',
     op: 'deleteRecord',
     credentials: 'include',

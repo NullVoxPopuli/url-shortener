@@ -19,6 +19,7 @@ import type { CustomDomain } from '#app/data/types';
 
 interface Signature {
   Args: {
+    accountId: string;
     isAdmin: boolean;
     domains: Future<ReactiveDataDocument<CustomDomain[]>>;
   };
@@ -43,7 +44,7 @@ export default class DomainManager extends Component<Signature> {
     this.error = null;
 
     try {
-      await this.store.request(createDomain(hostname));
+      await this.store.request(createDomain(hostname, this.args.accountId));
       await refresh();
       form.reset();
     } catch (error) {
@@ -62,7 +63,7 @@ export default class DomainManager extends Component<Signature> {
     this.error = null;
 
     try {
-      await this.store.request(deleteDomain(domain.id));
+      await this.store.request(deleteDomain(domain.id, this.args.accountId));
       await refresh();
     } catch (error) {
       this.error = messageFrom(error);

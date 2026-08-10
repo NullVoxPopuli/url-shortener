@@ -21,10 +21,11 @@ export default class AuthController {
           id: user.id,
           name: user.name,
           isStaff: Boolean(user.isStaff),
-          accountId: user.account_id,
+          personalAccountId: user.account_id,
           memberships: memberships.map((membership) => ({
             accountId: membership.account_id,
             accountName: membership.account.name,
+            isPersonal: Boolean(membership.account.isPersonal),
             role: membership.role,
           })),
         },

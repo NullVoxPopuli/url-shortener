@@ -63,7 +63,12 @@ test.group('Custom domains', (group) => {
 
     await overridePlan(account, 'hobby');
 
-    for (const hostname of ['not a hostname', 'https://example.com', 'nvp.local', 'sub.nvp.local']) {
+    for (const hostname of [
+      'not a hostname',
+      'https://example.com',
+      'nvp.local',
+      'sub.nvp.local',
+    ]) {
       const response = await addDomain(client, user, hostname);
 
       response.assertStatus(422);
@@ -134,8 +139,8 @@ test.group('Custom domains', (group) => {
       .withGuard('web')
       .loginAs(outsider.user);
 
-    foreign.assertStatus(200);
-    assert.isNotNull(await CustomDomain.find(id), 'silent no-op for outsiders');
+    foreign.assertStatus(404);
+    assert.isNotNull(await CustomDomain.find(id), 'foreign deletes do not delete');
 
     const own = await client
       .delete(`http://${API_DOMAIN}/v1/domains/${id}`)

@@ -5,7 +5,7 @@ import AccountInvitation from '#models/account_invitation';
 import AccountMembership from '#models/account_membership';
 import { jsonapi } from '#jsonapi';
 import { render } from '#jsonapi/data';
-import { membershipFor, resetActiveAccount, teamCapacity } from '#services/team';
+import { membershipFor, teamCapacity } from '#services/team';
 
 /**
  * Shared prologue: the target account, only if the caller belongs to
@@ -110,12 +110,14 @@ export async function revokeInvitation(context: HttpContext): Promise<Response> 
 
     if (membership?.role === 'admin') {
       await invitation.delete();
+
+      response.status(200);
+
+      return jsonapi.empty();
     }
   }
 
-  response.status(200);
-
-  return jsonapi.empty();
+  return jsonapi.notFound({ kind: 'Invitation', id });
 }
 
 export async function acceptInvitation(context: HttpContext): Promise<Response> {
@@ -210,11 +212,12 @@ export async function removeMembership(context: HttpContext): Promise<Response> 
      */
     if (!isOwner && (isAdmin || isSelf)) {
       await membership.delete();
-      await resetActiveAccount(membership.user_id, membership.account_id);
+
+      response.status(200);
+
+      return jsonapi.empty();
     }
   }
 
-  response.status(200);
-
-  return jsonapi.empty();
+  return jsonapi.notFound({ kind: 'Membership', id });
 }

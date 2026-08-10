@@ -34,6 +34,7 @@ router
       router.delete('links/:id', [links, 'delete']);
       router.get('links/:id/visits', [links, 'visits']);
 
+      router.post('accounts', [accounts, 'create']);
       router.get('accounts/:id', [accounts, 'show']);
       router.get('accounts/:id/memberships', [accounts, 'memberships']);
       router.get('accounts/:id/invitations', [accounts, 'invitations']);
@@ -42,9 +43,6 @@ router
 
       let memberships = () => import('#controllers/api/v1/memberships');
       let invitations = () => import('#controllers/api/v1/invitations');
-      let me = () => import('#controllers/api/v1/me');
-
-      router.post('me/account', [me, 'switchAccount']);
 
       let domains = () => import('#controllers/api/v1/domains');
 

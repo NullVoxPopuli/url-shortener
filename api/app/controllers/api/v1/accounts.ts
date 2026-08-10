@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http';
 import { authenticatedAction } from '../base.js';
 import { showAccount } from './actions/show-account.js';
 import { createInvitation, listInvitations, listMemberships } from './actions/team.js';
+import { createAccount } from './actions/create-account.js';
 
 export default class AccountsController {
   /**
@@ -11,6 +12,15 @@ export default class AccountsController {
    */
   async show(context: HttpContext) {
     return authenticatedAction(context, showAccount);
+  }
+
+  /**
+   * @create
+   * @summary create an additional account
+   * @description Creates an additional (non-personal) account, gated by your personal account's plan.
+   */
+  async create(context: HttpContext) {
+    return authenticatedAction(context, createAccount);
   }
 
   /**

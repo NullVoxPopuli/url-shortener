@@ -6,6 +6,7 @@ export const PLANS = [
     monthlyLinkLimit: 15,
     teammates: 0,
     customDomains: 0,
+    additionalAccounts: 1,
     stripePriceId: 'price_1U2ILAKsGhcICKKY7PsC0LTW',
   },
   {
@@ -15,6 +16,7 @@ export const PLANS = [
     monthlyLinkLimit: 100,
     teammates: 0,
     customDomains: 2,
+    additionalAccounts: 2,
     stripePriceId: 'price_1U2ILPKsGhcICKKY6OLKcW35',
   },
   {
@@ -24,6 +26,7 @@ export const PLANS = [
     monthlyLinkLimit: 1000,
     teammates: 2,
     customDomains: 3,
+    additionalAccounts: 3,
     stripePriceId: 'price_1U2ILeKsGhcICKKYQFVqMsbn',
   },
 ] as const;
@@ -37,6 +40,7 @@ export const NO_SUBSCRIPTION_PLAN = {
   monthlyLinkLimit: 5,
   teammates: 0,
   customDomains: 0,
+  additionalAccounts: 0,
 } as const;
 
 /**
@@ -49,6 +53,7 @@ export const FREE_PLAN = {
   monthlyLinkLimit: null,
   teammates: null,
   customDomains: null,
+  additionalAccounts: null,
 } as const;
 
 export function planForPriceId(priceId: string | null) {
@@ -61,5 +66,7 @@ interface PlanHolder {
 }
 
 export function planFor(account: PlanHolder) {
-  return account.isFree ? FREE_PLAN : (planForPriceId(account.stripePriceId) ?? NO_SUBSCRIPTION_PLAN);
+  return account.isFree
+    ? FREE_PLAN
+    : (planForPriceId(account.stripePriceId) ?? NO_SUBSCRIPTION_PLAN);
 }

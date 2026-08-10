@@ -39,19 +39,18 @@ test.group('DELETE [authenticated session]', (group) => {
 
     /**
      * Same response as deleting a non-existent id: no signal about
-     * which ids exist — but the link must survive.
+     * which ids exist — and the link must survive.
      */
-    response.assertStatus(200);
+    response.assertStatus(404);
 
     assert.isNotNull(await Link.find(victimLink.id));
   });
 
-  test('deleting a non-existent id is a no-op', async ({ client }) => {
+  test('deleting a non-existent id → 404', async ({ client }) => {
     let { user } = await createNewAccount();
 
     let response = await del(client, user, uuidv4());
 
-    response.assertStatus(200);
-    response.assertBody({ data: null });
+    response.assertStatus(404);
   });
 });

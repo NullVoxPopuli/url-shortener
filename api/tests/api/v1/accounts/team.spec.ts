@@ -151,10 +151,6 @@ test.group('Team | memberships + invitations', (group) => {
       userId: member.user.id,
     });
 
-    // the member's active account moves to the team account, then they leave
-    member.user.account_id = account.id;
-    await member.user.save();
-
     const leave = await client
       .delete(`http://${API_DOMAIN}/v1/memberships/${membership.id}`)
       .headers(jsonHeaders)
@@ -165,11 +161,11 @@ test.group('Team | memberships + invitations', (group) => {
 
     assert.isNull(await AccountMembership.find(membership.id));
 
-    // active account falls back to their own
+    // the personal-account pointer never changes
     await member.user.refresh();
     assert.strictEqual(member.user.account_id, member.account.id);
 
-    // the owner's membership is permanent
+    // the owner's membership is permanent (404: nothing removable)
     const ownerMembership = await AccountMembership.query()
       .where('account_id', account.id)
       .where('user_id', user.id)
@@ -181,7 +177,7 @@ test.group('Team | memberships + invitations', (group) => {
       .withGuard('web')
       .loginAs(user);
 
-    removeOwner.assertStatus(200);
+    removeOwner.assertStatus(404);
     assert.isNotNull(await AccountMembership.find(ownerMembership.id));
   });
 

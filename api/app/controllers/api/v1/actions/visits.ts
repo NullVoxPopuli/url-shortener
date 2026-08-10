@@ -3,6 +3,7 @@ import Link from '#models/link';
 import LinkVisit from '#models/link_visit';
 import { jsonapi } from '#jsonapi';
 import { render } from '#jsonapi/data';
+import { accountContext } from '#services/account_context';
 
 export async function listVisits(context: HttpContext) {
   let { auth, request, response } = context;
@@ -10,10 +11,13 @@ export async function listVisits(context: HttpContext) {
   let user = await auth.authenticate();
   let id = request.param('id');
 
-  let link = await Link.query()
-    .withScopes((scopes) => scopes.visibleTo(user))
-    .where('id', id)
-    .first();
+  let account = await accountContext(context, user);
+
+  if (!account) {
+    return jsonapi.notFound({ kind: 'Account', id: String(request.input('account')) });
+  }
+
+  let link = await Link.query().where('owned_by', account.id).where('id', id).first();
 
   if (!link) {
     return jsonapi.notFound({ kind: 'Link', id });

@@ -4,10 +4,12 @@ import Service from '@ember/service';
 import { getPromiseState } from 'reactiveweb/get-promise-state';
 
 import config from '#config';
+import { shortAccountId } from '#utils/account';
 
 export interface CurrentUserMembership {
   accountId: string;
   accountName: string;
+  isPersonal: boolean;
   role: 'admin' | 'member';
 }
 
@@ -15,7 +17,7 @@ interface CurrentUserData {
   id: string | number;
   name: string;
   isStaff: boolean;
-  accountId: string;
+  personalAccountId: string;
   memberships: CurrentUserMembership[];
 }
 
@@ -43,20 +45,31 @@ export default class CurrentUserService extends Service {
     return Boolean(this.user)
   }
 
-  get accountId() {
-    return this.user?.accountId ?? null;
+  get personalAccountId() {
+    return this.user?.personalAccountId ?? null;
   }
 
   get memberships() {
     return this.user?.memberships ?? [];
   }
 
-  get activeMembership() {
-    return this.memberships.find((m) => m.accountId === this.accountId) ?? null;
+  /**
+   * Accepts a full account id or the 8-char URL slug.
+   */
+  membershipFor(idOrSlug: string) {
+    if (!idOrSlug) return null;
+
+    return this.memberships.find((m) => m.accountId.startsWith(idOrSlug)) ?? null;
   }
 
-  get isAdminOfActiveAccount() {
-    return this.activeMembership?.role === 'admin';
+  get personalAccountSlug() {
+    let id = this.personalAccountId;
+
+    return id ? shortAccountId(id) : null;
+  }
+
+  isAdminOf(accountId: string) {
+    return this.membershipFor(accountId)?.role === 'admin';
   }
 
   async refresh() {
