@@ -9,8 +9,6 @@ export async function htmlAction(
 ) {
   let { response } = context;
 
-  response.header('content-type', 'text/html; charset=utf-8');
-
   try {
     /**
      * This could call auth,
@@ -19,10 +17,17 @@ export async function htmlAction(
     let result = await callback(context);
 
     response.safeStatus(jsonapi.statusFrom(result as any));
+    /**
+     * AFTER the callback: jsonApi.render() stamps the JSON:API media
+     * type on the response, and this is an HTML page.
+     */
+    response.header('content-type', 'text/html; charset=utf-8');
     return result;
   } catch (error) {
     // Uncomment for debugging
     console.error('catch: ', error.message, error.name, error.stack);
+
+    response.header('content-type', 'text/html; charset=utf-8');
 
     if ('name' in error) {
       switch (error.name) {
