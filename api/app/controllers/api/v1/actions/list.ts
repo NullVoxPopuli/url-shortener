@@ -1,18 +1,16 @@
 import Link from '#models/link';
-import { jsonapi } from '#jsonapi';
 import { render } from '#jsonapi/data';
-import { accountContext } from '#services/account_context';
+import { authenticateWithScope } from '#services/api_keys';
 import type { HttpContext } from '@adonisjs/core/http';
 
 export async function listLinks(context: HttpContext) {
-  let { auth, request, response } = context;
+  let { response } = context;
 
-  let user = await auth.authenticate();
-  let account = await accountContext(context, user);
+  let authed = await authenticateWithScope(context, 'links:read');
 
-  if (!account) {
-    return jsonapi.notFound({ kind: 'Account', id: String(request.input('account')) });
-  }
+  if ('response' in authed) return authed.response;
+
+  let { account } = authed;
 
   let links = await Link.query()
     .where('owned_by', account.id)

@@ -45,6 +45,11 @@ router
       let invitations = () => import('#controllers/api/v1/invitations');
 
       let domains = () => import('#controllers/api/v1/domains');
+      let apiKeys = () => import('#controllers/api/v1/api_keys');
+
+      router.get('api-keys', [apiKeys, 'index']);
+      router.post('api-keys', [apiKeys, 'create']);
+      router.delete('api-keys/:id', [apiKeys, 'delete']);
 
       router.get('domains', [domains, 'index']);
       router.post('domains', [domains, 'create']);

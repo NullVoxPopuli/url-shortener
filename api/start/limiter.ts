@@ -34,19 +34,16 @@ export const apiThrottle = limiter.define('api', async (ctx) => {
   }
 
   try {
-    await ctx.auth.use('api').authenticate();
+    /**
+     * API keys are quota'd per membership (user-in-account).
+     *
+     * TODO: determine if this needs to be bumped by subscription
+     */
+    let membership = await ctx.auth.use('api').authenticate();
+
+    return limiter.allowRequests(100).every('1 minute').usingKey(`membership_${membership.id}`);
   } catch {
     // Anonymous requests use the IP-based limit below.
-  }
-
-  /**
-   * Allow logged-in users to make 100 requests by
-   * their user ID
-   *
-   * TODO: determine if this needs to be buwped by subscription
-   */
-  if (ctx.auth.user) {
-    return limiter.allowRequests(100).every('1 minute').usingKey(`user_${ctx.auth.user.id}`);
   }
 
   return limiter.allowRequests(1).every('1 minute').usingKey(`ip_${ctx.request.ip()}`);

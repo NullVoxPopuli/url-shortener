@@ -1,4 +1,4 @@
-import type { BillingStatus, Link } from '#app/data/types';
+import type { ApiKey, BillingStatus, Link } from '#app/data/types';
 
 export function makeBilling(overrides?: {
   planKey?: string;
@@ -48,6 +48,18 @@ export function makeBilling(overrides?: {
     paymentMethod: { brand: null, last4: null },
     lastSyncedAt: null,
   } as unknown as BillingStatus;
+}
+
+export function makeApiKey(overrides?: Partial<Record<keyof ApiKey, unknown>>): ApiKey {
+  return {
+    id: 'key-1',
+    name: 'CI deploys',
+    scopes: ['links:read'],
+    createdAt: '2026-08-09T12:00:00.000Z',
+    lastUsedAt: null,
+    expiresAt: null,
+    ...overrides,
+  } as unknown as ApiKey;
 }
 
 export function makeLink(overrides?: Partial<Record<keyof Link, unknown>>): Link {

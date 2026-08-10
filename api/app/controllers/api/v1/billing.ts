@@ -42,14 +42,13 @@ export default class BillingController {
     const candidate = request.input('return_to');
     const returnTo = candidate && isSafeRedirect(candidate) ? candidate : fallback;
 
+    let user;
+
     try {
-      await auth.authenticateUsing(['web', 'api']);
+      user = await auth.use('web').authenticate();
     } catch {
       return response.redirect(returnTo);
     }
-
-    const user = auth.user;
-    if (!user) return response.redirect(returnTo);
 
     const account = await Account.find(user.account_id);
     if (!account) return response.redirect(returnTo);

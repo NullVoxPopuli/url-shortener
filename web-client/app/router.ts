@@ -26,6 +26,7 @@ Router.map(function () {
     this.route('links');
     this.route('users');
     this.route('domains');
+    this.route('api-keys');
   });
   // legacy entry point: forwards to the personal account
   this.route('dashboard-redirect', { path: '/dashboard' });

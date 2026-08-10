@@ -7,7 +7,7 @@ import { membershipFor } from '#services/team';
 export async function showAccount(context: HttpContext) {
   let { auth, request, response } = context;
 
-  let user = await auth.authenticate();
+  let user = await auth.use('web').authenticate();
   let id = request.param('id');
 
   /**

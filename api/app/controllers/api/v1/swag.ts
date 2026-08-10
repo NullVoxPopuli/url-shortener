@@ -20,7 +20,8 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
     '/v1/links': {
       get: {
         summary: 'List links',
-        description: "Lists the account's links.",
+        description: "Lists the account's links. Accepts an API key with the `links:read` scope.",
+        security: [{ apiKey: [] }],
         parameters: [accountParam],
         responses: {
           200: {
@@ -44,13 +45,17 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       post: {
         summary: 'Create links',
         description:
-          'Creates a short link on the account. Body: { "originalUrl": "https://..." } and optionally { "domain": "..." } — one of the account\'s custom domains.',
+          'Creates a short link on the account. Body: { "originalUrl": "https://..." } and optionally { "domain": "..." } — one of the account\'s custom domains. Accepts an API key with the `links:write` scope.',
+        security: [{ apiKey: [] }],
         parameters: [accountParam],
       },
     },
     '/v1/links/{id}': {
       get: {
         summary: 'Show link',
+        description:
+          "Shows one of the account's links. Accepts an API key with the `links:read` scope.",
+        security: [{ apiKey: [] }],
         parameters: [dynamicSegment('id'), accountParam],
         responses: {
           200: {
@@ -85,14 +90,17 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       delete: {
         parameters: [dynamicSegment('id'), accountParam],
         summary: 'Delete link',
-        description: "Deletes one of the account's links. 404 when there is nothing to delete.",
+        description:
+          "Deletes one of the account's links. 404 when there is nothing to delete. Accepts an API key with the `links:write` scope.",
+        security: [{ apiKey: [] }],
       },
     },
     '/v1/links/{id}/visits': {
       get: {
         summary: 'List visits for a link',
         description:
-          'Lists recorded visits ("clicks") for one of the account\'s links, most recent first. Each visit records when it happened, the referrer, and the user agent.',
+          'Lists recorded visits ("clicks") for one of the account\'s links, most recent first. Each visit records when it happened, the referrer, and the user agent. Accepts an API key with the `links:read` scope.',
+        security: [{ apiKey: [] }],
         parameters: [dynamicSegment('id'), accountParam],
         responses: {
           200: {
@@ -219,6 +227,32 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
         description:
           'Admins may remove anyone; members may remove themselves (leave). The account owner cannot be removed. When the removed member was active in that account, their active account falls back to their personal one.',
         parameters: [dynamicSegment('id')],
+      },
+    },
+    '/v1/api-keys': {
+      get: {
+        summary: 'List API keys',
+        description:
+          'Lists your API keys for the account, with the account-wide quota in `meta` ({ limit, used, remaining }). Key secrets are never included. Managing keys requires the browser session — a key cannot mint or revoke keys.',
+        parameters: [accountParam],
+        responses: {
+          401: componentSchemaRef('Unauthenticated'),
+          404: componentSchemaRef('NotFound'),
+          415: componentSchemaRef('UnsupportedMediaType'),
+        },
+      },
+      post: {
+        summary: 'Create an API key',
+        description:
+          'Creates an API key on your membership in the account. Body: { "name": "...", "scopes": ["links:read", "links:write"], "expiresInDays": 90 } (expiresInDays optional — omit for a non-expiring key). Gated by the account plan\'s API key limit: hobby 1, project 3, others 0 (402 when full). The secret (the `token` attribute, `nvp_...`) is ONLY in this response — store it immediately. Use it as `Authorization: Bearer nvp_...` on the links endpoints.',
+        parameters: [accountParam],
+      },
+    },
+    '/v1/api-keys/{id}': {
+      delete: {
+        summary: 'Revoke an API key',
+        description: 'Revokes one of your API keys. 404 when there is nothing to revoke.',
+        parameters: [dynamicSegment('id'), accountParam],
       },
     },
     '/v1/domains': {

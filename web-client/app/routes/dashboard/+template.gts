@@ -22,6 +22,8 @@ import { SidebarLink } from './sidebar-link';
           <li><SidebarLink @href="/{{@model.accountSlug}}/users">Users</SidebarLink></li>
           {{! @glint-expect-error - route templates do not have typed @model }}
           <li><SidebarLink @href="/{{@model.accountSlug}}/domains">Domains</SidebarLink></li>
+          {{! @glint-expect-error - route templates do not have typed @model }}
+          <li><SidebarLink @href="/{{@model.accountSlug}}/api-keys">API Keys</SidebarLink></li>
         </NavigationList>
       </Navigation>
     </:nav>

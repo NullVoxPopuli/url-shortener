@@ -171,9 +171,19 @@ function generate() {
         Authenticated users are limited to 100 requests per minute.
 
         All endpoints use the \`${mimeType}\` MIME type for both \`Accept\` and \`Content-Type\` headers.
+
+        The links endpoints accept an API key via \`Authorization: Bearer nvp_...\` — create one in the dashboard under "API Keys". Keys carry scopes (\`links:read\`, \`links:write\`) and are pinned to the account they were created in. Everything else requires the first-party browser session.
       `,
     },
     components: {
+      securitySchemes: {
+        apiKey: {
+          type: 'http',
+          scheme: 'bearer',
+          description:
+            'An API key (`nvp_...`), created in the dashboard under "API Keys". Keys are scoped (`links:read`, `links:write`) and pinned to one account.',
+        },
+      },
       schemas: {
         jsonapi: {
           $ref: 'https://raw.githubusercontent.com/json-api/json-api/refs/heads/gh-pages/_schemas/1.0/schema.json',

@@ -14,7 +14,7 @@ import { planFor } from '#services/plans';
 export async function createAccount(context: HttpContext): Promise<Response> {
   let { auth, request, response } = context;
 
-  let user = await auth.authenticate();
+  let user = await auth.use('web').authenticate();
 
   let name = String(request.input('name') ?? '').trim();
 

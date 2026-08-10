@@ -7,7 +7,7 @@ import { render } from '#jsonapi/data';
 export async function showUser(context: HttpContext) {
   let { auth, request, response } = context;
 
-  let user = await auth.authenticate();
+  let user = await auth.use('web').authenticate();
   let id = request.param('id');
 
   let target = await User.query().preload('account').where('id', id).first();

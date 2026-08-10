@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon';
 import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm';
+import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens';
 import Account from './account.js';
 import User from './user.js';
 import type { BelongsTo } from '@adonisjs/lucid/types/relations';
@@ -27,6 +28,16 @@ export default class AccountMembership extends BaseModel {
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime;
+
+  /**
+   * API keys hang off the *membership* (user-in-account), so a key is
+   * pinned to exactly one account and dies with the membership.
+   */
+  static apiKeys = DbAccessTokensProvider.forModel(AccountMembership, {
+    table: 'api_keys',
+    type: 'api_key',
+    prefix: 'nvp_',
+  });
 
   /**
    * Idempotently grant membership.

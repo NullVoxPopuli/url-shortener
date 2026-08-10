@@ -17,7 +17,7 @@ const HOSTNAME_PATTERN = /^(?!-)[a-z0-9-]{1,63}(?<!-)(\.(?!-)[a-z0-9-]{1,63}(?<!
 export async function listDomains(context: HttpContext): Promise<Response> {
   let { auth, request, response } = context;
 
-  let user = await auth.authenticate();
+  let user = await auth.use('web').authenticate();
   let contextAccount = await accountContext(context, user);
 
   if (!contextAccount) {
@@ -37,7 +37,7 @@ export async function listDomains(context: HttpContext): Promise<Response> {
 export async function createDomain(context: HttpContext): Promise<Response> {
   let { auth, request, response } = context;
 
-  let user = await auth.authenticate();
+  let user = await auth.use('web').authenticate();
   let account = await accountContext(context, user);
 
   if (!account) {
@@ -99,7 +99,7 @@ export async function createDomain(context: HttpContext): Promise<Response> {
 export async function deleteDomain(context: HttpContext): Promise<Response> {
   let { auth, request, response } = context;
 
-  let user = await auth.authenticate();
+  let user = await auth.use('web').authenticate();
   let id = request.param('id');
 
   let account = await accountContext(context, user);

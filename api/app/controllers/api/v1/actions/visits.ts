@@ -3,19 +3,18 @@ import Link from '#models/link';
 import LinkVisit from '#models/link_visit';
 import { jsonapi } from '#jsonapi';
 import { render } from '#jsonapi/data';
-import { accountContext } from '#services/account_context';
+import { authenticateWithScope } from '#services/api_keys';
 
 export async function listVisits(context: HttpContext) {
-  let { auth, request, response } = context;
+  let { request, response } = context;
 
-  let user = await auth.authenticate();
   let id = request.param('id');
 
-  let account = await accountContext(context, user);
+  let authed = await authenticateWithScope(context, 'links:read');
 
-  if (!account) {
-    return jsonapi.notFound({ kind: 'Account', id: String(request.input('account')) });
-  }
+  if ('response' in authed) return authed.response;
+
+  let { account } = authed;
 
   let link = await Link.query().where('owned_by', account.id).where('id', id).first();
 

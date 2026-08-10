@@ -100,6 +100,17 @@ export const SCHEMAS = [
     ],
   }),
   withDefaults({
+    type: 'api-key',
+    fields: [
+      { kind: 'field', name: 'name' },
+      { kind: 'array', name: 'scopes' },
+      { kind: 'field', name: 'token' },
+      { kind: 'field', name: 'createdAt' },
+      { kind: 'field', name: 'lastUsedAt' },
+      { kind: 'field', name: 'expiresAt' },
+    ],
+  }),
+  withDefaults({
     type: 'invitation',
     fields: [
       { kind: 'field', name: 'role' },

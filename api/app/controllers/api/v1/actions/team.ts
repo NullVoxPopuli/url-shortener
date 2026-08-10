@@ -14,7 +14,7 @@ import { membershipFor, teamCapacity } from '#services/team';
 async function accountForMember(context: HttpContext, options?: { admin?: boolean }) {
   let { auth, request } = context;
 
-  let user = await auth.authenticate();
+  let user = await auth.use('web').authenticate();
   let id = request.param('id');
 
   let membership = await membershipFor(user.id, id);
@@ -100,7 +100,7 @@ export async function listInvitations(context: HttpContext): Promise<Response> {
 export async function revokeInvitation(context: HttpContext): Promise<Response> {
   let { auth, request, response } = context;
 
-  let user = await auth.authenticate();
+  let user = await auth.use('web').authenticate();
   let id = request.param('id');
 
   let invitation = await AccountInvitation.find(id);
@@ -123,7 +123,7 @@ export async function revokeInvitation(context: HttpContext): Promise<Response> 
 export async function acceptInvitation(context: HttpContext): Promise<Response> {
   let { auth, request, response } = context;
 
-  let user = await auth.authenticate();
+  let user = await auth.use('web').authenticate();
   let token = request.input('token');
 
   let invitation = token ? await AccountInvitation.findBy({ token }) : null;
@@ -193,7 +193,7 @@ export async function acceptInvitation(context: HttpContext): Promise<Response> 
 export async function removeMembership(context: HttpContext): Promise<Response> {
   let { auth, request, response } = context;
 
-  let user = await auth.authenticate();
+  let user = await auth.use('web').authenticate();
   let id = request.param('id');
 
   let membership = await AccountMembership.find(id);

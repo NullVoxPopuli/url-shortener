@@ -5,7 +5,6 @@ import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations';
 import Account from './account.js';
 import Link from './link.js';
 import AccountMembership from './account_membership.js';
-import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens';
 
 export default class User extends BaseModel {
   static selfAssignPrimaryKey = true;
@@ -47,6 +46,4 @@ export default class User extends BaseModel {
   static assignUuid(user: User) {
     user.id ||= randomUUID();
   }
-
-  static accessTokens = DbAccessTokensProvider.forModel(User);
 }

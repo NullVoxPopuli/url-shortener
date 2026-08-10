@@ -1,19 +1,18 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import Link from '#models/link';
 import { jsonapi } from '#jsonapi';
-import { accountContext } from '#services/account_context';
+import { authenticateWithScope } from '#services/api_keys';
 
 export async function deleteLink(context: HttpContext) {
-  let { auth, request, response } = context;
+  let { request, response } = context;
 
-  let user = await auth.authenticate();
   let id = request.param('id');
 
-  let account = await accountContext(context, user);
+  let authed = await authenticateWithScope(context, 'links:write');
 
-  if (!account) {
-    return jsonapi.notFound({ kind: 'Account', id: String(request.input('account')) });
-  }
+  if ('response' in authed) return authed.response;
+
+  let { account } = authed;
 
   /**
    * Scoped to the caller's account: someone else's link 404s exactly

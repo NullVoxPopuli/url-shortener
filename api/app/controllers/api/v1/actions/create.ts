@@ -5,7 +5,7 @@ import { render } from '#jsonapi/data';
 import { glimdownOwner } from '#consts';
 import type User from '#models/user';
 import { quotaForAccount } from '#services/link_quota';
-import { accountContext } from '#services/account_context';
+import { maybeAuthenticateWithScope } from '#services/api_keys';
 import CustomDomain from '#models/custom_domain';
 
 export async function createLink(context: HttpContext) {
@@ -34,10 +34,11 @@ export async function createLink(context: HttpContext) {
   let parsed = new URL(originalUrl);
   let isGlimdown = parsed.host.endsWith('glimdown.com') || parsed.host.endsWith('repl.nvp.gg');
 
-  await context.auth.check();
-  let user = context.auth.user;
+  let authed = await maybeAuthenticateWithScope(context, 'links:write');
 
-  if (!user) {
+  if (authed && 'response' in authed) return authed.response;
+
+  if (!authed) {
     /**
      * While glimdown has special treatment,
      * we don't want to hijack paid accounts
@@ -59,15 +60,15 @@ export async function createLink(context: HttpContext) {
     });
   }
 
-  let account = await accountContext(context, user);
-  let quota = account ? await quotaForAccount(account) : null;
-  let canCreate = quota && (quota.remaining === null || quota.remaining > 0);
+  let { user, account } = authed;
+  let quota = await quotaForAccount(account);
+  let canCreate = quota.remaining === null || quota.remaining > 0;
   if (canCreate) {
     let requestedDomain = data.domain ? String(data.domain).trim().toLowerCase() : null;
 
     if (requestedDomain) {
       let owned = await CustomDomain.query()
-        .where('account_id', account!.id)
+        .where('account_id', account.id)
         .where('hostname', requestedDomain)
         .first();
 
@@ -78,7 +79,7 @@ export async function createLink(context: HttpContext) {
       }
     }
 
-    let link = await createMeteredLink(user, account!.id, parsed, requestedDomain);
+    let link = await createMeteredLink(user, account.id, parsed, requestedDomain);
 
     response.status(201);
     return render.link(link);
@@ -88,10 +89,7 @@ export async function createLink(context: HttpContext) {
     error({
       status: 402,
       title: 'Payment required',
-      detail:
-        quota?.remaining === 0
-          ? 'Monthly link limit reached'
-          : 'An account is required to create links',
+      detail: 'Monthly link limit reached',
     });
   });
 }

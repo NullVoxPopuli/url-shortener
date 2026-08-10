@@ -95,3 +95,24 @@ export interface CustomDomain {
   account: ApiAccount;
   [Type]: 'custom-domain';
 }
+
+export interface ApiKey {
+  id: string;
+  name: string;
+  scopes: string[];
+  /**
+   * The secret — only present in the create response; it cannot be
+   * retrieved again.
+   */
+  token?: string;
+  createdAt: string;
+  lastUsedAt: string | null;
+  expiresAt: string | null;
+  [Type]: 'api-key';
+}
+
+export interface ApiKeyQuota {
+  limit: number | null;
+  used: number;
+  remaining: number | null;
+}

@@ -29,12 +29,11 @@ async function accountForRequest(
 ): Promise<Actor> {
   const { auth } = context;
 
-  await auth.authenticateUsing(['web', 'api']);
-
-  const user = auth.user;
-  if (!user) {
-    return { error: jsonapi.notAuthenticated({ stack: 'No user' }) };
-  }
+  /**
+   * Billing is session-only: API keys are scoped to links and cannot
+   * see or change billing.
+   */
+  const user = await auth.use('web').authenticate();
 
   const account = await accountContext(context, user);
   if (!account) {

@@ -20,7 +20,7 @@ export async function authenticatedAction(
   callback: (context: HttpContext) => Promise<Response>
 ) {
   return action(context, async (context) => {
-    await context.auth.authenticate();
+    await context.auth.use('web').authenticate();
 
     return await callback(context);
   });

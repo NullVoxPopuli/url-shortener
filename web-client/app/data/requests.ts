@@ -2,7 +2,14 @@ import { withReactiveResponse } from '@warp-drive/core/request';
 
 import config from '#config';
 
-import type { BillingStatus, CustomDomain, Invitation, Link, Membership } from '#app/data/types';
+import type {
+  ApiKey,
+  BillingStatus,
+  CustomDomain,
+  Invitation,
+  Link,
+  Membership,
+} from '#app/data/types';
 
 function jsonapiHeaders() {
   return new Headers({
@@ -123,6 +130,41 @@ export function removeMembership(id: string) {
   });
 }
 
+
+export function getApiKeys(accountId?: string) {
+  return withReactiveResponse<ApiKey[]>({
+    url: `${config.apiOrigin}/v1/api-keys${accountId ? `?account=${accountId}` : ''}`,
+    method: 'GET',
+    op: 'query',
+    credentials: 'include',
+    headers: jsonapiHeaders(),
+    cacheOptions: { types: ['api-key'] },
+  });
+}
+
+export function createApiKey(
+  params: { name: string; scopes: string[]; expiresInDays?: number | null },
+  accountId?: string
+) {
+  return withReactiveResponse<ApiKey>({
+    url: `${config.apiOrigin}/v1/api-keys${accountId ? `?account=${accountId}` : ''}`,
+    method: 'POST',
+    op: 'createRecord',
+    credentials: 'include',
+    headers: jsonapiHeaders(),
+    body: JSON.stringify(params),
+  });
+}
+
+export function revokeApiKey(id: string, accountId?: string) {
+  return withReactiveResponse<null>({
+    url: `${config.apiOrigin}/v1/api-keys/${id}${accountId ? `?account=${accountId}` : ''}`,
+    method: 'DELETE',
+    op: 'deleteRecord',
+    credentials: 'include',
+    headers: jsonapiHeaders(),
+  });
+}
 
 export function getDomains(accountId?: string) {
   return withReactiveResponse<CustomDomain[]>({

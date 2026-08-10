@@ -3,21 +3,20 @@ import Link from '#models/link';
 import { render } from '#jsonapi/data';
 import { jsonapi } from '#jsonapi';
 import { isUUID } from '#utils/uuid';
-import { accountContext } from '#services/account_context';
+import { authenticateWithScope } from '#services/api_keys';
 
 export async function showLink(context: HttpContext) {
-  let { auth, request, response } = context;
+  let { request, response } = context;
   let id = request.param('id');
+
+  let authed = await authenticateWithScope(context, 'links:read');
+
+  if ('response' in authed) return authed.response;
+
+  let { account } = authed;
 
   if (!isUUID(id)) {
     return jsonapi.unprocessableContent(`ID received is not a valid UUID`);
-  }
-
-  let user = await auth.authenticate();
-  let account = await accountContext(context, user);
-
-  if (!account) {
-    return jsonapi.notFound({ kind: 'Account', id: String(request.input('account')) });
   }
 
   let link = await Link.query()
