@@ -10,7 +10,9 @@ import { SidebarLink } from './sidebar-link';
     <:nav>
       <Navigation>
         {{! @glint-expect-error - route templates do not have typed @model }}
-        <NavigationList @label={{@model.accountName}}>
+        <AccountSwitcher @accountId={{@model.accountId}} />
+
+        <NavigationList>
           {{! @glint-expect-error - route templates do not have typed @model }}
           <li><SidebarLink @href="/{{@model.accountSlug}}">Dashboard</SidebarLink></li>
         </NavigationList>
@@ -35,8 +37,6 @@ import { SidebarLink } from './sidebar-link';
     </:headerLeft>
 
     <:headerRight>
-      {{! @glint-expect-error - route templates do not have typed @model }}
-      <AccountSwitcher @accountId={{@model.accountId}} />
       <HeaderAuthActions />
       <ThemeToggle />
     </:headerRight>

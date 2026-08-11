@@ -1,16 +1,20 @@
 import Component from '@glimmer/component';
-import { on } from '@ember/modifier';
 import { service } from '@ember/service';
+
+import { Menu } from 'nvp.ui';
 
 import { shortAccountId } from '#utils/account';
 
-import type RouterService from '@ember/routing/router-service';
 import type CurrentUserService from '#services/current-user';
 
 interface Signature {
   Args: {
     accountId: string;
   };
+}
+
+function eq(a: string, b: string) {
+  return a === b;
 }
 
 /**
@@ -20,41 +24,57 @@ interface Signature {
  */
 export class AccountSwitcher extends Component<Signature> {
   @service declare currentUser: CurrentUserService;
-  @service declare router: RouterService;
 
   get memberships() {
     return this.currentUser.memberships;
   }
 
-  get showSwitcher() {
+  get current() {
+    return this.memberships.find((membership) => membership.accountId === this.args.accountId);
+  }
+
+  get hasMultiple() {
     return this.memberships.length > 1;
   }
 
-  switch = (event: Event) => {
-    const accountId = (event.target as HTMLSelectElement).value;
-
-    if (!accountId || accountId === this.args.accountId) return;
-
-    void this.router.transitionTo('dashboard', shortAccountId(accountId));
-  };
-
   <template>
-    {{#if this.showSwitcher}}
-      <label class="account-switcher">
-        <span class="visually-hidden">Active account</span>
-        <select {{on "change" this.switch}}>
-          {{#each this.memberships as |membership|}}
-            <option
-              value={{membership.accountId}}
-              selected={{eq membership.accountId @accountId}}
-            >{{membership.accountName}}</option>
-          {{/each}}
-        </select>
-      </label>
-    {{/if}}
-  </template>
-}
+    <div class="account-switcher">
+      {{#if this.hasMultiple}}
+        <Menu as |menu|>
+          <menu.Trigger class="trigger" aria-label="Switch account">
+            {{this.current.accountName}}
+          </menu.Trigger>
 
-function eq(a: string, b: string) {
-  return a === b;
+          <menu.Content as |content|>
+            {{#each this.memberships as |membership|}}
+              <content.LinkItem
+                @href="/{{shortAccountId membership.accountId}}"
+                aria-current={{if (eq membership.accountId @accountId) "true"}}
+              >
+                {{membership.accountName}}
+              </content.LinkItem>
+            {{/each}}
+          </menu.Content>
+        </Menu>
+      {{else}}
+        <span class="single-account">{{this.current.accountName}}</span>
+      {{/if}}
+    </div>
+
+    <style scoped>
+      .account-switcher {
+        padding: var(--padding-2) 0;
+      }
+
+      .trigger {
+        width: 100%;
+      }
+
+      .single-account {
+        display: block;
+        padding: var(--padding-1) var(--padding-2);
+        font-weight: 600;
+      }
+    </style>
+  </template>
 }
