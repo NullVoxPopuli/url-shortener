@@ -1,6 +1,19 @@
 import { assert } from 'chai';
 import { DOMAIN } from '#start/env';
-import { ApiClient, ApiResponse } from '@japa/api-client';
+import type { ApiClient, ApiResponse } from '@japa/api-client';
+
+/** A minimal JSON:API resource document for write requests. */
+export function doc(type: string, attributes: Record<string, unknown>) {
+  return { data: { type, attributes } };
+}
+
+export function linkDoc(body: { originalUrl?: unknown; domain?: unknown }) {
+  let attributes: Record<string, unknown> = { original: body.originalUrl };
+
+  if (body.domain !== undefined) attributes.domain = body.domain;
+
+  return doc('link', attributes);
+}
 
 export function clientFor(client: ApiClient, url: string) {
   return {
@@ -48,13 +61,29 @@ export function hasUUID(resource: any) {
 
 export function assertWellFormedLinkData(data: any) {
   hasUUID(data);
+  assert.strictEqual(data.type, 'link');
   hasAttr(data, 'createdAt');
   hasAttr(data, 'updatedAt');
+  hasAttr(data, 'original');
   assert.include(attr(data, 'shortUrl'), `https://${DOMAIN}`);
   assert.ok(attr(data, 'shortUrl').startsWith(`https://${DOMAIN}`));
 
-  hasRelationship(data, 'createdBy', 'user');
-  hasRelationship(data, 'ownedBy', 'account');
+  hasLinkedRelationship(data, 'ownedBy', 'account');
+  hasLinkedRelationship(data, 'createdBy', 'user');
+}
+
+/**
+ * Modern JSON:API relationship: identifier linkage AND a related
+ * link — WarpDrive's JSONAPICache validates (in dev mode) that every
+ * linksMode belongsTo carries `links.related`, on primary data and
+ * included resources alike.
+ */
+export function hasLinkedRelationship(resource: any, name: string, type: string) {
+  let r = relationship(resource, name);
+
+  assert.strictEqual(r.data.type, type);
+  assert.ok(r.data.id, `relationship ${name} has an id`);
+  assert.ok(r.links?.related, `relationship ${name} has links.related`);
 }
 
 export function assertUnauthorized(response: ApiResponse) {
@@ -63,6 +92,7 @@ export function assertUnauthorized(response: ApiResponse) {
   let body = response.body();
 
   assert.strictEqual(body.errors.length, 1);
-  assert.strictEqual(body.errors[0].status, 401);
-  assert.strictEqual(body.errors[0].title, 'Not Authenticated');
+  // JSON:API error `status` members are strings, per spec
+  assert.strictEqual(body.errors[0].status, '401');
+  assert.strictEqual(body.errors[0].title, 'Unauthorized');
 }

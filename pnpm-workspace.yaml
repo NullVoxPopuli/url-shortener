@@ -2,3 +2,19 @@ packages:
   - api
   - web-client
   - packages/*
+
+allowBuilds:
+  '@swc/core': true
+  better-sqlite3: true
+  core-js: true
+  esbuild: true
+  node-gyp: true
+  unrs-resolver: true
+
+minimumReleaseAgeExclude:
+  - nvp.ui@0.9.2 || 0.10.0
+
+peerDependencyRules:
+  allowAny:
+    - prettier
+    - '@ember-data/*'

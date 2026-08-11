@@ -1,12 +1,37 @@
+import '@warp-drive/ember/install';
+
 import Application from '@ember/application';
-import compatModules from '@embroider/virtual/compat-modules';
 
-import Resolver from 'ember-resolver';
+const routes = import.meta.glob('./routes/**/+{route,template}.{ts,gts}', { eager: true });
 
-import config from './config/environment';
+function customLayout(globbed: Record<string, unknown>) {
+  const result: Record<string, unknown> = {};
+
+  for (const [key, module] of Object.entries(globbed)) {
+    if (key.endsWith('/+route.ts')) {
+      const name = key.replace(/^\.\/routes\//, '').replace(/\/\+route.ts$/, '');
+
+      result[`./routes/${ name }`] = module;
+      continue;
+    }
+
+    if (key.endsWith('/+template.gts')) {
+      const name = key.replace(/^\.\/routes\//, '').replace(/\/\+template.gts$/, '');
+
+      result[`./templates/${ name }`] = module;
+      continue;
+    }
+
+    throw new Error(`Unsupported pattern: ${key}`);
+  }
+
+  return result;
+}
 
 export default class App extends Application {
-  modulePrefix = config.modulePrefix;
-  podModulePrefix = config.podModulePrefix;
-  Resolver = Resolver.withModules(compatModules);
+  modules = {
+    ...import.meta.glob('./router.ts', { eager: true }),
+    ...import.meta.glob('./services/**/*.ts', { eager: true }),
+    ...customLayout(routes),
+  };
 }

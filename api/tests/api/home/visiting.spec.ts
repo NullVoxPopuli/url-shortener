@@ -1,13 +1,22 @@
 import { DateTime } from 'luxon';
+import { assert } from 'chai';
+import LinkVisit from '#models/link_visit';
+import Link from '#models/link';
 import { createLink, createNewAccount } from '#tests/db';
-import { ApiClient } from '@japa/api-client';
+import { DOMAIN } from '#start/env';
+import type { ApiClient } from '@japa/api-client';
 import { test } from '@japa/runner';
 
+/**
+ * The apex routes are domain-scoped (see start/routes.ts), so the
+ * request must carry the apex hostname.
+ */
 const get = (client: ApiClient, id: string) =>
   client
     .get(`/${id}`)
     .headers({
       Accept: 'text/html',
+      Host: DOMAIN,
     })
     .redirects(0);
 
@@ -20,6 +29,38 @@ test.group('GET /:link', () => {
 
     response.assertStatus(308);
     response.assertHeader('location', link.original);
+  });
+
+  test('a visit is recorded', async ({ client }) => {
+    let { user, account } = await createNewAccount();
+    let link = await createLink(user, account);
+
+    await get(client, link.id);
+    await get(client, link.id);
+
+    let fresh = await Link.findOrFail(link.id);
+
+    assert.strictEqual(fresh.visits, 2);
+
+    let visits = await LinkVisit.query().where('link_id', link.id);
+
+    assert.strictEqual(visits.length, 2);
+    assert.ok(visits[0].visitedAt);
+  });
+
+  test('an expired or unknown link records no visit', async ({ client }) => {
+    let { user, account } = await createNewAccount();
+    let link = await createLink(user, account, {
+      expiresAt: DateTime.fromJSDate(new Date('2022-02-02')),
+    });
+
+    let response = await get(client, link.id);
+
+    response.assertStatus(404);
+
+    let visits = await LinkVisit.query().where('link_id', link.id);
+
+    assert.strictEqual(visits.length, 0);
   });
 
   test(':link is the comppssedUUID', async ({ client }) => {

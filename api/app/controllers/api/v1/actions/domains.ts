@@ -1,0 +1,121 @@
+import type { HttpContext } from '@adonisjs/core/http';
+import CustomDomain from '#models/custom_domain';
+import { accountContext } from '#services/account_context';
+import { notAuthorized, notFound, paymentRequired, unprocessable } from '#exceptions/api_errors';
+import { planFor } from '#services/plans';
+import { DOMAIN } from '#start/env';
+import { membershipFor } from '#services/team';
+
+/**
+ * A bare hostname: labels with letters/digits/hyphens, at least one
+ * dot, no scheme, no path, no port.
+ */
+const HOSTNAME_PATTERN = /^(?!-)[a-z0-9-]{1,63}(?<!-)(\.(?!-)[a-z0-9-]{1,63}(?<!-))+$/;
+
+export async function listDomains(context: HttpContext) {
+  let { auth, request } = context;
+
+  let user = await auth.use('web').authenticate();
+  let contextAccount = await accountContext(context, user);
+
+  if (!contextAccount) {
+    throw notFound('Account', String(request.input('accountId')));
+  }
+
+  let domains = await context.jsonApi
+    .query(CustomDomain)
+    .where('account_id', contextAccount.id)
+    .orderBy('created_at', 'asc');
+
+  return context.jsonApi.render(domains);
+}
+
+export async function createDomain(context: HttpContext) {
+  let { auth, request, response } = context;
+
+  let user = await auth.use('web').authenticate();
+  let account = await accountContext(context, user);
+
+  if (!account) {
+    throw notFound('Account', String(request.input('accountId')));
+  }
+
+  let membership = await membershipFor(user.id, account.id);
+
+  if (membership?.role !== 'admin') {
+    throw notAuthorized('Only account admins can manage domains');
+  }
+
+  let plan = planFor(account);
+
+  let input = await context.jsonApi.deserialize(CustomDomain);
+  let hostname = String(input.attributes.hostname ?? '')
+    .trim()
+    .toLowerCase();
+
+  if (!HOSTNAME_PATTERN.test(hostname)) {
+    throw unprocessable(
+      `"${hostname}" is not a valid hostname (expected something like links.example.com)`
+    );
+  }
+
+  if (hostname === DOMAIN || hostname.endsWith(`.${DOMAIN}`)) {
+    throw unprocessable(`${DOMAIN} is the built-in domain — no need to add it`);
+  }
+
+  let existing = await CustomDomain.query().where('account_id', account.id);
+
+  if (plan.customDomains !== null && existing.length >= plan.customDomains) {
+    throw paymentRequired(
+      'Custom domain limit reached',
+      plan.customDomains === 0
+        ? 'Your plan does not include custom domains. Upgrade to add one.'
+        : `Your plan includes ${plan.customDomains} custom domain(s).`
+    );
+  }
+
+  let taken = await CustomDomain.findBy({ hostname });
+
+  if (taken) {
+    throw unprocessable(`${hostname} is already in use`);
+  }
+
+  let domain = await CustomDomain.create({ account_id: account.id, hostname });
+
+  let fresh = await context.jsonApi.query(CustomDomain).where('id', domain.id).firstOrFail();
+
+  response.status(201);
+
+  return context.jsonApi.render(fresh);
+}
+
+export async function deleteDomain(context: HttpContext) {
+  let { auth, request, response } = context;
+
+  let user = await auth.use('web').authenticate();
+  let id = request.param('id');
+
+  let account = await accountContext(context, user);
+
+  if (!account) {
+    throw notFound('Account', String(request.input('accountId')));
+  }
+
+  let membership = await membershipFor(user.id, account.id);
+
+  if (membership?.role !== 'admin') {
+    throw notAuthorized('Only account admins can manage domains');
+  }
+
+  let domain = await CustomDomain.query().where('id', id).where('account_id', account.id).first();
+
+  if (!domain) {
+    throw notFound('CustomDomain', id);
+  }
+
+  await domain.delete();
+
+  response.status(200);
+
+  return context.jsonApi.render(null);
+}

@@ -54,6 +54,37 @@ const env = await Env.create(new URL('../', import.meta.url), {
   |----------------------------------------------------------
   */
   LIMITER_STORE: Env.schema.enum(['database', 'memory'] as const),
+
+  /*
+  |----------------------------------------------------------
+  | Stripe
+  |----------------------------------------------------------
+  |
+  | The API uses Stripe Checkout + webhooks. We intentionally keep a
+  | single "source of truth" sync function (called both after success
+  | redirects and from webhooks) to avoid split-brain states.
+  */
+  STRIPE_SECRET_KEY: Env.schema.string(),
+  STRIPE_WEBHOOK_SECRET: Env.schema.string(),
+  STRIPE_PRICE_ID: Env.schema.string(),
+
+  /**
+   * Where Stripe Checkout should send users after payment.
+   * Example: https://api.example.com/v1/billing/success
+   */
+  STRIPE_SUCCESS_URL: Env.schema.string(),
+
+  /**
+   * Where Stripe Checkout should send users when they cancel.
+   * Example: https://app.example.com/billing
+   */
+  STRIPE_CANCEL_URL: Env.schema.string(),
+
+  /**
+   * Billing portal return URL.
+   * Example: https://app.example.com/settings/billing
+   */
+  STRIPE_PORTAL_RETURN_URL: Env.schema.string(),
 });
 
 export default env;
@@ -61,6 +92,10 @@ export default env;
 export const HOST = env.get('HOST');
 export const DOMAIN = env.get('DOMAIN');
 export const isPG = env.get('DB_CONNECTION') === 'postgres';
+const isProd = env.get('NODE_ENV') === 'production';
+export const APP_ORIGIN = isProd ? `https://app.${DOMAIN}` : `http://app.${DOMAIN}`;
+export const API_ORIGIN = isProd ? `https://api.${DOMAIN}` : `http://api.${DOMAIN}`;
+export const AUTH_ORIGIN = isProd ? `https://${DOMAIN}` : `http://${DOMAIN}`;
 
 // Probably just for testing
 export const API_DOMAIN = `api.${DOMAIN}:${env.get('PORT')}`;

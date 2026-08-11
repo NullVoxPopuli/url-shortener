@@ -7,12 +7,10 @@
   "author": "NullVoxPopuli",
   "license": "GNU AGPLv3",
   "scripts": {
-    "prepare": "pnpm --filter '*' run rebuild",
     "start": "concurrently 'pnpm:start:api' 'pnpm:start:web'",
     "start:api": "pnpm --filter 'api' dev",
     "start:web": "pnpm --filter 'web-client' start",
     "build": "pnpm --filter 'api' build",
-    "rebuild": "echo 'rebuilding packages with binaries'n'such'; pnpm --filter '*' rebuild",
     "lint": "pnpm --filter '*' lint",
     "lint:fix": "pnpm lint:eslint && pnpm lint:prettier",
     "lint:eslint": "pnpm --filter '*' lint --fix ",
@@ -25,33 +23,14 @@
     "@glint/core": "unstable",
     "typescript": "^5.9.3"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "better-sqlite3",
-      "node-gyp"
-    ],
-    "peerDependencyRules": {
-      "allowAny": [
-        "prettier",
-        "@ember-data/*"
-      ]
-    },
-    "overrides": {
-      "prettier": "github:jurgenwerk/prettier#glimmer-embed-style-wip"
-    },
-    "patchedDependencies": {}
-  },
   "cacheDirectories": [
     "node_modules",
     "api/node_modules",
     "web-client/node_modules",
     "packages/url-compression/node_modules"
   ],
-  "packageManager": "pnpm@10.28.0",
+  "packageManager": "pnpm@11.20.0",
   "engines": {
     "node": "^24.0.0"
-  },
-  "dependencies": {
-    "ts-node-maintained": "^10.9.6"
   }
 }

@@ -3,6 +3,8 @@
 if (typeof module !== 'undefined') {
   module.exports = {
     test_page: 'tests/index.html?hidepassed',
+    // Serve the BUILT app (pnpm build:test) — like ember.nvp
+    cwd: 'dist',
     disable_watching: true,
     launch_in_ci: ['Chrome'],
     launch_in_dev: ['Chrome'],
