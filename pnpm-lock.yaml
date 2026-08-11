@@ -232,8 +232,8 @@ importers:
         specifier: ~7.3.0-alpha.5
         version: 7.3.0-alpha.5(@glimmer/component@2.1.1(supports-color@10.2.2))(supports-color@10.2.2)
       nvp.ui:
-        specifier: ^0.9.2
-        version: 0.9.2(@babel/core@7.28.6(supports-color@10.2.2))(ember-source@7.3.0-alpha.5(@glimmer/component@2.1.1(supports-color@10.2.2))(supports-color@10.2.2))(supports-color@10.2.2)
+        specifier: ^0.10.0
+        version: 0.10.0(@babel/core@7.28.6(supports-color@10.2.2))(ember-source@7.3.0-alpha.5(@glimmer/component@2.1.1(supports-color@10.2.2))(supports-color@10.2.2))(supports-color@10.2.2)
       qrcode-generator:
         specifier: ^2.0.4
         version: 2.0.4
@@ -6461,8 +6461,8 @@ packages:
     resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
     engines: {node: '>=18'}
 
-  nvp.ui@0.9.2:
-    resolution: {integrity: sha512-/oEONEpnBgCaY5Hm2iQzuXQWxXM6T6Q3V2HpsLAdcbkl9DPAP3qUjQu+MTyWhzug5/OyAjalcwFIq2I6/MBe8A==}
+  nvp.ui@0.10.0:
+    resolution: {integrity: sha512-xT15NPDFPJu9bCy/954Z980PVbknP8HS0wEn5NOx5HHw+4nzVk1J/XSHOy/WlsqecsTXcIcNRpVoDl3bFF7DAg==}
 
   nwsapi@2.2.24:
     resolution: {integrity: sha512-7YRhZ3jS45LwmSCT4b2sVFHt/WuovaktDU07QrtOBY2PXskss5a9jfmR9jptyumwXST+rFjrmppMY1KT/yn35A==}
@@ -15370,7 +15370,7 @@ snapshots:
       path-key: 4.0.0
       unicorn-magic: 0.3.0
 
-  nvp.ui@0.9.2(@babel/core@7.28.6(supports-color@10.2.2))(ember-source@7.3.0-alpha.5(@glimmer/component@2.1.1(supports-color@10.2.2))(supports-color@10.2.2))(supports-color@10.2.2):
+  nvp.ui@0.10.0(@babel/core@7.28.6(supports-color@10.2.2))(ember-source@7.3.0-alpha.5(@glimmer/component@2.1.1(supports-color@10.2.2))(supports-color@10.2.2))(supports-color@10.2.2):
     dependencies:
       '@ember/test-helpers': 5.4.3(@babel/core@7.28.6(supports-color@10.2.2))(supports-color@10.2.2)
       '@ember/test-waiters': 4.1.2(supports-color@10.2.2)

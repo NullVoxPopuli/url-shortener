@@ -40,7 +40,7 @@ export class AccountSwitcher extends Component<Signature> {
   <template>
     <div class="account-switcher">
       {{#if this.hasMultiple}}
-        <Menu as |menu|>
+        <Menu @variant="bare" as |menu|>
           <menu.Trigger class="trigger" aria-label="Switch account">
             {{this.current.accountName}}
           </menu.Trigger>
