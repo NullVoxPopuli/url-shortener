@@ -29,17 +29,8 @@ interface CurrentUserResponse {
 export default class CurrentUserService extends Service {
   #refreshPromise = tracked<Promise<CurrentUserData | null > | undefined>(undefined);
 
-  get refreshPromise() {
-    return this.#refreshPromise.value;
-  }
-  set refreshPromise(promise) {
-    console.log('setting promise');
-    this.#refreshPromise.value = promise;
-  }
-
-  @cached
   get state() {
-    return getPromiseState(this.refreshPromise);
+    return getPromiseState(this.#refreshPromise.value);
   }
 
   get user() {
@@ -82,18 +73,16 @@ export default class CurrentUserService extends Service {
   }
 
   async loadFromRoute() {
-    if (!this.refreshPromise) {
+    if (!this.#refreshPromise.value) {
       await this.refresh();
     }
 
-    await this.refreshPromise;
-
-    console.log('?', this.state, this.isAuthenticated, this.user);
+    await this.#refreshPromise.value;
   }
 
   async refresh() {
-    this.refreshPromise = this.fetchCurrentUser();
-    await this.refreshPromise;
+    this.#refreshPromise.value = this.fetchCurrentUser();
+    await this.#refreshPromise.value;
   }
 
   private async fetchCurrentUser(): Promise<CurrentUserData | null> {

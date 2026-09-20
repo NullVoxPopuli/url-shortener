@@ -8,7 +8,7 @@ import type { Store } from '@warp-drive/core';
 export default class DashboardIndexRoute extends Route {
   @service declare store: Store;
 
-  model() {
+  async model() {
     const { accountId } = this.modelFor('dashboard') as { accountId: string };
 
     return {
