@@ -130,8 +130,8 @@ export async function syncStripeDataToAccount(account: Account): Promise<StripeS
     subscriptionId: subscription.id,
     status: subscription.status,
     priceId,
-    currentPeriodStart: subscription.current_period_start ?? null,
-    currentPeriodEnd: subscription.current_period_end ?? null,
+    currentPeriodStart: item?.current_period_start ?? null,
+    currentPeriodEnd: item?.current_period_end ?? null,
     cancelAtPeriodEnd: subscription.cancel_at_period_end ?? false,
     paymentMethod,
   };

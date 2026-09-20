@@ -10,6 +10,6 @@ import env from '#start/env';
 export const stripe = new Stripe(env.get('STRIPE_SECRET_KEY'), {
   // Keep this explicit so payload shapes don’t drift unexpectedly.
   // If you change it, also update your Stripe webhook endpoint version.
-  apiVersion: '2025-02-24.acacia',
+  apiVersion: '2026-08-26.dahlia',
   typescript: true,
 });
