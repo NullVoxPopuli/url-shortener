@@ -2,8 +2,8 @@ import { click, render } from '@ember/test-helpers';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 
-import ApiKeyTable from '#app/routes/dashboard/api-keys/api-key-table';
-import NewApiKey from '#app/routes/dashboard/api-keys/new-api-key';
+import ApiKeyTable from '#app/routes/dashboard/api-keys/api-key-table.gts';
+import NewApiKey from '#app/routes/dashboard/api-keys/new-api-key.gts';
 import { makeApiKey } from '#test-helpers/fixtures';
 
 import type { ApiKey } from '#app/data/types';

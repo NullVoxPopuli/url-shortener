@@ -2,7 +2,7 @@ import { click, render } from '@ember/test-helpers';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 
-import { LinksTable } from '#app/routes/dashboard/links-table';
+import { LinksTable } from '#app/routes/dashboard/links-table.gts';
 import { makeLink } from '#test-helpers/fixtures';
 
 import type { Link } from '#app/data/types';

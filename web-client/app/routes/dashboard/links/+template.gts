@@ -1,4 +1,4 @@
-import LinkManager from './link-manager';
+import LinkManager from './link-manager.gts';
 
 <template>
   {{! @glint-expect-error - route templates do not have typed @model }}

@@ -1,8 +1,8 @@
 import { Request } from '@warp-drive/ember';
 
-import { LinksTable } from '../links-table';
-import { SubscriptionCard } from './subscription-card';
-import { UsageCard } from './usage-card';
+import { LinksTable } from '../links-table.gts';
+import { SubscriptionCard } from './subscription-card.gts';
+import { UsageCard } from './usage-card.gts';
 
 import type { TOC } from '@ember/component/template-only';
 import type { ReactiveDataDocument } from '@warp-drive/core/reactive';

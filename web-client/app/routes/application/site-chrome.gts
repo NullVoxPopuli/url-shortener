@@ -3,9 +3,9 @@ import { on } from '@ember/modifier';
 import { StickyFooter } from 'ember-primitives';
 import { Header as NvpHeader, Shell, ThemeToggle } from 'nvp.ui';
 
-import { Footer } from './footer';
-import HeaderAuthActions from './header-auth-actions';
-import HeaderLinks from './header-links';
+import { Footer } from './footer.gts';
+import HeaderAuthActions from './header-auth-actions.gts';
+import HeaderLinks from './header-links.gts';
 
 import type { TOC } from '@ember/component/template-only';
 

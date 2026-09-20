@@ -1,17 +1,15 @@
 {
   "extends": "@ember/app-tsconfig",
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "emitDeclarationOnly": false,
     "noEmit": true,
-    "baseUrl": ".",
     "paths": {
-      "#app/*": ["app/*"],
-      "#config": ["app/config.ts"],
-      "#components/*": ["app/components/*"],
-      "#services/*": ["app/services/*"],
-      "#test-helpers/*": ["tests/helpers/*"],
-      "#utils/*": ["app/utils/*"]
+      "#app/*": ["./app/*"],
+      "#config": ["./app/config.ts"],
+      "#components/*": ["./app/components/*"],
+      "#services/*": ["./app/services/*"],
+      "#test-helpers/*": ["./tests/helpers/*"],
+      "#utils/*": ["./app/utils/*"]
     },
 
     "types": [
@@ -22,4 +20,10 @@
     ]
   },
   "include": ["app", "tests", "types", "vite.config.mjs"],
+  "contentMappers": [
+    {
+      "package": "ember-content-mapper",
+      "extensions": [".gts", ".gjs"]
+    }
+  ]
 }

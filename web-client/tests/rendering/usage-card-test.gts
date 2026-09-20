@@ -2,7 +2,7 @@ import { render } from '@ember/test-helpers';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 
-import { UsageCard } from '#app/routes/dashboard/index/usage-card';
+import { UsageCard } from '#app/routes/dashboard/index/usage-card.gts';
 import { makeBilling } from '#test-helpers/fixtures';
 
 module('Rendering | dashboard | UsageCard', function (hooks) {

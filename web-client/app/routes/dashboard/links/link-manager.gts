@@ -10,7 +10,7 @@ import { Button } from 'nvp.ui';
 import { messageFrom } from '#app/data/errors';
 import { createLink, deleteLink } from '#app/data/requests';
 
-import { LinksTable } from '../links-table';
+import { LinksTable } from '../links-table.gts';
 
 import type { Store } from '@warp-drive/core';
 import type { ReactiveDataDocument } from '@warp-drive/core/reactive';

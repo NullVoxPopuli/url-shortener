@@ -1,4 +1,4 @@
-import { SiteChrome } from '../application/site-chrome';
+import { SiteChrome } from '../application/site-chrome.gts';
 
 <template>
   <SiteChrome>

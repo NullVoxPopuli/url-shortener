@@ -1,4 +1,4 @@
-import TeamManager from './team-manager';
+import TeamManager from './team-manager.gts';
 
 <template>
   {{! @glint-expect-error - route templates do not have typed @model }}

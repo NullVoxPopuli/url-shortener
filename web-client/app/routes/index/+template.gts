@@ -2,8 +2,8 @@ import { Hero } from 'ember-primitives/layout/hero';
 
 import config from '#config';
 
-import { SiteChrome } from '../application/site-chrome';
-import { ShortenURLForm } from './form';
+import { SiteChrome } from '../application/site-chrome.gts';
+import { ShortenURLForm } from './form.gts';
 
 const docsOrigin = config.docsOrigin;
 

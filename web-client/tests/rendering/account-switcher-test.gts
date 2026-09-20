@@ -4,7 +4,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { PortalTargets } from 'ember-primitives';
 
-import { AccountSwitcher } from '#app/routes/dashboard/account-switcher';
+import { AccountSwitcher } from '#app/routes/dashboard/account-switcher.gts';
 
 const PERSONAL = 'aaaaaaaa-1111-2222-3333-444444444444';
 const TEAM = 'bbbbbbbb-1111-2222-3333-444444444444';
