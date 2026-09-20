@@ -4,7 +4,7 @@ const dateFormat = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
 });
 
-export function formatDate(value: string | null | undefined) {
+export function formatDate(value: number | string | null | undefined) {
   if (!value) return '—';
 
   const date = new Date(value);
@@ -27,7 +27,7 @@ const utcDateTimeFormat = new Intl.DateTimeFormat('en-US', {
   timeZoneName: 'short',
 });
 
-export function formatUtcDateTime(value: string | null | undefined) {
+export function formatUtcDateTime(value: number | string | null | undefined) {
   if (!value) return '—';
 
   const date = new Date(value);

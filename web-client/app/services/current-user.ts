@@ -63,7 +63,7 @@ export default class CurrentUserService extends Service {
   }
 
   get personalAccountSlug() {
-    let id = this.personalAccountId;
+    const id = this.personalAccountId;
 
     return id ? shortAccountId(id) : null;
   }
@@ -102,11 +102,5 @@ export default class CurrentUserService extends Service {
     console.debug('Not authenticated');
 
     return null;
-  }
-}
-
-declare module '@ember/service' {
-  interface Registry {
-    'current-user': CurrentUserService;
   }
 }

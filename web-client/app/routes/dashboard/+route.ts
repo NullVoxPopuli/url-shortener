@@ -8,16 +8,22 @@ import type CurrentUserService from '#services/current-user';
 
 /**
  * Auth gate + account-context resolution for the whole logged-in
- * area. The active account IS the URL segment: /{account-id}/...
- * Switching accounts is a pure URL change — no server state.
+ * area.
+ *
+ * The active account IS the URL segment: /{account-id}/...
+ * Switching accounts is a pure URL change.
  */
 export default class DashboardRoute extends Route {
   @service declare currentUser: CurrentUserService;
   @service declare router: RouterService;
 
-  beforeModel() {
+  async beforeModel() {
+    await this.currentUser.refreshPromise;
+
     if (!this.currentUser.isAuthenticated) {
-      return this.router.replaceWith('auth.login');
+      this.router.replaceWith('auth.login');
+
+      return;
     }
   }
 
@@ -25,8 +31,7 @@ export default class DashboardRoute extends Route {
     const membership = this.currentUser.membershipFor(params.account_id);
 
     if (!membership) {
-      // unknown account for this user: land on the personal account
-      return this.router.replaceWith('dashboard', this.currentUser.personalAccountSlug!);
+      return this.router.replaceWith('dashboard', this.currentUser.personalAccountSlug);
     }
 
     const accountSlug = shortAccountId(membership.accountId);

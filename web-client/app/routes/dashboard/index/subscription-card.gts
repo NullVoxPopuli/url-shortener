@@ -4,7 +4,7 @@ import { on } from '@ember/modifier';
 
 import { openBillingPortal } from '#app/data/billing';
 
-import { formatDate } from '../format';
+import { formatDate } from '../format.ts';
 
 import type { BillingStatus } from '#app/data/types';
 
@@ -20,6 +20,18 @@ interface Signature {
   Args: {
     billing: BillingStatus;
   };
+}
+
+/**
+ * JS uses ms-since-epoch.
+ * But standard outside of JS is seconds since epoch.
+ */
+function stripeDate(value: number | string | null) {
+  if (!value) return '—';
+
+  const ms = Number(value) * 1000;
+
+  return formatDate(ms);
 }
 
 export class SubscriptionCard extends Component<Signature> {
@@ -51,9 +63,9 @@ export class SubscriptionCard extends Component<Signature> {
         <p class="plan-name">{{@billing.plan.name}}</p>
         <p class="muted">
           Current period:
-          {{formatDate @billing.stripe.currentPeriodStart}}
+          {{stripeDate @billing.stripe.currentPeriodStart}}
           –
-          {{formatDate @billing.stripe.currentPeriodEnd}}
+          {{stripeDate @billing.stripe.currentPeriodEnd}}
         </p>
         {{#if @billing.stripe.cancelAtPeriodEnd}}
           <p class="warning">Cancellation is scheduled for the end of the

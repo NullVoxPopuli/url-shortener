@@ -410,6 +410,9 @@ importers:
       '@embroider/core':
         specifier: ^4.6.7
         version: 4.6.7(@glint/template@1.9.0)(supports-color@10.2.2)
+      '@embroider/legacy-inspector-support':
+        specifier: ^0.1.3
+        version: 0.1.3(supports-color@10.2.2)
       '@glint/ember-tsc':
         specifier: ^1.11.4
         version: 1.11.4(@typescript/typescript6@6.0.2)(ember-source@7.3.0(@glimmer/component@2.1.1(supports-color@10.2.2))(supports-color@10.2.2))(supports-color@10.2.2)
@@ -1593,6 +1596,9 @@ packages:
   '@embroider/core@4.6.7':
     resolution: {integrity: sha512-XapxW4txnaJq/PZmEa2GKLhhi7kt/byGXPPAyspsZwtRSmIKc3RKr8Bv+k0s7RyKrtKjUOBFySDK6M69MFJwJA==}
     engines: {node: '>= 20.19.*'}
+
+  '@embroider/legacy-inspector-support@0.1.3':
+    resolution: {integrity: sha512-0VzD1xExkT78a1CUiW8wZ5VZDL4bVyMSc3t8E/RiAW1X6TlyKIA/m6zoQgsQtQIiiTPPxH0/1Tdd0F7b5//etw==}
 
   '@embroider/macros@1.20.2':
     resolution: {integrity: sha512-WJWSkG9vIL0s93vKwtNFqqAOCOflNkWNpqsC7VAqXeeTKNpCc7wtdOhPkNGJpb52CEt7vlQ5R/zMyCfGAB7MEA==}
@@ -9138,6 +9144,12 @@ snapshots:
       - canvas
       - supports-color
       - utf-8-validate
+
+  '@embroider/legacy-inspector-support@0.1.3(supports-color@10.2.2)':
+    dependencies:
+      '@embroider/addon-shim': 1.10.3(supports-color@10.2.2)
+    transitivePeerDependencies:
+      - supports-color
 
   '@embroider/macros@1.20.2(@babel/core@7.29.7(supports-color@10.2.2))(@glint/template@1.9.0)(supports-color@10.2.2)':
     dependencies:
