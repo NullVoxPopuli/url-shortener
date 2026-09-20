@@ -1,4 +1,4 @@
-import { tracked } from '@glimmer/tracking';
+import { cached, tracked } from '@glimmer/tracking';
 import Service from '@ember/service';
 
 import { getPromiseState } from 'reactiveweb/get-promise-state';
@@ -27,8 +27,17 @@ interface CurrentUserResponse {
 }
 
 export default class CurrentUserService extends Service {
-  @tracked refreshPromise: Promise<CurrentUserData | null > | undefined;
+  #refreshPromise = tracked<Promise<CurrentUserData | null > | undefined>(undefined);
 
+  get refreshPromise() {
+    return this.#refreshPromise.value;
+  }
+  set refreshPromise(promise) {
+    console.log('setting promise');
+    this.#refreshPromise.value = promise;
+  }
+
+  @cached
   get state() {
     return getPromiseState(this.refreshPromise);
   }
@@ -72,6 +81,16 @@ export default class CurrentUserService extends Service {
     return this.membershipFor(accountId)?.role === 'admin';
   }
 
+  async loadFromRoute() {
+    if (!this.refreshPromise) {
+      await this.refresh();
+    }
+
+    await this.refreshPromise;
+
+    console.log('?', this.state, this.isAuthenticated, this.user);
+  }
+
   async refresh() {
     this.refreshPromise = this.fetchCurrentUser();
     await this.refreshPromise;
@@ -90,7 +109,7 @@ export default class CurrentUserService extends Service {
         const data = (await response.json()) as CurrentUserResponse;
 
         if (data.authenticated) {
-          console.debug('Authenticated', this.isAuthenticated);
+          console.debug('Authenticated', data);
 
           return data.user;
         }

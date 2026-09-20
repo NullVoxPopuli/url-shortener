@@ -8398,7 +8398,7 @@ snapshots:
 
   '@babel/parser@7.26.2':
     dependencies:
-      '@babel/types': 7.26.0
+      '@babel/types': 7.29.8
 
   '@babel/parser@7.29.9':
     dependencies:
@@ -10214,7 +10214,7 @@ snapshots:
       '@typescript-eslint/types': 8.16.0
       '@typescript-eslint/visitor-keys': 8.16.0
       debug: 4.4.3(supports-color@10.2.2)
-      fast-glob: 3.3.2
+      fast-glob: 3.3.3
       is-glob: 4.0.3
       minimatch: 9.0.9
       semver: 7.8.5
@@ -12392,8 +12392,8 @@ snapshots:
 
   espree@10.3.0:
     dependencies:
-      acorn: 8.14.0
-      acorn-jsx: 5.3.2(acorn@8.14.0)
+      acorn: 8.18.0
+      acorn-jsx: 5.3.2(acorn@8.18.0)
       eslint-visitor-keys: 4.2.1
 
   espree@10.4.0:
@@ -13990,7 +13990,7 @@ snapshots:
 
   parse-json@8.1.0:
     dependencies:
-      '@babel/code-frame': 7.26.2
+      '@babel/code-frame': 7.29.7
       index-to-position: 0.1.2
       type-fest: 4.41.0
 
@@ -15632,7 +15632,7 @@ snapshots:
 
   vnopts@2.0.0:
     dependencies:
-      chalk: 5.3.0
+      chalk: 5.6.2
       leven: 4.0.0
       tslib: 2.8.1
 

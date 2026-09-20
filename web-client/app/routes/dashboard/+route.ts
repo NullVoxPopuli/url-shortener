@@ -4,6 +4,7 @@ import { service } from '@ember/service';
 import { shortAccountId } from '#utils/account';
 
 import type RouterService from '@ember/routing/router-service';
+import type Transition from '@ember/routing/transition';
 import type CurrentUserService from '#services/current-user';
 
 /**
@@ -17,10 +18,15 @@ export default class DashboardRoute extends Route {
   @service declare currentUser: CurrentUserService;
   @service declare router: RouterService;
 
-  async beforeModel() {
-    await this.currentUser.refreshPromise;
+  async beforeModel(transition: Transition) {
+    await this.currentUser.loadFromRoute();
 
+    console.log('dashboard');
+
+    console.log('authenticated:', this.currentUser.isAuthenticated);
     if (!this.currentUser.isAuthenticated) {
+      transition.abort();
+      console.log('to login');
       this.router.replaceWith('auth.login');
 
       return;
