@@ -19,10 +19,6 @@
     "test": "pnpm --filter '*' test",
     "dev": "cd api && node ace serve --hmr"
   },
-  "devDependencies": {
-    "@glint/core": "unstable",
-    "typescript": "^5.9.3"
-  },
   "cacheDirectories": [
     "node_modules",
     "api/node_modules",
