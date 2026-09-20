@@ -2,7 +2,7 @@ import { render } from '@ember/test-helpers';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 
-import { SubscriptionCard } from '#app/routes/dashboard/index/subscription-card';
+import { SubscriptionCard } from '#app/routes/dashboard/index/subscription-card.gts';
 import { makeBilling } from '#test-helpers/fixtures';
 
 module('Rendering | dashboard | SubscriptionCard', function (hooks) {

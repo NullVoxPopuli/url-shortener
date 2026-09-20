@@ -4,7 +4,7 @@ import { fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 
 import { formatDate } from './format';
-import { QrCode } from './qr-code';
+import { QrCode } from './qr-code.gts';
 
 import type { TOC } from '@ember/component/template-only';
 import type { Link } from '#app/data/types';

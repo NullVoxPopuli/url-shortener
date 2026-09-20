@@ -1,5 +1,5 @@
-import { SiteChrome } from '../application/site-chrome';
-import Pricing from './pricing';
+import { SiteChrome } from '../application/site-chrome.gts';
+import Pricing from './pricing.gts';
 
 <template>
   <SiteChrome>

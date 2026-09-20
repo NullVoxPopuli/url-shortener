@@ -1,4 +1,4 @@
-import DomainManager from './domain-manager';
+import DomainManager from './domain-manager.gts';
 
 <template>
   {{! @glint-expect-error - route templates do not have typed @model }}

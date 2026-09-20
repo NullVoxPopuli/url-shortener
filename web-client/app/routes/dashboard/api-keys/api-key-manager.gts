@@ -10,8 +10,8 @@ import { Button } from 'nvp.ui';
 import { messageFrom } from '#app/data/errors';
 import { createApiKey, revokeApiKey } from '#app/data/requests';
 
-import ApiKeyTable from './api-key-table';
-import NewApiKey from './new-api-key';
+import ApiKeyTable from './api-key-table.gts';
+import NewApiKey from './new-api-key.gts';
 
 import type { Store } from '@warp-drive/core';
 import type { ReactiveDataDocument } from '@warp-drive/core/reactive';

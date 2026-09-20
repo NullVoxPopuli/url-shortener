@@ -1,9 +1,9 @@
 import { ApplicationShell, Navigation, NavigationList, ThemeToggle } from 'nvp.ui';
 
-import HeaderAuthActions from '../application/header-auth-actions';
-import HeaderLinks from '../application/header-links';
-import { AccountSwitcher } from './account-switcher';
-import { SidebarLink } from './sidebar-link';
+import HeaderAuthActions from '../application/header-auth-actions.gts';
+import HeaderLinks from '../application/header-links.gts';
+import { AccountSwitcher } from './account-switcher.gts';
+import { SidebarLink } from './sidebar-link.gts';
 
 <template>
   <ApplicationShell>
