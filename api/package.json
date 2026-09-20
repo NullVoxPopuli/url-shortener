@@ -107,9 +107,5 @@
       "./app/controllers/**/*.ts",
       "./app/middleware/*.ts"
     ]
-  },
-  "packageManager": "pnpm@11.20.0",
-  "volta": {
-    "extends": "../package.json"
   }
 }
