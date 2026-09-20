@@ -40,6 +40,7 @@
     "babel-plugin-ember-template-compilation": "^4.0.0",
     "concurrently": "^10.0.5",
     "decorator-transforms": "^2.4.0",
+    "ember-cli-deprecation-workflow": "^4.0.1",
     "ember-content-mapper": "^0.3.1",
     "ember-qunit": "^9.1.0",
     "ember-scoped-css": "^3.5.2",
