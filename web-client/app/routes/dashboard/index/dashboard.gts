@@ -44,7 +44,7 @@ const Dashboard: TOC<Signature> = <template>
           </div>
 
           <section class="dashboard-card surface">
-            <h2>Your links</h2>
+            <h2>Recent links</h2>
 
             <Request @request={{@links}} @autorefresh="invalid">
               <:loading>

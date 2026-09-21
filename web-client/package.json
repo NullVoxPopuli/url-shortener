@@ -85,7 +85,7 @@
     "ember-primitives": "^0.62.0",
     "ember-resources": "^7.1.0",
     "ember-source": "~7.3.0",
-    "nvp.ui": "^0.10.0",
+    "nvp.ui": "^0.11.0",
     "qrcode-generator": "^2.0.4",
     "reactiveweb": "^1.9.3"
   }
