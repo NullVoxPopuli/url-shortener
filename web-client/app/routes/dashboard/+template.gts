@@ -23,10 +23,6 @@ import type { TOC } from '@ember/component/template-only';
           <li><SidebarLink @href="/{{@model.accountSlug}}/domains">Domains</SidebarLink></li>
           <li><SidebarLink @href="/{{@model.accountSlug}}/api-keys">API Keys</SidebarLink></li>
         </NavigationList>
-
-        <NavigationList @label="Settings">
-          <li><SidebarLink @href="/{{@model.accountSlug}}/settings/billing">Billing</SidebarLink></li>
-        </NavigationList>
       </Navigation>
     </:nav>
 
