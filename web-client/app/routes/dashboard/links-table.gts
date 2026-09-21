@@ -12,6 +12,7 @@ import { QrCode } from './qr-code.gts';
 
 import type { TOC } from '@ember/component/template-only';
 import type { Link } from '#app/data/types';
+import type { CellSignature, Row, TableColumn } from 'nvp.ui';
 
 /**
  * Everything the table needs to offer editing. The owner holds the
@@ -28,20 +29,32 @@ export interface LinkEditing {
   save: (link: Link, editable: Link) => unknown;
 }
 
+/**
+ * What the action cells need beyond the row. It rides on the column
+ * config, which a Cell reads through `@column.config`.
+ */
+interface ActionsConfig {
+  onDelete?: (link: Link) => unknown;
+  editing?: LinkEditing;
+  isDeleting?: boolean;
+}
+
 function isEditing(link: Link, editing: LinkEditing | undefined) {
   return Boolean(editing) && link.id === editing?.id;
 }
 
-/**
- * The Actions column spans one more cell than the data columns when
- * it is shown, so the editor row can stretch under the whole table.
- */
-function columnCount(hasActions: boolean) {
-  return hasActions ? 6 : 5;
+function actionsOf(column: { config: object }) {
+  return column.config as ActionsConfig;
 }
 
-function isEmpty(links: Link[]) {
-  return links.length === 0;
+/**
+ * Why Edit is disabled, which the button shows as its tooltip.
+ */
+function editDisabledReason(editing: LinkEditing, isDeleting: boolean | undefined) {
+  if (editing.remaining === 0) return 'No link edits left on your plan this month';
+  if (isDeleting) return 'Working...';
+
+  return undefined;
 }
 
 interface QrDisclosureSignature {
@@ -82,134 +95,23 @@ class QrDisclosure extends Component<QrDisclosureSignature> {
   </template>
 }
 
-interface Signature {
-  Args: {
-    links: Link[];
-    watermark: boolean;
-    /**
-     * When provided, an Actions column with a Delete button appears
-     * (the link-management page passes this; the overview does not).
-     */
-    onDelete?: (link: Link) => unknown;
-    isDeleting?: boolean;
-    /**
-     * When provided, an Edit button appears (the link-management page
-     * passes this; the overview does not).
-     */
-    editing?: LinkEditing;
-  };
-  Blocks: {
-    /**
-     * Below the table: pagination.
-     */
-    footer: [];
-  };
-}
-
-function hasActions(onDelete: unknown, editing: unknown) {
-  return Boolean(onDelete || editing);
-}
-
-/**
- * Why Edit is disabled, which the button shows as its tooltip.
- */
-function editDisabledReason(editing: LinkEditing, isDeleting: boolean | undefined) {
-  if (editing.remaining === 0) return 'No link edits left on your plan this month';
-  if (isDeleting) return 'Working...';
-
-  return undefined;
-}
-
-export const LinksTable: TOC<Signature> = <template>
-  <Table @caption="Your links" @isEmpty={{isEmpty @links}} class="links-table">
-    <:head as |h|>
-      <h.Cell>Short link</h.Cell>
-      <h.Cell>QR code</h.Cell>
-      <h.Cell @align="end">Visits</h.Cell>
-      <h.Cell>Created</h.Cell>
-      <h.Cell>Expires</h.Cell>
-      {{#if (hasActions @onDelete @editing)}}
-        <h.Cell @align="end">Actions</h.Cell>
-      {{/if}}
-    </:head>
-
-    <:body as |b|>
-      {{#each @links as |link|}}
-        <b.Row as |r|>
-          <r.Cell>
-            <a
-              href={{link.shortUrl}}
-              target="_blank"
-              rel="noopener noreferrer"
-            >{{link.shortUrl}}</a>
-            <details class="link-details">
-              <summary>Details</summary>
-              <dl>
-                <div class="link-details-row">
-                  <dt>Original URL</dt>
-                  <dd>
-                    <a
-                      href={{link.original}}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >{{link.original}}</a>
-                  </dd>
-                </div>
-              </dl>
-            </details>
-          </r.Cell>
-          <r.Cell>
-            <QrDisclosure @data={{link.shortUrl}} @watermark={{@watermark}} />
-          </r.Cell>
-          <r.Cell @align="end">{{link.visits}}</r.Cell>
-          <r.Cell @nowrap={{true}}>{{formatDate link.createdAt}}</r.Cell>
-          <r.Cell @nowrap={{true}}>{{formatDate link.expiresAt}}</r.Cell>
-          {{#if (hasActions @onDelete @editing)}}
-            <r.Actions>
-              {{#if @editing}}
-                <Button
-                  class="edit-button"
-                  @disabled={{editDisabledReason @editing @isDeleting}}
-                  @onClick={{fn @editing.start link}}
-                >
-                  Edit
-                </Button>
-              {{/if}}
-              {{#if @onDelete}}
-                <Button
-                  class="delete-button"
-                  @variant="danger"
-                  @disabled={{if @isDeleting "Working..."}}
-                  @onClick={{fn @onDelete link}}
-                >
-                  Delete
-                </Button>
-              {{/if}}
-            </r.Actions>
-          {{/if}}
-        </b.Row>
-        {{#if @editing}}
-          {{#if (isEditing link @editing)}}
-            <b.Row class="editor-row" as |r|>
-              <r.Cell colspan={{columnCount (hasActions @onDelete @editing)}}>
-                <EditLinkForm
-                  @link={{link}}
-                  @canSetExpiration={{@editing.canSetExpiration}}
-                  @isSaving={{if @isDeleting true false}}
-                  @onSave={{fn @editing.save link}}
-                  @onCancel={{@editing.cancel}}
-                />
-              </r.Cell>
-            </b.Row>
-          {{/if}}
-        {{/if}}
-      {{/each}}
-    </:body>
-
-    <:empty>No links yet.</:empty>
-
-    <:footer>{{yield to="footer"}}</:footer>
-  </Table>
+const ShortLinkCell: TOC<CellSignature<Link>> = <template>
+  <a href={{@row.data.shortUrl}} target="_blank" rel="noopener noreferrer">{{@row.data.shortUrl}}</a>
+  <details class="link-details">
+    <summary>Details</summary>
+    <dl>
+      <div class="link-details-row">
+        <dt>Original URL</dt>
+        <dd>
+          <a
+            href={{@row.data.original}}
+            target="_blank"
+            rel="noopener noreferrer"
+          >{{@row.data.original}}</a>
+        </dd>
+      </div>
+    </dl>
+  </details>
 
   <style scoped>
     .link-details {
@@ -244,9 +146,133 @@ export const LinksTable: TOC<Signature> = <template>
       margin: 0;
       overflow-wrap: anywhere;
     }
-
-    .editor-row td {
-      background: var(--color-page-background);
-    }
   </style>
 </template>;
+
+const QrCell: TOC<CellSignature<Link>> = <template>
+  <QrDisclosure @data={{@row.data.shortUrl}} @watermark={{watermarkOf @column}} />
+</template>;
+
+function watermarkOf(column: { config: object }) {
+  return Boolean((column.config as { watermark?: boolean }).watermark);
+}
+
+const ActionsCell: TOC<CellSignature<Link>> = <template>
+  {{#let (actionsOf @column) as |actions|}}
+    {{#if actions.editing}}
+      <Button
+        class="edit-button"
+        @disabled={{editDisabledReason actions.editing actions.isDeleting}}
+        @onClick={{fn actions.editing.start @row.data}}
+      >
+        Edit
+      </Button>
+    {{/if}}
+    {{#if actions.onDelete}}
+      <Button
+        class="delete-button"
+        @variant="danger"
+        @disabled={{if actions.isDeleting "Working..."}}
+        @onClick={{fn actions.onDelete @row.data}}
+      >
+        Delete
+      </Button>
+    {{/if}}
+  {{/let}}
+</template>;
+
+interface Signature {
+  Args: {
+    links: Link[];
+    watermark: boolean;
+    /**
+     * When provided, an Actions column with a Delete button appears
+     * (the link-management page passes this; the overview does not).
+     */
+    onDelete?: (link: Link) => unknown;
+    isDeleting?: boolean;
+    /**
+     * When provided, an Edit button appears (the link-management page
+     * passes this; the overview does not).
+     */
+    editing?: LinkEditing;
+  };
+  Blocks: {
+    /**
+     * Below the table: pagination.
+     */
+    footer: [];
+  };
+}
+
+export class LinksTable extends Component<Signature> {
+  /**
+   * The columns carry what their cells need: the watermark flag for
+   * the QR cell, the handlers for the actions cell.
+   */
+  get columns(): TableColumn<Link>[] {
+    const columns: TableColumn<Link>[] = [
+      { key: 'shortUrl', name: 'Short link', Cell: ShortLinkCell },
+      { key: 'qr', name: 'QR code', Cell: QrCell, watermark: this.args.watermark },
+      { key: 'visits', name: 'Visits', align: 'end' },
+      { key: 'createdAt', name: 'Created', nowrap: true, value: createdOn },
+      { key: 'expiresAt', name: 'Expires', nowrap: true, value: expiresOn },
+    ];
+
+    if (this.args.onDelete || this.args.editing) {
+      columns.push({
+        key: 'actions',
+        name: 'Actions',
+        align: 'end',
+        Cell: ActionsCell,
+        onDelete: this.args.onDelete,
+        editing: this.args.editing,
+        isDeleting: this.args.isDeleting,
+      });
+    }
+
+    return columns;
+  }
+
+  isEditorFor = (row: Row<Link>) => isEditing(row.data, this.args.editing);
+
+  <template>
+    <Table @caption="Your links" @columns={{this.columns}} @data={{@links}} class="links-table">
+      <:afterRow as |row count|>
+        {{#if @editing}}
+          {{#if (this.isEditorFor row)}}
+            <tr class="editor-row">
+              <td colspan={{count}}>
+                <EditLinkForm
+                  @link={{row.data}}
+                  @canSetExpiration={{@editing.canSetExpiration}}
+                  @isSaving={{if @isDeleting true false}}
+                  @onSave={{fn @editing.save row.data}}
+                  @onCancel={{@editing.cancel}}
+                />
+              </td>
+            </tr>
+          {{/if}}
+        {{/if}}
+      </:afterRow>
+
+      <:empty>No links yet.</:empty>
+
+      <:footer>{{yield to="footer"}}</:footer>
+    </Table>
+
+    <style scoped>
+      .editor-row td {
+        background: var(--color-page-background);
+      }
+    </style>
+  </template>
+}
+
+function createdOn({ row }: { row: Row<Link> }) {
+  return formatDate(row.data.createdAt);
+}
+
+function expiresOn({ row }: { row: Row<Link> }) {
+  return formatDate(row.data.expiresAt);
+}
