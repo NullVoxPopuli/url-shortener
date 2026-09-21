@@ -5,6 +5,7 @@ import { setupRenderingTest } from 'ember-qunit';
 import { EditLinkForm } from '#app/routes/dashboard/edit-link-form.gts';
 import { LinksTable } from '#app/routes/dashboard/links-table.gts';
 import { makeLink } from '#test-helpers/fixtures';
+import { pushLink } from '#test-helpers/store';
 
 import type { Link } from '#app/data/types';
 import type { LinkChanges } from '#app/routes/dashboard/edit-link-form.gts';
@@ -26,7 +27,7 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
   setupRenderingTest(hooks);
 
   test('saves only what changed', async function (assert) {
-    const link = makeLink({ original: 'https://example.com/old', expiresAt: null });
+    const link = pushLink(this.owner, { original: 'https://example.com/old', expiresAt: null });
     const onSave = (changes: LinkChanges) => assert.step(JSON.stringify(changes));
     const onCancel = () => assert.step('cancel');
 
@@ -53,7 +54,7 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
   });
 
   test('an expiration date means the end of that day, UTC', async function (assert) {
-    const link = makeLink({ expiresAt: '2026-10-01T23:59:59.000Z' });
+    const link = pushLink(this.owner, { expiresAt: '2026-10-01T23:59:59.000Z' });
     const onSave = (changes: LinkChanges) => assert.step(JSON.stringify(changes));
     const onCancel = () => assert.step('cancel');
 
@@ -78,7 +79,7 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
   });
 
   test('the Clear button empties the date and sends null', async function (assert) {
-    const link = makeLink({ expiresAt: '2026-10-01T23:59:59.000Z' });
+    const link = pushLink(this.owner, { expiresAt: '2026-10-01T23:59:59.000Z' });
     const onSave = (changes: LinkChanges) => assert.step(JSON.stringify(changes));
     const onCancel = () => assert.step('cancel');
 
@@ -107,7 +108,7 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
   });
 
   test('no expiration input when the plan has none', async function (assert) {
-    const link = makeLink();
+    const link = pushLink(this.owner);
     const onSave = () => assert.step('save');
     const onCancel = () => assert.step('cancel');
 
@@ -129,6 +130,33 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
     await click('button[type="submit"]');
 
     assert.verifySteps(['cancel']);
+  });
+});
+
+module('Rendering | dashboard | EditLinkForm record', function (hooks) {
+  setupRenderingTest(hooks);
+
+  test('typing edits a checked-out copy, not the record', async function (assert) {
+    const link = pushLink(this.owner, { original: 'https://example.com/old' });
+    const onSave = () => assert.step('save');
+    const onCancel = () => assert.step('cancel');
+
+    await render(
+      <template>
+        <EditLinkForm
+          @link={{link}}
+          @canSetExpiration={{true}}
+          @isSaving={{false}}
+          @onSave={{onSave}}
+          @onCancel={{onCancel}}
+        />
+      </template>
+    );
+
+    await fillIn('input[name="original"]', 'https://example.com/new');
+
+    assert.strictEqual(link.original, 'https://example.com/old');
+    assert.verifySteps([]);
   });
 });
 
@@ -155,7 +183,10 @@ module('Rendering | dashboard | LinksTable editing', function (hooks) {
   });
 
   test('the editor row opens for the link whose id is being edited', async function (assert) {
-    const links = [makeLink({ id: 'link-1' }), makeLink({ id: 'link-2' })];
+    const links = [
+      pushLink(this.owner, { id: 'link-1' }),
+      pushLink(this.owner, { id: 'link-2' }),
+    ];
     const options = editing({
       id: 'link-2',
       save: (link: Link, changes: LinkChanges) =>

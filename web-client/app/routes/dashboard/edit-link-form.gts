@@ -1,8 +1,10 @@
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
+import { cached } from '@glimmer/tracking';
 import { on } from '@ember/modifier';
 
+import { checkout } from '@warp-drive/core/reactive';
 import { Button } from 'nvp.ui';
+import { getPromiseState } from 'reactiveweb/get-promise-state';
 
 import type { Link } from '#app/data/types';
 
@@ -23,14 +25,28 @@ function toExpiresAt(dateInputValue: string) {
   return dateInputValue ? `${dateInputValue}T23:59:59.000Z` : null;
 }
 
-function field(data: FormData, name: string) {
-  const value = data.get(name);
+function inputValue(event: Event) {
+  return (event.target as HTMLInputElement).value;
+}
 
-  return typeof value === 'string' ? value : '';
+/**
+ * The fields on the editable copy that differ from the saved record.
+ */
+export function changesBetween(saved: Link, editable: Link): LinkChanges {
+  const changes: LinkChanges = {};
+
+  if (editable.original !== saved.original) changes.original = editable.original;
+  if (editable.expiresAt !== saved.expiresAt) changes.expiresAt = editable.expiresAt;
+
+  return changes;
 }
 
 interface Signature {
   Args: {
+    /**
+     * The immutable record from the store. The form edits a checked-out
+     * copy; the save response updates the cache, which commits the copy.
+     */
     link: Link;
     canSetExpiration: boolean;
     isSaving: boolean;
@@ -40,35 +56,41 @@ interface Signature {
 }
 
 export class EditLinkForm extends Component<Signature> {
-  @tracked expiresValue = toDateInputValue(this.args.link.expiresAt);
+  @cached
+  get checkout() {
+    return checkout<Link>(this.args.link);
+  }
 
-  updateExpires = (event: Event) => {
-    this.expiresValue = (event.target as HTMLInputElement).value;
+  get state() {
+    return getPromiseState(this.checkout);
+  }
+
+  get editable() {
+    return this.state.resolved ?? null;
+  }
+
+  get expiresValue() {
+    return toDateInputValue(this.editable?.expiresAt ?? null);
+  }
+
+  setOriginal = (event: Event) => {
+    if (this.editable) this.editable.original = inputValue(event).trim();
+  };
+
+  setExpires = (event: Event) => {
+    if (this.editable) this.editable.expiresAt = toExpiresAt(inputValue(event));
   };
 
   clearExpires = () => {
-    this.expiresValue = '';
+    if (this.editable) this.editable.expiresAt = null;
   };
 
   submit = (event: SubmitEvent) => {
     event.preventDefault();
 
-    const form = event.currentTarget as HTMLFormElement;
-    const data = new FormData(form);
-    const original = field(data, 'original').trim();
-    const changes: LinkChanges = {};
+    if (!this.editable) return;
 
-    if (original && original !== this.args.link.original) {
-      changes.original = original;
-    }
-
-    if (this.args.canSetExpiration) {
-      const expiresAt = toExpiresAt(field(data, 'expiresAt'));
-
-      if (expiresAt !== this.args.link.expiresAt) {
-        changes.expiresAt = expiresAt;
-      }
-    }
+    const changes = changesBetween(this.args.link, this.editable);
 
     if (Object.keys(changes).length === 0) {
       this.args.onCancel();
@@ -80,40 +102,55 @@ export class EditLinkForm extends Component<Signature> {
   };
 
   <template>
-    <form class="edit-link-form" {{on "submit" this.submit}}>
-      <label>
-        <span>Destination</span>
-        <input name="original" type="url" required value={{@link.original}}>
-      </label>
+    {{#if this.editable}}
+      <form class="edit-link-form" {{on "submit" this.submit}}>
+        <label>
+          <span>Destination</span>
+          <input
+            name="original"
+            type="url"
+            required
+            value={{this.editable.original}}
+            {{on "input" this.setOriginal}}
+          >
+        </label>
 
-      {{#if @canSetExpiration}}
-        <div class="expires-field">
-          <label>
-            <span>Expires</span>
-            <input
-              name="expiresAt"
-              type="date"
-              value={{this.expiresValue}}
-              {{on "input" this.updateExpires}}
-            >
-          </label>
-          {{#if this.expiresValue}}
-            <Button type="button" @variant="bare" @onClick={{this.clearExpires}} data-test-clear-expires>
-              Clear
-            </Button>
-          {{/if}}
+        {{#if @canSetExpiration}}
+          <div class="expires-field">
+            <label>
+              <span>Expires</span>
+              <input
+                name="expiresAt"
+                type="date"
+                value={{this.expiresValue}}
+                {{on "input" this.setExpires}}
+              >
+            </label>
+            {{#if this.editable.expiresAt}}
+              <Button
+                type="button"
+                @variant="bare"
+                @onClick={{this.clearExpires}}
+                data-test-clear-expires
+              >
+                Clear
+              </Button>
+            {{/if}}
+          </div>
+        {{/if}}
+
+        <div class="edit-link-actions">
+          <Button type="submit" @variant="primary" @disabled={{if @isSaving "Saving..."}}>
+            Save
+          </Button>
+          <Button type="button" @variant="secondary" @onClick={{@onCancel}}>
+            Cancel
+          </Button>
         </div>
-      {{/if}}
-
-      <div class="edit-link-actions">
-        <Button type="submit" @variant="primary" @disabled={{if @isSaving "Saving..."}}>
-          Save
-        </Button>
-        <Button type="button" @variant="secondary" @onClick={{@onCancel}}>
-          Cancel
-        </Button>
-      </div>
-    </form>
+      </form>
+    {{else if this.state.error}}
+      <p class="warning">Could not open this link for editing.</p>
+    {{/if}}
 
     <style scoped>
       .edit-link-form {
@@ -157,6 +194,10 @@ export class EditLinkForm extends Component<Signature> {
         display: flex;
         gap: var(--gap-2);
         align-items: center;
+      }
+
+      .warning {
+        color: var(--color-danger);
       }
     </style>
   </template>
