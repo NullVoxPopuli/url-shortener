@@ -3,6 +3,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 
 import { cacheKeyFor } from '@warp-drive/core';
+import { serializePatch } from '@warp-drive/utilities/json-api';
 
 import { EditLinkForm } from '#app/routes/dashboard/edit-link-form.gts';
 import { LinksTable } from '#app/routes/dashboard/links-table.gts';
@@ -14,14 +15,14 @@ import type { Link } from '#app/data/types';
 import type { LinkEditing } from '#app/routes/dashboard/links-table.gts';
 
 /**
- * What the cache says changed on the editable copy, as `name=value`.
+ * The attributes the PATCH body would carry for the editable copy.
  */
 function changedOn(owner: object, editable: Link) {
   const store = (owner as { lookup(name: string): unknown }).lookup('service:store') as Store;
-  const changed = store.cache.changedAttrs(cacheKeyFor(editable));
+  const { attributes } = serializePatch(store.cache, cacheKeyFor(editable)).data;
 
-  return Object.entries(changed)
-    .map(([name, [, value]]) => `${name}=${JSON.stringify(value)}`)
+  return Object.entries(attributes ?? {})
+    .map(([name, value]) => `${name}=${JSON.stringify(value)}`)
     .join('&');
 }
 

@@ -6,6 +6,7 @@ import { service } from '@ember/service';
 
 import { cacheKeyFor } from '@warp-drive/core';
 import { Request } from '@warp-drive/ember';
+import { serializePatch } from '@warp-drive/utilities/json-api';
 import { Button } from 'nvp.ui';
 
 import { messageFrom } from '#app/data/errors';
@@ -70,13 +71,10 @@ export default class LinkManager extends Component<Signature> {
   });
 
   edit = async (refresh: Array<() => Promise<void>>, link: Link, editable: Link) => {
-    // The cache tracks what the checkout changed; send only that.
-    const changed = this.store.cache.changedAttrs(cacheKeyFor(editable));
-    const attributes = Object.fromEntries(
-      Object.entries(changed).map(([name, [, value]]) => [name, value])
-    );
+    // The patch holds only what the checkout changed.
+    const patch = serializePatch(this.store.cache, cacheKeyFor(editable));
 
-    if (Object.keys(attributes).length === 0) {
+    if (!patch.data.attributes) {
       this.editingId = null;
 
       return;
@@ -86,7 +84,7 @@ export default class LinkManager extends Component<Signature> {
     this.error = null;
 
     try {
-      await this.store.request(updateLink(link.id, attributes, this.args.accountId));
+      await this.store.request(updateLink(link.id, patch, this.args.accountId));
       await Promise.all(refresh.map((fn) => fn()));
       this.editingId = null;
     } catch (error) {

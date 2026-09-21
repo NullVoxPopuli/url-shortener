@@ -95,16 +95,18 @@ export function createLink(
   });
 }
 
-export function updateLink(id: string, changes: Record<string, unknown>, accountId?: string) {
+/**
+ * `patch` is the document from `serializePatch`: the record's changed
+ * fields, as the cache tracked them on the editable copy.
+ */
+export function updateLink(id: string, patch: object, accountId?: string) {
   return withReactiveResponse<Link>({
     url: url(`/v1/links/${id}`, { accountId, include: 'ownedBy,createdBy' }),
     method: 'PATCH',
     op: 'updateRecord',
     credentials: 'include',
     headers: jsonapiHeaders(),
-    body: JSON.stringify({
-      data: { type: 'link', id, attributes: changes },
-    }),
+    body: JSON.stringify(patch),
   });
 }
 
