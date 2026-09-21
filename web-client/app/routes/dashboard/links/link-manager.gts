@@ -5,11 +5,14 @@ import { service } from '@ember/service';
 
 import { cacheKeyFor } from '@warp-drive/core';
 import { Request } from '@warp-drive/ember';
+import { EachLink, Paginate } from '@warp-drive/ember/experiments';
 import { dataFromEvent } from 'ember-primitives/components/form';
 import { Button } from 'nvp.ui';
+import { Pagination } from 'nvp.ui/pagination';
 
 import { messageFrom } from '#app/data/errors';
 import { text } from '#app/data/form';
+import { pageHints } from '#app/data/pagination';
 import { createLink, deleteLink, updateLink } from '#app/data/requests';
 
 import { LinksTable } from '../links-table.gts';
@@ -34,6 +37,18 @@ function hasNoEdits(billing: BillingStatus) {
 
 function errorMessage(error: unknown) {
   return messageFrom(error);
+}
+
+function isPaged(totalPages: number) {
+  return totalPages > 1;
+}
+
+/**
+ * A page that has not loaded yet has no data; the table shows nothing
+ * rather than crashing.
+ */
+function linksOn(page: { data: Link[] | null }) {
+  return page.data ?? [];
 }
 
 interface Signature {
@@ -150,7 +165,7 @@ export default class LinkManager extends Component<Signature> {
         </:error>
 
         <:content as |billingDoc|>
-          <Request @request={{@links}} @autorefresh="invalid">
+          <Paginate @request={{@links}} @pageHints={{pageHints}} @autorefresh="invalid">
             <:loading>
               <p class="muted">Loading your links…</p>
             </:loading>
@@ -161,7 +176,7 @@ export default class LinkManager extends Component<Signature> {
               <p class="warning">{{errorMessage error}}</p>
             </:error>
 
-            <:content as |linksDoc|>
+            <:content as |pages|>
                 <section class="page-card surface">
                   <h2>Create a link</h2>
 
@@ -235,16 +250,30 @@ export default class LinkManager extends Component<Signature> {
                       link edits for this month.</p>
                   {{/if}}
 
-                  <LinksTable
-                    @links={{linksDoc.data}}
-                    @watermark={{isWatermarked billingDoc.data}}
-                    @onDelete={{this.delete}}
-                    @isDeleting={{this.isWorking}}
-                    @editing={{this.editingFor billingDoc.data}}
-                  />
+                  {{#if pages.activePage}}
+                    <LinksTable
+                      @links={{linksOn pages.activePage}}
+                      @watermark={{isWatermarked billingDoc.data}}
+                      @onDelete={{this.delete}}
+                      @isDeleting={{this.isWorking}}
+                      @editing={{this.editingFor billingDoc.data}}
+                    >
+                      <:footer>
+                        {{#if (isPaged pages.totalPages)}}
+                          <span class="muted">Page
+                            {{pages.activePage.pageNumber}}
+                            of
+                            {{pages.totalPages}}</span>
+                          <EachLink @pages={{pages}} as |links|>
+                            <Pagination @links={{links}} @label="Link pages" />
+                          </EachLink>
+                        {{/if}}
+                      </:footer>
+                    </LinksTable>
+                  {{/if}}
                 </section>
             </:content>
-          </Request>
+          </Paginate>
         </:content>
       </Request>
     </div>
