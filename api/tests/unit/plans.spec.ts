@@ -60,7 +60,9 @@ test.group('plans', () => {
   });
 
   test('no pending downgrade without a grace, or on a free account', () => {
-    assert.isNull(pendingDowngradeFor({ isInternal: false, stripePriceId: PLANS[2].prices.month.id }));
+    assert.isNull(
+      pendingDowngradeFor({ isInternal: false, stripePriceId: PLANS[2].prices.month.id })
+    );
     assert.isNull(
       pendingDowngradeFor({
         isInternal: true,
