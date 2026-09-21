@@ -1,8 +1,32 @@
+/**
+ * Each paid plan is one Stripe product with one recurring price per
+ * billing interval. `node ace stripe:prices` prints the products and
+ * prices of the configured Stripe account in this shape.
+ */
+export type BillingInterval = 'month' | 'year';
+
+export interface PlanPrice {
+  id: string;
+  amountInCents: number;
+}
+
+export type PlanPrices = Record<BillingInterval, PlanPrice>;
+
+export const BILLING_INTERVALS: BillingInterval[] = ['month', 'year'];
+
+/**
+ * TODO: replace the `price_..._TODO` ids with the ids from Stripe.
+ * `node ace stripe:prices` lists them. Only Vast's are filled in.
+ */
 export const PLANS = [
   {
-    key: 'side-hobby',
-    name: 'Side-Hobby',
-    priceInCents: 100,
+    key: 'base',
+    name: 'Base',
+    stripeProductId: 'prod_base_TODO',
+    prices: {
+      month: { id: 'price_base_month_TODO', amountInCents: 100 },
+      year: { id: 'price_base_year_TODO', amountInCents: 1100 },
+    },
     monthlyLinkLimit: 15,
     teammates: 0,
     customDomains: 0,
@@ -10,12 +34,15 @@ export const PLANS = [
     apiKeys: 0,
     linkEditsPerMonth: 0,
     linkExpiration: false,
-    stripePriceId: 'price_1U2ILAKsGhcICKKY7PsC0LTW',
   },
   {
-    key: 'hobby',
-    name: 'Hobby',
-    priceInCents: 500,
+    key: 'essentials',
+    name: 'Essentials',
+    stripeProductId: 'prod_essentials_TODO',
+    prices: {
+      month: { id: 'price_essentials_month_TODO', amountInCents: 500 },
+      year: { id: 'price_essentials_year_TODO', amountInCents: 5500 },
+    },
     monthlyLinkLimit: 100,
     teammates: 0,
     customDomains: 2,
@@ -23,12 +50,15 @@ export const PLANS = [
     apiKeys: 1,
     linkEditsPerMonth: 0,
     linkExpiration: false,
-    stripePriceId: 'price_1U2ILPKsGhcICKKY6OLKcW35',
   },
   {
-    key: 'project',
-    name: 'Project',
-    priceInCents: 1500,
+    key: 'pro',
+    name: 'Pro',
+    stripeProductId: 'prod_pro_TODO',
+    prices: {
+      month: { id: 'price_pro_month_TODO', amountInCents: 1500 },
+      year: { id: 'price_pro_year_TODO', amountInCents: 16500 },
+    },
     monthlyLinkLimit: 1000,
     teammates: 2,
     customDomains: 3,
@@ -36,16 +66,31 @@ export const PLANS = [
     apiKeys: 3,
     linkEditsPerMonth: 50,
     linkExpiration: true,
-    stripePriceId: 'price_1U2ILeKsGhcICKKYQFVqMsbn',
+  },
+  {
+    key: 'vast',
+    name: 'Vast',
+    stripeProductId: 'prod_QIhPQZXW4aywu2',
+    prices: {
+      month: { id: 'price_1PS60rKsGhcICKKYNgDoPVji', amountInCents: 5000 },
+      year: { id: 'price_1PS62AKsGhcICKKYNMVh8ywd', amountInCents: 55000 },
+    },
+    monthlyLinkLimit: 10000,
+    teammates: 10,
+    customDomains: 10,
+    additionalAccounts: 10,
+    apiKeys: 10,
+    linkEditsPerMonth: 500,
+    linkExpiration: true,
   },
 ] as const;
 
-export type PlanKey = (typeof PLANS)[number]['key'];
+export type Plan = (typeof PLANS)[number];
+export type PlanKey = Plan['key'];
 
 export const NO_SUBSCRIPTION_PLAN = {
   key: 'none',
   name: 'No subscription',
-  priceInCents: 0,
   monthlyLinkLimit: 5,
   teammates: 0,
   customDomains: 0,
@@ -61,7 +106,6 @@ export const NO_SUBSCRIPTION_PLAN = {
 export const FREE_PLAN = {
   key: 'free',
   name: 'Free',
-  priceInCents: 0,
   monthlyLinkLimit: null,
   teammates: null,
   customDomains: null,
@@ -71,8 +115,27 @@ export const FREE_PLAN = {
   linkExpiration: true,
 } as const;
 
+export function isBillingInterval(value: unknown): value is BillingInterval {
+  return value === 'month' || value === 'year';
+}
+
+export function planForKey(key: string | null | undefined) {
+  return PLANS.find((plan) => plan.key === key) ?? null;
+}
+
+/**
+ * Any of a plan's prices identifies the plan.
+ */
 export function planForPriceId(priceId: string | null) {
-  return PLANS.find((plan) => plan.stripePriceId === priceId) ?? null;
+  if (!priceId) return null;
+
+  return PLANS.find((plan) => intervalForPriceId(plan, priceId) !== null) ?? null;
+}
+
+export function intervalForPriceId(plan: Plan, priceId: string | null): BillingInterval | null {
+  if (!priceId) return null;
+
+  return BILLING_INTERVALS.find((interval) => plan.prices[interval].id === priceId) ?? null;
 }
 
 interface PlanHolder {
@@ -84,4 +147,14 @@ export function planFor(account: PlanHolder) {
   return account.isFree
     ? FREE_PLAN
     : (planForPriceId(account.stripePriceId) ?? NO_SUBSCRIPTION_PLAN);
+}
+
+/**
+ * The billing interval of the account's current price, when it is on
+ * a paid plan.
+ */
+export function billingIntervalFor(account: PlanHolder): BillingInterval | null {
+  const plan = planForPriceId(account.stripePriceId);
+
+  return plan ? intervalForPriceId(plan, account.stripePriceId) : null;
 }

@@ -36,8 +36,8 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
 
   test('active subscription: plan, period, manage button', async function (assert) {
     const billing = makeBilling({
-      planKey: 'hobby',
-      planName: 'Hobby',
+      planKey: 'essentials',
+      planName: 'Essentials',
       monthlyLinkLimit: 100,
       remaining: 98,
       used: 2,
@@ -46,7 +46,7 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
 
     await render(<template><SubscriptionCard @billing={{billing}} /></template>);
 
-    assert.dom('section').containsText('Hobby');
+    assert.dom('section').containsText('Essentials');
     assert.dom('section').containsText('Current period:');
     assert.dom('button').containsText('Manage billing');
     assert.dom('a[href="/pricing"]').doesNotExist();
@@ -54,8 +54,8 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
 
   test('scheduled cancellation is called out', async function (assert) {
     const billing = makeBilling({
-      planKey: 'hobby',
-      planName: 'Hobby',
+      planKey: 'essentials',
+      planName: 'Essentials',
       hasActiveSubscription: true,
       cancelAtPeriodEnd: true,
     });

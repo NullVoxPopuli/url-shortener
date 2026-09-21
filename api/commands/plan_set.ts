@@ -14,7 +14,7 @@ export default class PlanSet extends BaseCommand {
   @args.string({ description: 'Account id or name' })
   declare account: string;
 
-  @args.string({ description: 'Plan key (side-hobby, hobby, project, free, none)' })
+  @args.string({ description: 'Plan key (base, essentials, pro, vast, free, none)' })
   declare plan: string;
 
   async run() {

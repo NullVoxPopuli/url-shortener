@@ -1,16 +1,26 @@
 import type { Type } from '@warp-drive/core/types/symbols';
 
+export type BillingInterval = 'month' | 'year';
+
+export interface PlanPrice {
+  id: string;
+  amountInCents: number;
+}
+
 export interface Plan {
   key: string;
   name: string;
-  priceInCents: number;
+  /**
+   * Paid plans only: one Stripe price per billing interval.
+   */
+  prices?: Record<BillingInterval, PlanPrice>;
+  stripeProductId?: string;
   monthlyLinkLimit: number | null;
   /**
    * null = unlimited, 0 = the plan has no editing
    */
   linkEditsPerMonth: number | null;
   linkExpiration: boolean;
-  stripePriceId?: string;
 }
 
 export interface BillingStatus {
@@ -22,6 +32,7 @@ export interface BillingStatus {
     subscriptionId: string | null;
     subscriptionStatus: string | null;
     priceId: string | null;
+    interval: BillingInterval | null;
     currentPeriodStart: string | null;
     currentPeriodEnd: string | null;
     cancelAtPeriodEnd: boolean;

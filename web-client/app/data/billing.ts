@@ -1,5 +1,7 @@
 import config from '#config';
 
+import type { BillingInterval } from '#app/data/types';
+
 /**
  * Checkout + portal are "leave the app" actions: they POST to the API,
  * then redirect the whole window to Stripe. No data lands in the cache,
@@ -26,8 +28,11 @@ async function redirectToStripe(path: string, body?: string) {
   window.location.assign(url);
 }
 
-export async function startCheckout(planKey: string) {
-  await redirectToStripe('/v1/billing/checkout', JSON.stringify({ plan: planKey }));
+export async function startCheckout(planKey: string, interval: BillingInterval = 'month') {
+  await redirectToStripe(
+    '/v1/billing/checkout',
+    JSON.stringify({ plan: planKey, interval })
+  );
 }
 
 export async function openBillingPortal() {

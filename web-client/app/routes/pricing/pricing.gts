@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { fn } from '@ember/helper';
+import { on } from '@ember/modifier';
 
 import { Request } from '@warp-drive/ember';
 import { Button } from 'nvp.ui';
@@ -9,7 +10,7 @@ import { openBillingPortal, startCheckout } from '#app/data/billing';
 
 import type { ReactiveDataDocument } from '@warp-drive/core/reactive';
 import type { Future } from '@warp-drive/core/request';
-import type { BillingStatus, Plan } from '#app/data/types';
+import type { BillingInterval, BillingStatus, Plan } from '#app/data/types';
 
 const CONTACT_EMAIL = 'sales@nvp.gg';
 const CONTACT_HREF = `mailto:${CONTACT_EMAIL}?subject=Custom plan inquiry`;
@@ -18,15 +19,25 @@ function formatPrice(priceInCents: number) {
   return `$${(priceInCents / 100).toFixed(priceInCents % 100 === 0 ? 0 : 2)}`;
 }
 
+function priceLabel(plan: Plan, interval: BillingInterval) {
+  const price = plan.prices?.[interval];
+
+  return price ? `${formatPrice(price.amountInCents)}/${interval}` : '';
+}
+
+function isInterval(current: BillingInterval, candidate: BillingInterval) {
+  return current === candidate;
+}
+
 /**
  * Marketing copy for each plan, keyed by the API's plan key.
  * Quotas (links/month, price) come from the API; these lists are
  * display-only.
  */
 const PLAN_FEATURES: Record<string, string[]> = {
-  'side-hobby': ['15 QR codes/month (non-watermarked)'],
-  hobby: ['100 QR codes/month', 'Advanced click statistics', '2 custom domains'],
-  project: [
+  base: ['15 QR codes/month (non-watermarked)'],
+  essentials: ['100 QR codes/month', 'Advanced click statistics', '2 custom domains'],
+  pro: [
     '1000 QR codes/month',
     'Advanced click statistics',
     '3 custom domains',
@@ -34,6 +45,14 @@ const PLAN_FEATURES: Record<string, string[]> = {
     '50 password-protected links',
     'Link expiration',
     '2 teammates',
+  ],
+  vast: [
+    '10000 QR codes/month',
+    'Advanced click statistics',
+    '10 custom domains',
+    '500 link / QR code edits per month',
+    'Link expiration',
+    '10 teammates',
   ],
 };
 
@@ -67,12 +86,17 @@ interface Signature {
 
 export default class Pricing extends Component<Signature> {
   @tracked isSubmitting = false;
+  @tracked interval: BillingInterval = 'month';
+
+  setInterval = (interval: BillingInterval) => {
+    this.interval = interval;
+  };
 
   checkout = async (planKey: string) => {
     this.isSubmitting = true;
 
     try {
-      await startCheckout(planKey);
+      await startCheckout(planKey, this.interval);
     } finally {
       this.isSubmitting = false;
     }
@@ -115,11 +139,30 @@ export default class Pricing extends Component<Signature> {
                 </Button>
               {{/if}}
 
+              <div class="interval-toggle" role="group" aria-label="Billing interval">
+                <button
+                  type="button"
+                  class="interval-button"
+                  aria-pressed={{if (isInterval this.interval "month") "true" "false"}}
+                  {{on "click" (fn this.setInterval "month")}}
+                >
+                  Monthly
+                </button>
+                <button
+                  type="button"
+                  class="interval-button"
+                  aria-pressed={{if (isInterval this.interval "year") "true" "false"}}
+                  {{on "click" (fn this.setInterval "year")}}
+                >
+                  Yearly
+                </button>
+              </div>
+
               <div class="plans">
                 {{#each billing.availablePlans as |plan|}}
                   <article class="plan surface">
                     <h2>{{plan.name}}</h2>
-                    <p class="price">{{formatPrice plan.priceInCents}}/month</p>
+                    <p class="price">{{priceLabel plan this.interval}}</p>
                     <ul class="features">
                       <li>{{plan.monthlyLinkLimit}} links/month</li>
                       {{#each (featuresFor plan.key) as |feature|}}
@@ -198,9 +241,29 @@ export default class Pricing extends Component<Signature> {
         background: var(--surface-background-color);
       }
 
+      .interval-toggle {
+        display: inline-flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      .interval-button {
+        padding: 0.375rem 0.75rem;
+        border: var(--border-width) var(--border-style) var(--border-color);
+        border-radius: var(--radius);
+        background: none;
+        color: var(--color-text);
+        cursor: pointer;
+      }
+
+      .interval-button[aria-pressed="true"] {
+        background: var(--color-text);
+        color: var(--surface-background-color);
+      }
+
       .plans {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
         gap: 1rem;
         margin-top: 1rem;
       }

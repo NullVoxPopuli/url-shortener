@@ -186,7 +186,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       post: {
         summary: 'Create an additional account',
         description:
-          'Creates an additional (non-personal) account with you as admin. Body is a { json:api } resource document: { "data": { "type": "account", "attributes": { "name": "..." } } }. Gated by your personal account\'s plan: side-hobby 1, hobby 2, project 3, unpaid 0 (402 when full).',
+          'Creates an additional (non-personal) account with you as admin. Body is a { json:api } resource document: { "data": { "type": "account", "attributes": { "name": "..." } } }. Gated by your personal account\'s plan: base 1, essentials 2, pro 3, vast 10, unpaid 0 (402 when full).',
       },
     },
     '/v1/accounts/{id}': {
@@ -291,7 +291,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       post: {
         summary: 'Create an API key',
         description:
-          'Creates an API key on your membership in the account. Body: { "name": "...", "scopes": ["links:read", "links:write"], "expiresInDays": 90 } (expiresInDays optional — omit for a non-expiring key). Gated by the account plan\'s API key limit: hobby 1, project 3, others 0 (402 when full). The secret (the `token` attribute, `nvp_...`) is ONLY in this response — store it immediately. Use it as `Authorization: Bearer nvp_...` on the links endpoints.',
+          'Creates an API key on your membership in the account. Body: { "name": "...", "scopes": ["links:read", "links:write"], "expiresInDays": 90 } (expiresInDays optional — omit for a non-expiring key). Gated by the account plan\'s API key limit: essentials 1, pro 3, vast 10, others 0 (402 when full). The secret (the `token` attribute, `nvp_...`) is ONLY in this response — store it immediately. Use it as `Authorization: Bearer nvp_...` on the links endpoints.',
         parameters: [accountParam],
       },
     },
@@ -367,7 +367,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       post: {
         summary: 'Start a Stripe Checkout session',
         description:
-          'Starts a subscription checkout for the account (account admins only). Body: { "plan": "side-hobby" | "hobby" | "project" }. Returns the Stripe-hosted checkout URL to redirect the browser to. 409 when a subscription is already active.',
+          'Starts a subscription checkout for the account (account admins only). Body: { "plan": "base" | "essentials" | "pro" | "vast", "interval": "month" | "year" } (interval defaults to month). Returns the Stripe-hosted checkout URL to redirect the browser to. 409 when a subscription is already active.',
         parameters: [accountParam],
       },
     },

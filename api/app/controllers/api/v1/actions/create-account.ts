@@ -6,7 +6,7 @@ import { planFor } from '#services/plans';
 
 /**
  * Additional (non-personal) accounts, gated by the creator's PERSONAL
- * account plan: side-hobby 1, hobby 2, project 3, unpaid 0,
+ * account plan: base 1, essentials 2, pro 3, vast 10, unpaid 0,
  * staff/legacy-free unlimited.
  */
 export async function createAccount(context: HttpContext) {

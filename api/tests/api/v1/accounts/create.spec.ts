@@ -38,7 +38,7 @@ test.group('POST /v1/accounts (additional accounts)', (group) => {
   test('side-hobby allows one additional account', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'side-hobby');
+    await overridePlan(account, 'base');
 
     const first = await create(client, user, 'Side Project');
 
@@ -67,7 +67,7 @@ test.group('POST /v1/accounts (additional accounts)', (group) => {
   test('project allows three additional accounts', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'project');
+    await overridePlan(account, 'pro');
 
     for (const name of ['One', 'Two', 'Three']) {
       const response = await create(client, user, name);
@@ -83,7 +83,7 @@ test.group('POST /v1/accounts (additional accounts)', (group) => {
   test('account names are validated', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'side-hobby');
+    await overridePlan(account, 'base');
 
     const response = await create(client, user, 'x');
 
