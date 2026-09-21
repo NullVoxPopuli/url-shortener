@@ -14,6 +14,7 @@ import {
   pendingDowngradeFor,
   planForKey,
 } from '#services/plans';
+import { overagesFor } from '#services/downgrade_overages';
 
 function mustBeAccountAdmin(params: { userId: string; account: Account }) {
   const { userId, account } = params;
@@ -114,6 +115,10 @@ export async function billingStatus(context: HttpContext) {
     quotaForAccount(account),
     editQuotaForAccount(account),
   ]);
+  const downgrade = pendingDowngradeFor(account);
+  const pendingDowngrade = downgrade
+    ? { ...downgrade, overages: await overagesFor(account, downgrade.plan) }
+    : null;
 
   return {
     data: {
@@ -131,14 +136,15 @@ export async function billingStatus(context: HttpContext) {
           currentPeriodStart: account.stripeCurrentPeriodStart,
           currentPeriodEnd: account.stripeCurrentPeriodEnd,
           cancelAtPeriodEnd: account.stripeCancelAtPeriodEnd,
-          pendingPriceId: account.stripePendingPriceId,
-          pendingAt: account.stripePendingAt,
+          downgradedFromPriceId: account.stripeDowngradedFromPriceId,
+          downgradedUntil: account.stripeDowngradedUntil,
         },
         /**
-         * A scheduled downgrade. The account keeps `plan` until
-         * `pendingDowngrade.at`. Upgrades apply at once.
+         * A downgrade in progress: `plan` stays until `at`, then the
+         * account drops to `pendingDowngrade.plan`. `overages` lists
+         * what the account uses today beyond that plan's limits.
          */
-        pendingDowngrade: pendingDowngradeFor(account),
+        pendingDowngrade,
         plan: quota.plan,
         usage: {
           used: quota.used,

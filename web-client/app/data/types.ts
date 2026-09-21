@@ -32,6 +32,12 @@ export interface PlanResource extends Plan {
   [Type]: 'plan';
 }
 
+export interface Overage {
+  resource: 'links' | 'customDomains' | 'apiKeys' | 'teammates';
+  used: number;
+  limit: number;
+}
+
 export interface BillingStatus {
   id: string;
   isFree: boolean;
@@ -45,17 +51,19 @@ export interface BillingStatus {
     currentPeriodStart: string | null;
     currentPeriodEnd: string | null;
     cancelAtPeriodEnd: boolean;
-    pendingPriceId: string | null;
-    pendingAt: number | null;
+    downgradedFromPriceId: string | null;
+    downgradedUntil: number | null;
   };
   plan: Plan;
   /**
-   * A scheduled downgrade. The account keeps `plan` until `at`.
-   * Upgrades apply at once.
+   * A downgrade in progress: `plan` stays until `at`, then the account
+   * drops to this plan. `overages` is what the account uses today
+   * beyond that plan's limits.
    */
   pendingDowngrade: {
     plan: Plan;
-    at: number | null;
+    at: number;
+    overages: Overage[];
   } | null;
   usage: {
     used: number;

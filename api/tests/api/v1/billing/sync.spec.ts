@@ -5,7 +5,7 @@ import type Stripe from 'stripe';
 import Account from '#models/account';
 import { stripe } from '#services/stripe';
 import { syncStripeDataToAccount } from '#services/stripe_sync';
-import { PLANS, pendingDowngradeFor } from '#services/plans';
+import { PLANS, pendingDowngradeFor, planFor } from '#services/plans';
 import { createNewAccount } from '#tests/db';
 import { setup } from '#tests/helpers';
 
@@ -32,7 +32,6 @@ function subscription(overrides: Partial<Stripe.Subscription>) {
     status: 'active',
     cancel_at_period_end: false,
     cancel_at: null,
-    schedule: null,
     default_payment_method: null,
     items: {
       data: [
@@ -88,81 +87,120 @@ test.group('syncStripeDataToAccount', (group) => {
     assert.isFalse(fresh.stripeCancelAtPeriodEnd);
   });
 
-  test('a downgrade scheduled for the next period is pending, and the current plan stays', async () => {
-    const { account } = await createNewAccount({
-      account: { stripeCustomerId: `cus_${randomUUID()}` },
-    });
-    const now = Math.floor(Date.now() / 1000);
+  test('a downgrade keeps the previous plan until the paid period ends', async () => {
     const pro = PLANS[2];
     const base = PLANS[0];
+    const now = Math.floor(Date.now() / 1000);
+    const { account } = await createNewAccount({
+      account: { stripeCustomerId: `cus_${randomUUID()}`, stripePriceId: pro.prices.month.id },
+    });
 
-    await withSubscriptions(
-      [
-        subscription({
-          items: {
-            data: [
-              {
-                price: { id: pro.prices.month.id },
-                current_period_start: now - 100,
-                current_period_end: now + 1000,
-              },
-            ],
-          } as unknown as Stripe.Subscription['items'],
-          schedule: {
-            phases: [
-              {
-                start_date: now - 100,
-                end_date: now + 1000,
-                items: [{ price: pro.prices.month.id }],
-              },
-              {
-                start_date: now + 1000,
-                end_date: now + 2000,
-                items: [{ price: base.prices.month.id }],
-              },
-            ],
-          } as unknown as Stripe.SubscriptionSchedule,
-        }),
-      ],
-      () => syncStripeDataToAccount(account)
+    await withSubscriptions([subscription(onPrice(base.prices.month.id, now + 1000))], () =>
+      syncStripeDataToAccount(account)
     );
 
     const fresh = await Account.findOrFail(account.id);
-    assert.strictEqual(fresh.stripePriceId, pro.prices.month.id);
-    assert.strictEqual(fresh.stripePendingPriceId, base.prices.month.id);
-    assert.strictEqual(fresh.stripePendingAt, now + 1000);
-
-    const downgrade = pendingDowngradeFor(fresh);
-    assert.strictEqual(downgrade?.plan.key, 'base');
-    assert.strictEqual(downgrade?.at, now + 1000);
+    assert.strictEqual(fresh.stripePriceId, base.prices.month.id);
+    assert.strictEqual(fresh.stripeDowngradedFromPriceId, pro.prices.month.id);
+    assert.strictEqual(fresh.stripeDowngradedUntil, now + 1000);
+    assert.strictEqual(planFor(fresh).key, 'pro');
+    assert.deepEqual(pendingDowngradeFor(fresh), { plan: base, at: now + 1000 });
   });
 
-  test('a schedule whose next phase keeps the price is not a pending change', async () => {
+  test('a second downgrade during the grace keeps the original plan', async () => {
+    const now = Math.floor(Date.now() / 1000);
     const { account } = await createNewAccount({
       account: {
         stripeCustomerId: `cus_${randomUUID()}`,
-        stripePendingPriceId: 'price_old_pending',
-        stripePendingAt: 1,
+        stripePriceId: PLANS[1].prices.month.id,
+        stripeDowngradedFromPriceId: PLANS[2].prices.month.id,
+        stripeDowngradedUntil: now + 1000,
       },
     });
+
+    await withSubscriptions([subscription(onPrice(PLANS[0].prices.month.id, now + 1000))], () =>
+      syncStripeDataToAccount(account)
+    );
+
+    const fresh = await Account.findOrFail(account.id);
+    assert.strictEqual(fresh.stripeDowngradedFromPriceId, PLANS[2].prices.month.id);
+    assert.strictEqual(planFor(fresh).key, 'pro');
+    assert.strictEqual(pendingDowngradeFor(fresh)?.plan.key, 'base');
+  });
+
+  test('an upgrade ends the grace', async () => {
     const now = Math.floor(Date.now() / 1000);
+    const { account } = await createNewAccount({
+      account: {
+        stripeCustomerId: `cus_${randomUUID()}`,
+        stripePriceId: PLANS[0].prices.month.id,
+        stripeDowngradedFromPriceId: PLANS[2].prices.month.id,
+        stripeDowngradedUntil: now + 1000,
+      },
+    });
+
+    await withSubscriptions([subscription(onPrice(PLANS[3].prices.month.id, now + 1000))], () =>
+      syncStripeDataToAccount(account)
+    );
+
+    const fresh = await Account.findOrFail(account.id);
+    assert.isNull(fresh.stripeDowngradedFromPriceId);
+    assert.isNull(fresh.stripeDowngradedUntil);
+    assert.strictEqual(planFor(fresh).key, 'vast');
+  });
+
+  test('an expired grace is dropped', async () => {
+    const now = Math.floor(Date.now() / 1000);
+    const { account } = await createNewAccount({
+      account: {
+        stripeCustomerId: `cus_${randomUUID()}`,
+        stripePriceId: PLANS[0].prices.month.id,
+        stripeDowngradedFromPriceId: PLANS[2].prices.month.id,
+        stripeDowngradedUntil: now - 10,
+      },
+    });
+
+    await withSubscriptions([subscription(onPrice(PLANS[0].prices.month.id, now + 1000))], () =>
+      syncStripeDataToAccount(account)
+    );
+
+    const fresh = await Account.findOrFail(account.id);
+    assert.isNull(fresh.stripeDowngradedFromPriceId);
+    assert.strictEqual(planFor(fresh).key, 'base');
+    assert.isNull(pendingDowngradeFor(fresh));
+  });
+
+  test('a cancellation ends the grace', async () => {
+    const now = Math.floor(Date.now() / 1000);
+    const { account } = await createNewAccount({
+      account: {
+        stripeCustomerId: `cus_${randomUUID()}`,
+        stripePriceId: PLANS[0].prices.month.id,
+        stripeDowngradedFromPriceId: PLANS[2].prices.month.id,
+        stripeDowngradedUntil: now + 1000,
+      },
+    });
 
     await withSubscriptions(
-      [
-        subscription({
-          schedule: {
-            phases: [
-              { start_date: now - 100, end_date: now + 1000, items: [{ price: 'price_1' }] },
-              { start_date: now + 1000, end_date: now + 2000, items: [{ price: 'price_1' }] },
-            ],
-          } as unknown as Stripe.SubscriptionSchedule,
-        }),
-      ],
+      [subscription({ ...onPrice(PLANS[0].prices.month.id, now + 1000), status: 'canceled' })],
       () => syncStripeDataToAccount(account)
     );
 
     const fresh = await Account.findOrFail(account.id);
-    assert.isNull(fresh.stripePendingPriceId);
-    assert.isNull(fresh.stripePendingAt);
+    assert.isNull(fresh.stripeDowngradedFromPriceId);
   });
 });
+
+function onPrice(priceId: string, currentPeriodEnd: number): Partial<Stripe.Subscription> {
+  return {
+    items: {
+      data: [
+        {
+          price: { id: priceId },
+          current_period_start: currentPeriodEnd - 2000,
+          current_period_end: currentPeriodEnd,
+        },
+      ],
+    } as unknown as Stripe.Subscription['items'],
+  };
+}
