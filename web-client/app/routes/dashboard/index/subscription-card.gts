@@ -67,7 +67,11 @@ export class SubscriptionCard extends Component<Signature> {
     <section class="dashboard-card surface">
       <h2>Subscription</h2>
 
-      {{#if (hasNoSubscription @billing)}}
+      {{#if @billing.isGlimdown}}
+        <p class="plan-name" data-test-glimdown>Glimdown</p>
+        <p class="muted">The shared account behind glimdown.com and repl.nvp.gg links.
+          Anyone shortens one without signing in, and nothing is billed.</p>
+      {{else if (hasNoSubscription @billing)}}
         <p class="plan-name" data-test-free-plan>Free</p>
         <ul class="plan-includes">
           <li>{{@billing.plan.monthlyLinkLimit}} links a month</li>
@@ -105,7 +109,7 @@ export class SubscriptionCard extends Component<Signature> {
       {{/if}}
 
       {{#unless (isFree @billing)}}
-        <div class="card-actions">
+        <div class="card-actions" data-test-actions>
           {{#if @billing.hasActiveSubscription}}
             <button
               type="button"

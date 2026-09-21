@@ -13,6 +13,7 @@ export function makeBilling(overrides?: {
   editsUsed?: number;
   editsRemaining?: number | null;
   pendingDowngrade?: BillingStatus['pendingDowngrade'];
+  isGlimdown?: boolean;
 }): BillingStatus {
   const {
     planKey = 'none',
@@ -27,11 +28,13 @@ export function makeBilling(overrides?: {
     editsUsed = 0,
     editsRemaining = linkEditsPerMonth === null ? null : linkEditsPerMonth - editsUsed,
     pendingDowngrade = null,
+    isGlimdown = false,
   } = overrides ?? {};
 
   return {
     id: 'account-1',
     isFree: planKey === 'free',
+    isGlimdown,
     hasActiveSubscription,
     stripe: {
       customerId: null,

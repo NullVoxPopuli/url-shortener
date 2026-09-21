@@ -5,6 +5,7 @@ export const SCHEMAS = [
     type: 'billing-status',
     fields: [
       { kind: 'field', name: 'isFree' },
+      { kind: 'field', name: 'isGlimdown' },
       { kind: 'field', name: 'hasActiveSubscription' },
       { kind: 'object', name: 'stripe' },
       { kind: 'object', name: 'plan' },

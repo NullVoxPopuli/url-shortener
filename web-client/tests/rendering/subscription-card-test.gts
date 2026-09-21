@@ -121,4 +121,21 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
       .dom('[data-test-overages]')
       .hasText("Over Base's limits: 40 links this month (limit 15), 2 custom domains (limit 0).");
   });
+
+  test('the glimdown account is named as the shared one, with no actions', async function (assert) {
+    const billing = makeBilling({
+      planKey: 'free',
+      planName: 'Free',
+      monthlyLinkLimit: null,
+      remaining: null,
+      isGlimdown: true,
+    });
+
+    await render(<template><SubscriptionCard @billing={{billing}} /></template>);
+
+    assert.dom('[data-test-glimdown]').hasText('Glimdown');
+    assert.dom('section').containsText('without signing in');
+    assert.dom('section').doesNotContainText('legacy');
+    assert.dom('[data-test-actions]').doesNotExist();
+  });
 });

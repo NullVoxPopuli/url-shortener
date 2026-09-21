@@ -7,6 +7,8 @@ import { DateTime } from 'luxon';
 import { createLink, createNewAccount } from '#tests/db';
 import LinkEdit from '#models/link_edit';
 import { PLANS } from '#services/plans';
+import { glimdownOwner } from '#consts';
+import AccountMembership from '#models/account_membership';
 import { setup } from '#tests/helpers';
 import { assertUnauthorized } from '#tests/jsonapi';
 
@@ -81,6 +83,24 @@ test.group('GET /v1/billing/status', (group) => {
     assert.strictEqual(attributes.plan.key, 'free');
     assert.isNull(attributes.plan.monthlyLinkLimit);
     assert.isNull(attributes.usage.remaining);
+    assert.isFalse(attributes.isGlimdown);
+  });
+
+  test('the glimdown account says so', async ({ client }) => {
+    // seeded for every test run; a member reads its status through ?accountId=
+    const { user } = await createNewAccount();
+
+    await AccountMembership.ensure({ accountId: glimdownOwner.id, userId: user.id, role: 'admin' });
+
+    const response = await client
+      .get(`http://${API_DOMAIN}/v1/billing/status?accountId=${glimdownOwner.id}`)
+      .header('Accept', 'application/vnd.api+json')
+      .loginAs(user);
+    const attributes = response.body().data.attributes;
+
+    response.assertStatus(200);
+    assert.isTrue(attributes.isGlimdown);
+    assert.strictEqual(attributes.plan.key, 'free');
   });
 
   test('an account with an active subscription reports it', async ({ client }) => {

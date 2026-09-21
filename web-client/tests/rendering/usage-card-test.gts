@@ -64,4 +64,22 @@ module('Rendering | dashboard | UsageCard', function (hooks) {
     assert.dom('section').containsText("You've used your quota for this month");
     assert.dom('a[href="/pricing"]').doesNotExist();
   });
+
+  test('the glimdown account counts unmetered links, with no meter', async function (assert) {
+    const billing = makeBilling({
+      planKey: 'free',
+      planName: 'Free',
+      monthlyLinkLimit: null,
+      used: 340,
+      remaining: null,
+      isGlimdown: true,
+    });
+
+    await render(<template><UsageCard @billing={{billing}} /></template>);
+
+    assert.dom('[data-test-glimdown-usage]').containsText('340 glimdown links shortened this month');
+    assert.dom('section').containsText('Not metered');
+    assert.dom('[role="progressbar"]').doesNotExist();
+    assert.dom('a[href="/pricing"]').doesNotExist();
+  });
 });

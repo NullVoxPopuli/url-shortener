@@ -43,7 +43,13 @@ export const UsageCard: TOC<Signature> = <template>
   <section class="dashboard-card surface">
     <h2>Usage</h2>
 
-    {{#if (isUnlimited @billing)}}
+    {{#if @billing.isGlimdown}}
+      <p class="stat" data-test-glimdown-usage>
+        <span class="stat-number">{{@billing.usage.used}}</span>
+        glimdown links shortened this month
+      </p>
+      <p class="muted">Not metered. They never count against a plan.</p>
+    {{else if (isUnlimited @billing)}}
       <p class="stat">
         <span class="stat-number">{{@billing.usage.used}}</span>
         links created this month

@@ -15,6 +15,7 @@ import {
   planForKey,
 } from '#services/plans';
 import { overagesFor } from '#services/downgrade_overages';
+import { glimdownOwner } from '#consts';
 
 function mustBeAccountAdmin(params: { userId: string; account: Account }) {
   const { userId, account } = params;
@@ -126,6 +127,12 @@ export async function billingStatus(context: HttpContext) {
       id: account.id,
       attributes: {
         isFree: account.isFree,
+        /**
+         * The shared account that owns the links anyone shortens to
+         * glimdown.com or repl.nvp.gg without signing in. Free and
+         * unmetered by design, not a grandfathered customer.
+         */
+        isGlimdown: account.id === glimdownOwner.id,
         hasActiveSubscription: account.hasActiveSubscription,
         stripe: {
           customerId: account.stripeCustomerId,

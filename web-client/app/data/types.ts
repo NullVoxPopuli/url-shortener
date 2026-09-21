@@ -41,6 +41,11 @@ export interface Overage {
 export interface BillingStatus {
   id: string;
   isFree: boolean;
+  /**
+   * The shared account behind glimdown.com and repl.nvp.gg links,
+   * which anyone shortens without signing in.
+   */
+  isGlimdown: boolean;
   hasActiveSubscription: boolean;
   stripe: {
     customerId: string | null;
