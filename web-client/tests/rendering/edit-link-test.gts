@@ -44,6 +44,7 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
 
     assert.dom('input[name="original"]').hasValue('https://example.com/old');
     assert.dom('input[name="expiresAt"]').hasValue('');
+    assert.dom('[data-test-clear-expires]').doesNotExist();
 
     await fillIn('input[name="original"]', 'https://example.com/new');
     await click('button[type="submit"]');
@@ -76,7 +77,7 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
     assert.verifySteps(['{"expiresAt":"2026-12-31T23:59:59.000Z"}']);
   });
 
-  test('clearing the date sends null', async function (assert) {
+  test('the Clear button empties the date and sends null', async function (assert) {
     const link = makeLink({ expiresAt: '2026-10-01T23:59:59.000Z' });
     const onSave = (changes: LinkChanges) => assert.step(JSON.stringify(changes));
     const onCancel = () => assert.step('cancel');
@@ -93,7 +94,13 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
       </template>
     );
 
-    await fillIn('input[name="expiresAt"]', '');
+    assert.dom('[data-test-clear-expires]').exists();
+
+    await click('[data-test-clear-expires]');
+
+    assert.dom('input[name="expiresAt"]').hasValue('');
+    assert.dom('[data-test-clear-expires]').doesNotExist();
+
     await click('button[type="submit"]');
 
     assert.verifySteps(['{"expiresAt":null}']);

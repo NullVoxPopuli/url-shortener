@@ -1,4 +1,5 @@
 import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
 import { on } from '@ember/modifier';
 
 import { Button } from 'nvp.ui';
@@ -39,9 +40,15 @@ interface Signature {
 }
 
 export class EditLinkForm extends Component<Signature> {
-  get expiresValue() {
-    return toDateInputValue(this.args.link.expiresAt);
-  }
+  @tracked expiresValue = toDateInputValue(this.args.link.expiresAt);
+
+  updateExpires = (event: Event) => {
+    this.expiresValue = (event.target as HTMLInputElement).value;
+  };
+
+  clearExpires = () => {
+    this.expiresValue = '';
+  };
 
   submit = (event: SubmitEvent) => {
     event.preventDefault();
@@ -80,19 +87,31 @@ export class EditLinkForm extends Component<Signature> {
       </label>
 
       {{#if @canSetExpiration}}
-        <label>
-          <span>Expires</span>
-          <input name="expiresAt" type="date" value={{this.expiresValue}}>
-        </label>
+        <div class="expires-field">
+          <label>
+            <span>Expires</span>
+            <input
+              name="expiresAt"
+              type="date"
+              value={{this.expiresValue}}
+              {{on "input" this.updateExpires}}
+            >
+          </label>
+          {{#if this.expiresValue}}
+            <Button type="button" @variant="bare" @onClick={{this.clearExpires}} data-test-clear-expires>
+              Clear
+            </Button>
+          {{/if}}
+        </div>
       {{/if}}
 
       <div class="edit-link-actions">
         <Button type="submit" @variant="primary" @disabled={{if @isSaving "Saving..."}}>
           Save
         </Button>
-        <button type="button" class="cancel-button" {{on "click" @onCancel}}>
+        <Button type="button" @variant="secondary" @onClick={{@onCancel}}>
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
 
@@ -124,19 +143,20 @@ export class EditLinkForm extends Component<Signature> {
         color: var(--color-text);
       }
 
+      .expires-field {
+        display: flex;
+        gap: var(--gap-2);
+        align-items: end;
+      }
+
+      .expires-field label {
+        flex: 1;
+      }
+
       .edit-link-actions {
         display: flex;
         gap: var(--gap-2);
         align-items: center;
-      }
-
-      .cancel-button {
-        background: none;
-        border: var(--border-width) var(--border-style) var(--border-color);
-        border-radius: var(--radius);
-        padding: var(--padding-1) var(--padding-2);
-        cursor: pointer;
-        color: var(--color-text);
       }
     </style>
   </template>
