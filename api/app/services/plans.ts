@@ -24,14 +24,14 @@ export const PLANS = [
   {
     key: 'base',
     name: 'Base',
-    stripeProductId: 'prod_base_TODO',
+    stripeProductId: isTestingStripe ? 'prod_QIhMrp06GfI1Pu' : 'prod_QpTM9VP83chaev',
     prices: {
       month: {
-        id: isTestingStripe ? 'price_1PS5xgKsGhcICKKYhoMnFNcU' : 'TODO',
+        id: isTestingStripe ? 'price_1PS5xgKsGhcICKKYhoMnFNcU' : 'price_1PxoQ9KsGhcICKKY9K5hYaut',
         amountInCents: 100,
       },
       year: {
-        id: isTestingStripe ? 'price_1PS5yHKsGhcICKKYC4vOaFCf' : 'TODO',
+        id: isTestingStripe ? 'price_1PS5yHKsGhcICKKYC4vOaFCf' : 'price_1PxoQ9KsGhcICKKYIbutsL9G',
         amountInCents: 1100,
       },
     },
@@ -46,14 +46,14 @@ export const PLANS = [
   {
     key: 'essentials',
     name: 'Essentials',
-    stripeProductId: 'prod_essentials_TODO',
+    stripeProductId: isTestingStripe ? 'prod_QIhNOrpP5ckWQh' : 'prod_QpTM9xo9CXXsQt',
     prices: {
       month: {
-        id: isTestingStripe ? 'price_1PS5zAKsGhcICKKYMNHy5VPa' : 'TODO',
+        id: isTestingStripe ? 'price_1PS5zAKsGhcICKKYMNHy5VPa' : 'price_1PxoQBKsGhcICKKYLCo0R5JO',
         amountInCents: 500,
       },
       year: {
-        id: isTestingStripe ? 'price_1PS61FKsGhcICKKY3oeFkER3' : 'TODO',
+        id: isTestingStripe ? 'price_1PS61FKsGhcICKKY3oeFkER3' : 'price_1PxoQBKsGhcICKKYpAI5y722',
         amountInCents: 5500,
       },
     },
@@ -68,14 +68,14 @@ export const PLANS = [
   {
     key: 'pro',
     name: 'Pro',
-    stripeProductId: 'prod_pro_TODO',
+    stripeProductId: isTestingStripe ? 'prod_QIhOO01uHqIoZY' : 'prod_QpTMV26RczbZmq',
     prices: {
       month: {
-        id: isTestingStripe ? 'price_1PS5zaKsGhcICKKYUFzy9Uxk' : 'TODO',
+        id: isTestingStripe ? 'price_1PS5zaKsGhcICKKYUFzy9Uxk' : 'price_1PxoQEKsGhcICKKYRQmAkFoO',
         amountInCents: 1500,
       },
       year: {
-        id: isTestingStripe ? 'price_1PS61aKsGhcICKKYHCoAomIs' : 'TODO',
+        id: isTestingStripe ? 'price_1PS61aKsGhcICKKYHCoAomIs' : 'price_1PxoQEKsGhcICKKYCv57yPoZ',
         amountInCents: 16500,
       },
     },
@@ -90,14 +90,14 @@ export const PLANS = [
   {
     key: 'vast',
     name: 'Vast',
-    stripeProductId: 'prod_QIhPQZXW4aywu2',
+    stripeProductId: isTestingStripe ? 'prod_QIhPQZXW4aywu2' : 'prod_QpTNivpKSStcaH',
     prices: {
       month: {
-        id: isTestingStripe ? 'price_1PS60rKsGhcICKKYNgDoPVji' : 'TODO',
+        id: isTestingStripe ? 'price_1PS60rKsGhcICKKYNgDoPVji' : 'price_1PxoQGKsGhcICKKYvqMxyEdy',
         amountInCents: 5000,
       },
       year: {
-        id: isTestingStripe ? 'price_1PS62AKsGhcICKKYNMVh8ywd' : 'TODO',
+        id: isTestingStripe ? 'price_1PS62AKsGhcICKKYNMVh8ywd' : 'price_1PxoQGKsGhcICKKY2HCEHoFC',
         amountInCents: 55000,
       },
     },
