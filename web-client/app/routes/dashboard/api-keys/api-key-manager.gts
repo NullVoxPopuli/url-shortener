@@ -4,9 +4,11 @@ import { on } from '@ember/modifier';
 import { service } from '@ember/service';
 
 import { Request } from '@warp-drive/ember';
+import { dataFromEvent } from 'ember-primitives/components/form';
 import { Button } from 'nvp.ui';
 
 import { messageFrom } from '#app/data/errors';
+import { strings, text } from '#app/data/form';
 import { createApiKey, revokeApiKey } from '#app/data/requests';
 
 import ApiKeyTable from './api-key-table.gts';
@@ -16,10 +18,6 @@ import type { Store } from '@warp-drive/core';
 import type { ReactiveDataDocument } from '@warp-drive/core/reactive';
 import type { Future } from '@warp-drive/core/request';
 import type { ApiKey, ApiKeyQuota } from '#app/data/types';
-
-function text(value: FormDataEntryValue | null) {
-  return typeof value === 'string' ? value : '';
-}
 
 interface Signature {
   Args: {
@@ -43,10 +41,10 @@ export default class ApiKeyManager extends Component<Signature> {
     event.preventDefault();
 
     const form = event.currentTarget as HTMLFormElement;
-    const data = new FormData(form);
-    const name = text(data.get('name')).trim();
-    const scopes = data.getAll('scopes').map(String);
-    const expires = text(data.get('expiresInDays'));
+    const data = dataFromEvent(event);
+    const name = text(data.name);
+    const scopes = strings(data.scopes);
+    const expires = text(data.expiresInDays);
 
     if (!name || scopes.length === 0) {
       this.error = 'A name and at least one scope are required.';

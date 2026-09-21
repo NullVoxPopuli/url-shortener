@@ -3,9 +3,11 @@ import { tracked } from '@glimmer/tracking';
 import { on } from '@ember/modifier';
 import { service } from '@ember/service';
 
+import { dataFromEvent } from 'ember-primitives/components/form';
 import { Button } from 'nvp.ui';
 
 import { messageFrom } from '#app/data/errors';
+import { text } from '#app/data/form';
 import { createLink } from '#app/data/requests';
 
 import type { Store } from '@warp-drive/core';
@@ -21,8 +23,7 @@ export class ShortenURLForm extends Component {
     event.preventDefault();
 
     const form = event.currentTarget as HTMLFormElement;
-    const value = new FormData(form).get('url');
-    const url = typeof value === 'string' ? value.trim() : '';
+    const url = text(dataFromEvent(event).url);
 
     if (!url) return;
 

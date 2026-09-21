@@ -5,9 +5,11 @@ import { on } from '@ember/modifier';
 import { service } from '@ember/service';
 
 import { Request } from '@warp-drive/ember';
+import { dataFromEvent } from 'ember-primitives/components/form';
 import { Button } from 'nvp.ui';
 
 import { messageFrom } from '#app/data/errors';
+import { text } from '#app/data/form';
 import { createDomain, deleteDomain } from '#app/data/requests';
 
 import { formatDate } from '../format';
@@ -35,8 +37,7 @@ export default class DomainManager extends Component<Signature> {
     event.preventDefault();
 
     const form = event.currentTarget as HTMLFormElement;
-    const value = new FormData(form).get('hostname');
-    const hostname = typeof value === 'string' ? value.trim() : '';
+    const hostname = text(dataFromEvent(event).hostname);
 
     if (!hostname) return;
 

@@ -5,9 +5,11 @@ import { service } from '@ember/service';
 
 import { cacheKeyFor } from '@warp-drive/core';
 import { Request } from '@warp-drive/ember';
+import { dataFromEvent } from 'ember-primitives/components/form';
 import { Button } from 'nvp.ui';
 
 import { messageFrom } from '#app/data/errors';
+import { text } from '#app/data/form';
 import { createLink, deleteLink, updateLink } from '#app/data/requests';
 
 import { LinksTable } from '../links-table.gts';
@@ -97,12 +99,9 @@ export default class LinkManager extends Component<Signature> {
     event.preventDefault();
 
     const form = event.currentTarget as HTMLFormElement;
-    const formData = new FormData(form);
-    const value = formData.get('url');
-    const url = typeof value === 'string' ? value.trim() : '';
-    const domainValue = formData.get('domain');
-    const domain =
-      typeof domainValue === 'string' && domainValue !== '' ? domainValue : null;
+    const data = dataFromEvent(event);
+    const url = text(data.url);
+    const domain = text(data.domain) || null;
 
     if (!url) return;
 
