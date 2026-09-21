@@ -86,16 +86,6 @@ const SWAGGER_SCHEMAS = {
       },
     },
   },
-  Forbidden: {
-    description: 'Forbidden',
-    content: {
-      [mimeType]: {
-        schema: {
-          $ref: '#/components/schemas/Error',
-        },
-      },
-    },
-  },
   NotFound: {
     description: 'Not Found',
     content: {

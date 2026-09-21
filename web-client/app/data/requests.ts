@@ -4,7 +4,6 @@ import config from '#config';
 
 import type {
   ApiKey,
-  BillingHistory,
   BillingStatus,
   CustomDomain,
   Invitation,
@@ -38,17 +37,6 @@ export function getBillingStatus(accountId?: string) {
     // 'link' is included so link mutations invalidate the cached
     // usage numbers, which are derived from links.
     cacheOptions: { types: ['billing-status', 'link'] },
-  });
-}
-
-export function getBillingHistory(accountId?: string) {
-  return withReactiveResponse<BillingHistory>({
-    url: url('/v1/billing/history', { accountId }),
-    method: 'GET',
-    op: 'query',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-    cacheOptions: { types: ['billing-history', 'billing-status'] },
   });
 }
 

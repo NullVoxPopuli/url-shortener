@@ -6,7 +6,6 @@ import type Account from '#models/account';
 import { accountContext } from '#services/account_context';
 import { stripe } from '#services/stripe';
 import { getOrCreateStripeCustomerIdForAccount } from '#services/stripe_sync';
-import { EMPTY_BILLING_HISTORY, buildBillingHistory } from '#services/stripe_history';
 import { quotaForAccount } from '#services/link_quota';
 import { PLANS } from '#services/plans';
 
@@ -129,40 +128,6 @@ export async function billingStatus(context: HttpContext) {
         },
         lastSyncedAt: account.stripeLastSyncedAt?.toISO() ?? null,
       },
-    },
-  };
-}
-
-/**
- * Everything Stripe knows about this customer: every subscription, every
- * invoice, and a timeline derived from both.
- *
- * Reads live from Stripe. The cached columns on the account only cover the
- * current subscription.
- */
-export async function billingHistory(context: HttpContext) {
-  const { account } = await accountForRequest(context, { admin: true });
-  const customerId = account.stripeCustomerId;
-
-  let history = EMPTY_BILLING_HISTORY;
-
-  if (customerId) {
-    const [subscriptions, invoices] = await Promise.all([
-      stripe.subscriptions.list({ customer: customerId, status: 'all', limit: 100 }),
-      stripe.invoices.list({ customer: customerId, limit: 100 }),
-    ]);
-
-    history = buildBillingHistory({
-      subscriptions: subscriptions.data,
-      invoices: invoices.data,
-    });
-  }
-
-  return {
-    data: {
-      type: 'billing-history',
-      id: account.id,
-      attributes: history,
     },
   };
 }
