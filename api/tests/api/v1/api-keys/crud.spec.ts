@@ -52,10 +52,10 @@ test.group('API keys: management', (group) => {
     assert.strictEqual(response.body().errors[0].title, 'API key limit reached');
   });
 
-  test('side-hobby also has no API keys', async ({ client }) => {
+  test('base also has no API keys', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'side-hobby');
+    await overridePlan(account, 'base');
 
     const response = await createKey(client, user, {
       name: 'CI deploys',
@@ -65,10 +65,10 @@ test.group('API keys: management', (group) => {
     response.assertStatus(402);
   });
 
-  test('hobby gets 1 key; project gets 3', async ({ client }) => {
+  test('essentials gets 1 key; pro gets 3', async ({ client }) => {
     const hobby = await createNewAccount();
 
-    await overridePlan(hobby.account, 'hobby');
+    await overridePlan(hobby.account, 'essentials');
 
     const first = await createKey(client, hobby.user, { name: 'one', scopes: ['links:read'] });
     const second = await createKey(client, hobby.user, { name: 'two', scopes: ['links:read'] });
@@ -78,7 +78,7 @@ test.group('API keys: management', (group) => {
 
     const project = await createNewAccount();
 
-    await overridePlan(project.account, 'project');
+    await overridePlan(project.account, 'pro');
 
     for (const name of ['one', 'two', 'three']) {
       const response = await createKey(client, project.user, {
@@ -100,7 +100,7 @@ test.group('API keys: management', (group) => {
   test('the secret is only in the create response', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'hobby');
+    await overridePlan(account, 'essentials');
 
     const created = await createKey(client, user, {
       name: 'CI deploys',
@@ -129,7 +129,7 @@ test.group('API keys: management', (group) => {
   test('invalid input → 422', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'hobby');
+    await overridePlan(account, 'essentials');
 
     const cases: Record<string, unknown>[] = [
       { scopes: ['links:read'] }, // no name
@@ -152,7 +152,7 @@ test.group('API keys: management', (group) => {
   test('revoking is 404 when there is nothing to revoke', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'hobby');
+    await overridePlan(account, 'essentials');
 
     const created = await createKey(client, user, { name: 'gone', scopes: ['links:read'] });
     const id = created.body().data.id;
@@ -174,8 +174,8 @@ test.group('API keys: management', (group) => {
     const mine = await createNewAccount();
     const other = await createNewAccount();
 
-    await overridePlan(mine.account, 'hobby');
-    await overridePlan(other.account, 'hobby');
+    await overridePlan(mine.account, 'essentials');
+    await overridePlan(other.account, 'essentials');
 
     const created = await createKey(client, mine.user, { name: 'mine', scopes: ['links:read'] });
     const id = created.body().data.id;
@@ -192,7 +192,7 @@ test.group('API keys: management', (group) => {
   test('expired keys do not count against the quota', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'hobby');
+    await overridePlan(account, 'essentials');
 
     const created = await createKey(client, user, {
       name: 'short-lived',
@@ -233,7 +233,7 @@ test.group('API keys: bearer authentication', (group) => {
   test('links:read can list, but not create', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'project');
+    await overridePlan(account, 'pro');
 
     const token = await makeKey(client, user, ['links:read']);
 
@@ -256,7 +256,7 @@ test.group('API keys: bearer authentication', (group) => {
   test('links:write can create and delete', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'project');
+    await overridePlan(account, 'pro');
 
     const token = await makeKey(client, user, ['links:write']);
 
@@ -279,7 +279,7 @@ test.group('API keys: bearer authentication', (group) => {
   test('garbage and revoked keys → 401', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'hobby');
+    await overridePlan(account, 'essentials');
 
     const garbage = await client
       .get(`http://${API_DOMAIN}/v1/links`)
@@ -305,7 +305,7 @@ test.group('API keys: bearer authentication', (group) => {
     const { user, account } = await createNewAccount();
     const other = await createNewAccount();
 
-    await overridePlan(account, 'hobby');
+    await overridePlan(account, 'essentials');
 
     const token = await makeKey(client, user, ['links:read']);
 
@@ -327,7 +327,7 @@ test.group('API keys: bearer authentication', (group) => {
   test('removing the membership revokes its keys', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'hobby');
+    await overridePlan(account, 'essentials');
 
     const token = await makeKey(client, user, ['links:read']);
 

@@ -36,6 +36,7 @@ export function makeBilling(overrides?: {
       subscriptionId: null,
       subscriptionStatus: hasActiveSubscription ? 'active' : null,
       priceId: null,
+      interval: null,
       currentPeriodStart: hasActiveSubscription ? '2026-08-01T00:00:00Z' : null,
       currentPeriodEnd: hasActiveSubscription ? '2026-09-01T00:00:00Z' : null,
       cancelAtPeriodEnd,
@@ -43,7 +44,6 @@ export function makeBilling(overrides?: {
     plan: {
       key: planKey,
       name: planName,
-      priceInCents: 0,
       monthlyLinkLimit,
       linkEditsPerMonth,
       linkExpiration,

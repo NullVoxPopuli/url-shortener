@@ -7,7 +7,7 @@ import { accountContext } from '#services/account_context';
 import { stripe } from '#services/stripe';
 import { getOrCreateStripeCustomerIdForAccount } from '#services/stripe_sync';
 import { editQuotaForAccount, quotaForAccount } from '#services/link_quota';
-import { PLANS } from '#services/plans';
+import { PLANS, billingIntervalFor, isBillingInterval, planForKey } from '#services/plans';
 
 function mustBeAccountAdmin(params: { userId: string; account: Account }) {
   const { userId, account } = params;
@@ -41,9 +41,17 @@ async function accountForRequest(context: HttpContext, options?: { admin?: boole
 
 export async function billingCheckout(context: HttpContext) {
   const { user, account } = await accountForRequest(context, { admin: true });
-  const requestedPlan = context.request.input('plan');
-  const plan = PLANS.find((candidate) => candidate.key === requestedPlan) ?? PLANS[0];
-  const priceId = plan.stripePriceId;
+  const plan = planForKey(context.request.input('plan')) ?? PLANS[0];
+  const requestedInterval = context.request.input('interval', 'month');
+
+  if (!isBillingInterval(requestedInterval)) {
+    throw new JsonApiException(
+      { title: 'Unknown billing interval', detail: 'interval must be "month" or "year"' },
+      { status: 422 }
+    );
+  }
+
+  const priceId = plan.prices[requestedInterval].id;
   const accountShortId = account.id.split('-')[0]!;
   const returnUrl = `${APP_ORIGIN}/${accountShortId}`;
 
@@ -113,6 +121,7 @@ export async function billingStatus(context: HttpContext) {
           subscriptionId: account.stripeSubscriptionId,
           subscriptionStatus: account.stripeSubscriptionStatus,
           priceId: account.stripePriceId,
+          interval: billingIntervalFor(account),
           currentPeriodStart: account.stripeCurrentPeriodStart,
           currentPeriodEnd: account.stripeCurrentPeriodEnd,
           cancelAtPeriodEnd: account.stripeCancelAtPeriodEnd,

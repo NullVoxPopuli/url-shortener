@@ -45,7 +45,7 @@ test.group('Custom domains', (group) => {
   test('hobby plan can add up to 2 domains', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'hobby');
+    await overridePlan(account, 'essentials');
 
     const first = await addDomain(client, user, 'go.example.com');
 
@@ -62,7 +62,7 @@ test.group('Custom domains', (group) => {
   test('invalid + reserved hostnames are rejected', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'hobby');
+    await overridePlan(account, 'essentials');
 
     for (const hostname of [
       'not a hostname',
@@ -80,8 +80,8 @@ test.group('Custom domains', (group) => {
     const a = await createNewAccount();
     const b = await createNewAccount();
 
-    await overridePlan(a.account, 'hobby');
-    await overridePlan(b.account, 'hobby');
+    await overridePlan(a.account, 'essentials');
+    await overridePlan(b.account, 'essentials');
 
     const first = await addDomain(client, a.user, 'taken.example.com');
     const duplicate = await addDomain(client, b.user, 'taken.example.com');
@@ -93,7 +93,7 @@ test.group('Custom domains', (group) => {
   test('links can be created on an owned domain; shortUrl reflects it', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'hobby');
+    await overridePlan(account, 'essentials');
 
     const added = await addDomain(client, user, 'creation.example.com');
 
@@ -115,7 +115,7 @@ test.group('Custom domains', (group) => {
   test('links cannot be created on domains the account does not own', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'hobby');
+    await overridePlan(account, 'essentials');
 
     const response = await postLink(client, user, {
       originalUrl: 'https://emberjs.com',
@@ -129,7 +129,7 @@ test.group('Custom domains', (group) => {
     const { user, account } = await createNewAccount();
     const outsider = await createNewAccount();
 
-    await overridePlan(account, 'hobby');
+    await overridePlan(account, 'essentials');
 
     const created = await addDomain(client, user, 'mine.example.com');
     const id = created.body().data.id;
@@ -156,7 +156,7 @@ test.group('Custom domains', (group) => {
   test('redirects are scoped by host', async ({ client }) => {
     const { user, account } = await createNewAccount();
 
-    await overridePlan(account, 'hobby');
+    await overridePlan(account, 'essentials');
     await addDomain(client, user, 'redirects.example.com');
 
     const onCustom = await createLink(user, account, {

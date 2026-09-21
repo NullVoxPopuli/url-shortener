@@ -22,9 +22,9 @@ test.group('overridePlan', () => {
   test('paid plans set price + active status', async () => {
     const account = makeAccount();
 
-    await overridePlan(account, 'project');
+    await overridePlan(account, 'pro');
 
-    assert.strictEqual(planFor(account).key, 'project');
+    assert.strictEqual(planFor(account).key, 'pro');
     assert.strictEqual(account.stripeSubscriptionStatus, 'active');
     assert.isFalse(account.isFree);
   });

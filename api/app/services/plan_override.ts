@@ -17,7 +17,7 @@ export async function overridePlan(account: Account, planKey: string) {
 
   if (paid) {
     account.isFree = false;
-    account.stripePriceId = paid.stripePriceId;
+    account.stripePriceId = paid.prices.month.id;
     account.stripeSubscriptionStatus = 'active';
   } else if (planKey === FREE_PLAN.key) {
     account.isFree = true;
