@@ -1,5 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http';
-import env from '#start/env';
+import env, { APP_ORIGIN } from '#start/env';
 import { notAuthorized, notFound } from '#exceptions/api_errors';
 import { JsonApiException } from '@evoactivity/jsonapi-adonis';
 import type Account from '#models/account';
@@ -44,6 +44,8 @@ export async function billingCheckout(context: HttpContext) {
   const requestedPlan = context.request.input('plan');
   const plan = PLANS.find((candidate) => candidate.key === requestedPlan) ?? PLANS[0];
   const priceId = plan.stripePriceId;
+  const accountShortId = account.id.split('-')[0]!;
+  const returnUrl = `${APP_ORIGIN}/${accountShortId}`;
 
   if (account.hasActiveSubscription) {
     throw new JsonApiException(
@@ -60,9 +62,7 @@ export async function billingCheckout(context: HttpContext) {
   // the user would land on the cancel URL after paying.
   const successUrl = new URL(env.get('STRIPE_SUCCESS_URL'));
   if (!successUrl.searchParams.has('return_to')) {
-    const url = `https://${env.get('DOMAIN')}/${account.id.split('-')[0]!}`;
-
-    successUrl.searchParams.set('return_to', url);
+    successUrl.searchParams.set('return_to', returnUrl);
   }
 
   const customerId = await getOrCreateStripeCustomerIdForAccount({
@@ -75,7 +75,7 @@ export async function billingCheckout(context: HttpContext) {
     customer: customerId,
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: successUrl.toString(),
-    cancel_url: env.get('STRIPE_CANCEL_URL'),
+    cancel_url: returnUrl,
     // Helps you correlate sessions to your own data when debugging.
     client_reference_id: account.id,
     metadata: {
@@ -140,9 +140,12 @@ export async function billingPortal(context: HttpContext) {
     userId: user.id,
   });
 
+  const accountShortId = account.id.split('-')[0]!;
+  const returnUrl = `${APP_ORIGIN}/${accountShortId}`;
+
   const session = await stripe.billingPortal.sessions.create({
     customer: customerId,
-    return_url: env.get('STRIPE_PORTAL_RETURN_URL'),
+    return_url: returnUrl,
   });
 
   return {

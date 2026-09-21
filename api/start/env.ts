@@ -73,12 +73,6 @@ const env = await Env.create(new URL('../', import.meta.url), {
    * Example: https://api.example.com/v1/billing/success
    */
   STRIPE_SUCCESS_URL: Env.schema.string(),
-
-  /**
-   * Where Stripe Checkout should send users when they cancel.
-   * Example: https://app.example.com/billing
-   */
-  STRIPE_CANCEL_URL: Env.schema.string(),
 });
 
 export default env;

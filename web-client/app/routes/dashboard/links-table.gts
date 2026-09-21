@@ -123,7 +123,7 @@ export const LinksTable: TOC<Signature> = <template>
       </tbody>
     </table>
   {{else}}
-    <p class="muted">No links yet. Create one from the home page.</p>
+    <p class="muted">No links yet.</p>
   {{/if}}
 
   <style scoped>

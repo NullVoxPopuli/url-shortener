@@ -1,5 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http';
-import env from '#start/env';
+import env, { APP_ORIGIN } from '#start/env';
 import { DOMAIN } from '#start/env';
 import Account from '#models/account';
 import { syncStripeDataToAccount } from '#services/stripe_sync';
@@ -38,7 +38,7 @@ export default class BillingController {
    * redirects here), so it always redirects, never renders errors.
    */
   async success({ auth, response, request }: HttpContext) {
-    const fallback = env.get('STRIPE_CANCEL_URL');
+    const fallback = APP_ORIGIN;
     const candidate = request.input('return_to');
     const returnTo = candidate && isSafeRedirect(candidate) ? candidate : fallback;
 
