@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { test } from '@japa/runner';
 import type { ApiClient } from '@japa/api-client';
 import type User from '#models/user';
@@ -24,6 +25,27 @@ test.group('GET [authenticated session]', (group) => {
     response.assertBodyContains({
       data: [],
     });
+  });
+
+  test("another account's link with a future expiration is not listed", async ({
+    client,
+    assert,
+  }) => {
+    let { user, account } = await createNewAccount();
+    let mine = await createLink(user, account);
+    let other = await createNewAccount();
+    await createLink(other.user, other.account, {
+      original: 'https://example.com/theirs',
+      expiresAt: DateTime.utc().plus({ days: 7 }),
+    });
+
+    let response = await get(user, client);
+
+    response.assertStatus(200);
+    assert.deepEqual(
+      response.body().data.map((link: { id: string }) => link.id),
+      [mine.id]
+    );
   });
 
   test('default endpoint returns a list (with data)', async ({ client, assert }) => {

@@ -18,6 +18,8 @@ function hasNoSubscription(billing: BillingStatus) {
 
 const OVERAGE_LABELS: Record<Overage['resource'], string> = {
   links: 'links this month',
+  linkEdits: 'link edits this month',
+  expiringLinks: 'links with an expiration this month',
   customDomains: 'custom domains',
   apiKeys: 'API keys',
   teammates: 'teammates',

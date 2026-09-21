@@ -33,7 +33,7 @@ export interface PlanResource extends Plan {
 }
 
 export interface Overage {
-  resource: 'links' | 'customDomains' | 'apiKeys' | 'teammates';
+  resource: 'links' | 'linkEdits' | 'expiringLinks' | 'customDomains' | 'apiKeys' | 'teammates';
   used: number;
   limit: number;
 }
