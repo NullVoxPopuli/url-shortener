@@ -8,6 +8,8 @@ export const PLANS = [
     customDomains: 0,
     additionalAccounts: 1,
     apiKeys: 0,
+    linkEditsPerMonth: 0,
+    linkExpiration: false,
     stripePriceId: 'price_1U2ILAKsGhcICKKY7PsC0LTW',
   },
   {
@@ -19,6 +21,8 @@ export const PLANS = [
     customDomains: 2,
     additionalAccounts: 2,
     apiKeys: 1,
+    linkEditsPerMonth: 0,
+    linkExpiration: false,
     stripePriceId: 'price_1U2ILPKsGhcICKKY6OLKcW35',
   },
   {
@@ -30,6 +34,8 @@ export const PLANS = [
     customDomains: 3,
     additionalAccounts: 3,
     apiKeys: 3,
+    linkEditsPerMonth: 50,
+    linkExpiration: true,
     stripePriceId: 'price_1U2ILeKsGhcICKKYQFVqMsbn',
   },
 ] as const;
@@ -45,6 +51,8 @@ export const NO_SUBSCRIPTION_PLAN = {
   customDomains: 0,
   additionalAccounts: 0,
   apiKeys: 0,
+  linkEditsPerMonth: 0,
+  linkExpiration: false,
 } as const;
 
 /**
@@ -59,6 +67,8 @@ export const FREE_PLAN = {
   customDomains: null,
   additionalAccounts: null,
   apiKeys: null,
+  linkEditsPerMonth: null,
+  linkExpiration: true,
 } as const;
 
 export function planForPriceId(priceId: string | null) {

@@ -107,6 +107,40 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
           "Deletes one of the account's links. 404 when there is nothing to delete. Accepts an API key with the `links:write` scope.",
         security: [{ apiKey: [] }],
       },
+      patch: {
+        summary: 'Edit link',
+        description:
+          "Changes the link's destination (`original`) and / or its expiration (`expiresAt`, ISO 8601 or null to clear). Accepts an API key with the `links:write` scope. Every change spends one of the plan's monthly link edits (402 when none remain), and `expiresAt` needs a plan that includes link expiration (402 otherwise).",
+        security: [{ apiKey: [] }],
+        parameters: [dynamicSegment('id'), accountParam, includeParam('ownedBy,createdBy')],
+        responses: {
+          200: {
+            description: 'OK',
+            content: {
+              [mimeType]: {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { $ref: jsonapiRef('definitions/resource') },
+                  },
+                  example: {
+                    data: {
+                      type: 'link',
+                      id: 'link-uuid',
+                      attributes: {
+                        original: 'https://example.com/new-destination',
+                        expiresAt: '2027-01-01T00:00:00.000Z',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: componentSchemaRef('Unauthenticated'),
+          404: componentSchemaRef('NotFound'),
+        },
+      },
     },
     '/v1/links/{id}/visits': {
       get: {

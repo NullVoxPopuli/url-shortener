@@ -6,7 +6,7 @@ import type Account from '#models/account';
 import { accountContext } from '#services/account_context';
 import { stripe } from '#services/stripe';
 import { getOrCreateStripeCustomerIdForAccount } from '#services/stripe_sync';
-import { quotaForAccount } from '#services/link_quota';
+import { editQuotaForAccount, quotaForAccount } from '#services/link_quota';
 import { PLANS } from '#services/plans';
 
 function mustBeAccountAdmin(params: { userId: string; account: Account }) {
@@ -96,7 +96,10 @@ export async function billingCheckout(context: HttpContext) {
 
 export async function billingStatus(context: HttpContext) {
   const { account } = await accountForRequest(context);
-  const quota = await quotaForAccount(account);
+  const [quota, edits] = await Promise.all([
+    quotaForAccount(account),
+    editQuotaForAccount(account),
+  ]);
 
   return {
     data: {
@@ -120,6 +123,8 @@ export async function billingStatus(context: HttpContext) {
           remaining: quota.remaining,
           periodStart: quota.periodStart,
           periodEnd: quota.periodEnd,
+          editsUsed: edits.used,
+          editsRemaining: edits.remaining,
         },
         availablePlans: PLANS.map((plan) => ({ ...plan })),
         paymentMethod: {

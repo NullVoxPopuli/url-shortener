@@ -3,6 +3,7 @@ import { action } from '../base.js';
 import { createLink } from './actions/create.js';
 import { deleteLink } from './actions/delete.js';
 import { showLink } from './actions/show.js';
+import { updateLink } from './actions/update.js';
 import { listLinks } from './actions/list.js';
 import { listVisits } from './actions/visits.js';
 
@@ -37,6 +38,14 @@ export default class LinksController {
    */
   async delete(context: HttpContext) {
     return action(context, deleteLink);
+  }
+
+  /**
+   * @update
+   * @description change a link's destination or expiration
+   */
+  async update(context: HttpContext) {
+    return action(context, updateLink);
   }
 
   /**

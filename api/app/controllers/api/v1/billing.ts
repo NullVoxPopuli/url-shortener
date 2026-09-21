@@ -1,5 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http';
-import env, { APP_ORIGIN } from '#start/env';
+import { APP_ORIGIN } from '#start/env';
 import { DOMAIN } from '#start/env';
 import Account from '#models/account';
 import { syncStripeDataToAccount } from '#services/stripe_sync';

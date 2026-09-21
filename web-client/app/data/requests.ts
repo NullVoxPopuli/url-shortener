@@ -81,6 +81,23 @@ export function createLink(
   });
 }
 
+export function updateLink(
+  id: string,
+  changes: { original?: string; expiresAt?: string | null },
+  accountId?: string
+) {
+  return withReactiveResponse<Link>({
+    url: url(`/v1/links/${id}`, { accountId, include: 'ownedBy,createdBy' }),
+    method: 'PATCH',
+    op: 'updateRecord',
+    credentials: 'include',
+    headers: jsonapiHeaders(),
+    body: JSON.stringify({
+      data: { type: 'link', id, attributes: changes },
+    }),
+  });
+}
+
 export function getMemberships(accountId: string) {
   return withReactiveResponse<Membership[]>({
     url: url(`/v1/accounts/${accountId}/memberships`, { include: 'user,account.admin' }),

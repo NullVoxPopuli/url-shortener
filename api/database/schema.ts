@@ -162,6 +162,25 @@ export class CustomLinkSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class LinkEditSchema extends BaseModel {
+  static $columns = ['accountId', 'createdAt', 'editedBy', 'id', 'linkId', 'previousExpiresAt', 'previousOriginal'] as const
+  $columns = LinkEditSchema.$columns
+  @column()
+  declare accountId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare editedBy: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare linkId: string
+  @column.dateTime()
+  declare previousExpiresAt: DateTime | null
+  @column()
+  declare previousOriginal: string
+}
+
 export class LinkVisitSchema extends BaseModel {
   static $columns = ['id', 'linkId', 'referrer', 'userAgent', 'visitedAt'] as const
   $columns = LinkVisitSchema.$columns
