@@ -25,9 +25,6 @@ function toExpiresAt(dateInputValue: string) {
   return dateInputValue ? `${dateInputValue}T23:59:59.000Z` : null;
 }
 
-function inputValue(event: Event) {
-  return (event.target as HTMLInputElement).value;
-}
 
 /**
  * The fields on the editable copy that differ from the saved record.
@@ -73,12 +70,24 @@ export class EditLinkForm extends Component<Signature> {
     return toDateInputValue(this.editable?.expiresAt ?? null);
   }
 
-  setOriginal = (event: Event) => {
-    if (this.editable) this.editable.original = inputValue(event).trim();
-  };
+  /**
+   * One listener on the form; the input's name says which field.
+   */
+  onInput = (event: Event) => {
+    const input = event.target as HTMLInputElement;
 
-  setExpires = (event: Event) => {
-    if (this.editable) this.editable.expiresAt = toExpiresAt(inputValue(event));
+    if (!this.editable) return;
+
+    switch (input.name) {
+      case 'original':
+        this.editable.original = input.value.trim();
+
+        break;
+      case 'expiresAt':
+        this.editable.expiresAt = toExpiresAt(input.value);
+
+        break;
+    }
   };
 
   clearExpires = () => {
@@ -103,28 +112,21 @@ export class EditLinkForm extends Component<Signature> {
 
   <template>
     {{#if this.editable}}
-      <form class="edit-link-form" {{on "submit" this.submit}}>
+      <form
+        class="edit-link-form"
+        {{on "submit" this.submit}}
+        {{on "input" this.onInput}}
+      >
         <label>
           <span>Destination</span>
-          <input
-            name="original"
-            type="url"
-            required
-            value={{this.editable.original}}
-            {{on "input" this.setOriginal}}
-          >
+          <input name="original" type="url" required value={{this.editable.original}}>
         </label>
 
         {{#if @canSetExpiration}}
           <div class="expires-field">
             <label>
               <span>Expires</span>
-              <input
-                name="expiresAt"
-                type="date"
-                value={{this.expiresValue}}
-                {{on "input" this.setExpires}}
-              >
+              <input name="expiresAt" type="date" value={{this.expiresValue}}>
             </label>
             {{#if this.editable.expiresAt}}
               <Button
