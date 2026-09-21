@@ -147,7 +147,8 @@ export function createLink(
  * cache tracked as changed on it.
  */
 export function updateLink(store: Store, editable: Link, accountId?: string) {
-  const init = scoped(updateRecord(editable), accountId);
+  // the api routes PATCH; the builder sends PUT unless told otherwise
+  const init = scoped(updateRecord(editable, { patch: true }), accountId);
 
   init.url += `${init.url.includes('?') ? '&' : '?'}include=ownedBy,createdBy`;
 
