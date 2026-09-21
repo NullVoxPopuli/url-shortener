@@ -8,6 +8,7 @@ export const SCHEMAS = [
       { kind: 'field', name: 'hasActiveSubscription' },
       { kind: 'object', name: 'stripe' },
       { kind: 'object', name: 'plan' },
+      { kind: 'object', name: 'pendingDowngrade' },
       { kind: 'object', name: 'usage' },
       { kind: 'object', name: 'paymentMethod' },
       { kind: 'field', name: 'lastSyncedAt' },

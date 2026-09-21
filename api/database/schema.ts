@@ -46,7 +46,7 @@ export class AccountMembershipSchema extends BaseModel {
 }
 
 export class AccountSchema extends BaseModel {
-  static $columns = ['adminId', 'createdAt', 'id', 'isFree', 'isPersonal', 'name', 'stripeCancelAtPeriodEnd', 'stripeCurrentPeriodEnd', 'stripeCurrentPeriodStart', 'stripeCustomerId', 'stripeLastSyncedAt', 'stripePaymentMethodBrand', 'stripePaymentMethodLast4', 'stripePriceId', 'stripeSubscriptionId', 'stripeSubscriptionStatus', 'updatedAt'] as const
+  static $columns = ['adminId', 'createdAt', 'id', 'isFree', 'isPersonal', 'name', 'stripeCancelAtPeriodEnd', 'stripeCurrentPeriodEnd', 'stripeCurrentPeriodStart', 'stripeCustomerId', 'stripeLastSyncedAt', 'stripePaymentMethodBrand', 'stripePaymentMethodLast4', 'stripePendingAt', 'stripePendingPriceId', 'stripePriceId', 'stripeSubscriptionId', 'stripeSubscriptionStatus', 'updatedAt'] as const
   $columns = AccountSchema.$columns
   @column()
   declare adminId: string | null
@@ -74,6 +74,10 @@ export class AccountSchema extends BaseModel {
   declare stripePaymentMethodBrand: string | null
   @column()
   declare stripePaymentMethodLast4: string | null
+  @column()
+  declare stripePendingAt: bigint | number | null
+  @column()
+  declare stripePendingPriceId: string | null
   @column()
   declare stripePriceId: string | null
   @column()

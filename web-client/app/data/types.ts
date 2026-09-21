@@ -45,8 +45,18 @@ export interface BillingStatus {
     currentPeriodStart: string | null;
     currentPeriodEnd: string | null;
     cancelAtPeriodEnd: boolean;
+    pendingPriceId: string | null;
+    pendingAt: number | null;
   };
   plan: Plan;
+  /**
+   * A scheduled downgrade. The account keeps `plan` until `at`.
+   * Upgrades apply at once.
+   */
+  pendingDowngrade: {
+    plan: Plan;
+    at: number | null;
+  } | null;
   usage: {
     used: number;
     remaining: number | null;

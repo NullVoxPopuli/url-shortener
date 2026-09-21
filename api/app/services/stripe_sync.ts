@@ -11,6 +11,8 @@ export type StripeSubCache =
       currentPeriodStart: number | null;
       currentPeriodEnd: number | null;
       cancelAtPeriodEnd: boolean;
+      pendingPriceId: string | null;
+      pendingAt: number | null;
       paymentMethod: {
         brand: string | null;
         last4: string | null;
@@ -94,7 +96,7 @@ export async function syncStripeDataToAccount(account: Account): Promise<StripeS
     customer: customerId,
     limit: 1,
     status: 'all',
-    expand: ['data.default_payment_method'],
+    expand: ['data.default_payment_method', 'data.schedule'],
   });
 
   // No subscription: clear all fields.
@@ -105,6 +107,8 @@ export async function syncStripeDataToAccount(account: Account): Promise<StripeS
     account.stripeCurrentPeriodStart = null;
     account.stripeCurrentPeriodEnd = null;
     account.stripeCancelAtPeriodEnd = null;
+    account.stripePendingPriceId = null;
+    account.stripePendingAt = null;
     account.stripePaymentMethodBrand = null;
     account.stripePaymentMethodLast4 = null;
     account.stripeLastSyncedAt = DateTime.utc();
@@ -126,10 +130,14 @@ export async function syncStripeDataToAccount(account: Account): Promise<StripeS
         }
       : null;
 
+  const pending = pendingPhaseChange(subscription, priceId);
+
   const subData: StripeSubCache = {
     subscriptionId: subscription.id,
     status: subscription.status,
     priceId,
+    pendingPriceId: pending?.priceId ?? null,
+    pendingAt: pending?.at ?? null,
     currentPeriodStart: item?.current_period_start ?? null,
     currentPeriodEnd: item?.current_period_end ?? null,
     // The portal can schedule a cancellation as a `cancel_at` date
@@ -144,6 +152,8 @@ export async function syncStripeDataToAccount(account: Account): Promise<StripeS
   account.stripeCurrentPeriodStart = subData.currentPeriodStart;
   account.stripeCurrentPeriodEnd = subData.currentPeriodEnd;
   account.stripeCancelAtPeriodEnd = subData.cancelAtPeriodEnd;
+  account.stripePendingPriceId = subData.pendingPriceId;
+  account.stripePendingAt = subData.pendingAt;
   account.stripePaymentMethodBrand = subData.paymentMethod?.brand ?? null;
   account.stripePaymentMethodLast4 = subData.paymentMethod?.last4 ?? null;
   account.stripeLastSyncedAt = DateTime.utc();
@@ -151,4 +161,35 @@ export async function syncStripeDataToAccount(account: Account): Promise<StripeS
   await account.save();
 
   return subData;
+}
+
+function idOf(value: string | { id: string } | null | undefined): string | null {
+  if (!value) return null;
+
+  return typeof value === 'string' ? value : value.id;
+}
+
+/**
+ * A plan change scheduled for later lives on a subscription schedule:
+ * the subscription's items stay on the current price until the next
+ * phase starts. This finds that next phase, when its price differs.
+ */
+function pendingPhaseChange(subscription: Stripe.Subscription, currentPriceId: string | null) {
+  const schedule = subscription.schedule;
+
+  if (!schedule || typeof schedule === 'string') return null;
+
+  const now = Math.floor(Date.now() / 1000);
+  const upcoming = schedule.phases
+    .filter((phase) => phase.start_date > now)
+    .sort((a, b) => a.start_date - b.start_date);
+  const next = upcoming[0];
+
+  if (!next) return null;
+
+  const priceId = idOf(next.items[0]?.price);
+
+  if (!priceId || priceId === currentPriceId) return null;
+
+  return { priceId, at: next.start_date };
 }

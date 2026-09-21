@@ -4,6 +4,7 @@ import {
   PLANS,
   billingIntervalFor,
   intervalForPriceId,
+  pendingDowngradeFor,
   planFor,
   planForPriceId,
 } from '#services/plans';
@@ -40,5 +41,34 @@ test.group('plans', () => {
   test('accounts without a paid price have no interval', () => {
     assert.isNull(billingIntervalFor({ isFree: true, stripePriceId: null }));
     assert.isNull(billingIntervalFor({ isFree: false, stripePriceId: null }));
+  });
+
+  test('a pending price on another plan is a downgrade', () => {
+    const onPro = {
+      isFree: false,
+      stripePriceId: PLANS[2].prices.month.id,
+      stripePendingPriceId: PLANS[0].prices.year.id,
+      stripePendingAt: 123,
+    };
+
+    assert.deepEqual(pendingDowngradeFor(onPro), { plan: PLANS[0], at: 123 });
+  });
+
+  test('no pending downgrade without a pending price, or when it is the same plan', () => {
+    const account = {
+      isFree: false,
+      stripePriceId: PLANS[2].prices.month.id,
+      stripePendingPriceId: null,
+      stripePendingAt: null,
+    };
+
+    assert.isNull(pendingDowngradeFor(account));
+    assert.isNull(
+      pendingDowngradeFor({
+        ...account,
+        stripePendingPriceId: PLANS[2].prices.year.id,
+        stripePendingAt: 1,
+      })
+    );
   });
 });

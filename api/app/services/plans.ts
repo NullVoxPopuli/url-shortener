@@ -184,3 +184,27 @@ export function billingIntervalFor(account: PlanHolder): BillingInterval | null 
 
   return plan ? intervalForPriceId(plan, account.stripePriceId) : null;
 }
+
+export interface PendingDowngrade {
+  plan: Plan;
+  /** unix seconds, when Stripe switches the subscription */
+  at: number | null;
+}
+
+interface PendingDowngradeHolder extends PlanHolder {
+  stripePendingPriceId: string | null;
+  stripePendingAt: number | null;
+}
+
+/**
+ * The plan change Stripe has scheduled, if any. Upgrades apply at once,
+ * so a scheduled change is a downgrade, and the account keeps its
+ * current plan until `at`.
+ */
+export function pendingDowngradeFor(account: PendingDowngradeHolder): PendingDowngrade | null {
+  const pending = planForPriceId(account.stripePendingPriceId);
+
+  if (!pending || pending.key === planFor(account).key) return null;
+
+  return { plan: pending, at: account.stripePendingAt };
+}
