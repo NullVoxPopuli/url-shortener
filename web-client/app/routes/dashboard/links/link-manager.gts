@@ -1,15 +1,15 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { array, fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 import { service } from '@ember/service';
 
 import { cacheKeyFor } from '@warp-drive/core';
 import { Request } from '@warp-drive/ember';
-import { serializePatch } from '@warp-drive/utilities/json-api';
+import { dataFromEvent } from 'ember-primitives/components/form';
 import { Button } from 'nvp.ui';
 
 import { messageFrom } from '#app/data/errors';
+import { text } from '#app/data/form';
 import { createLink, deleteLink, updateLink } from '#app/data/requests';
 
 import { LinksTable } from '../links-table.gts';
@@ -53,10 +53,9 @@ export default class LinkManager extends Component<Signature> {
   @tracked editingId: string | null = null;
 
   /**
-   * Built in the template so `save` can reach the refresh functions.
    * Reading `editingId` here makes the table re-render on change.
    */
-  editingFor = (refresh: Array<() => Promise<void>>, billing: BillingStatus): LinkEditing => ({
+  editingFor = (billing: BillingStatus): LinkEditing => ({
     id: this.editingId,
     remaining: billing.usage.editsRemaining,
     canSetExpiration: billing.plan.linkExpiration,
@@ -67,14 +66,13 @@ export default class LinkManager extends Component<Signature> {
     cancel: () => {
       this.editingId = null;
     },
-    save: (link: Link, editable: Link) => this.edit(refresh, link, editable),
+    save: (link: Link, editable: Link) => this.edit(link, editable),
   });
 
-  edit = async (refresh: Array<() => Promise<void>>, link: Link, editable: Link) => {
-    // The patch holds only what the checkout changed.
-    const patch = serializePatch(this.store.cache, cacheKeyFor(editable));
+  edit = async (link: Link, editable: Link) => {
+    const changed = this.store.cache.changedAttrs(cacheKeyFor(editable));
 
-    if (!patch.data.attributes) {
+    if (Object.keys(changed).length === 0) {
       this.editingId = null;
 
       return;
@@ -84,8 +82,7 @@ export default class LinkManager extends Component<Signature> {
     this.error = null;
 
     try {
-      await this.store.request(updateLink(link.id, patch, this.args.accountId));
-      await Promise.all(refresh.map((fn) => fn()));
+      await this.store.request(updateLink(this.store, editable, this.args.accountId));
       this.editingId = null;
     } catch (error) {
       this.error = messageFrom(error);
@@ -95,20 +92,16 @@ export default class LinkManager extends Component<Signature> {
   };
 
   /**
-   * Refreshing both requests keeps the table and the quota numbers in
-   * sync after a mutation. The refresh functions come from the
-   * <Request> components' content features.
+   * Mutations invalidate the link and billing queries, and the
+   * <Request> components reload them.
    */
-  create = async (refresh: Array<() => Promise<void>>, event: SubmitEvent) => {
+  create = async (event: SubmitEvent) => {
     event.preventDefault();
 
     const form = event.currentTarget as HTMLFormElement;
-    const formData = new FormData(form);
-    const value = formData.get('url');
-    const url = typeof value === 'string' ? value.trim() : '';
-    const domainValue = formData.get('domain');
-    const domain =
-      typeof domainValue === 'string' && domainValue !== '' ? domainValue : null;
+    const data = dataFromEvent(event);
+    const url = text(data.url);
+    const domain = text(data.domain) || null;
 
     if (!url) return;
 
@@ -116,8 +109,7 @@ export default class LinkManager extends Component<Signature> {
     this.error = null;
 
     try {
-      await this.store.request(createLink(url, domain, this.args.accountId));
-      await Promise.all(refresh.map((fn) => fn()));
+      await this.store.request(createLink(this.store, { original: url, domain }, this.args.accountId));
       form.reset();
     } catch (error) {
       this.error = messageFrom(error);
@@ -126,7 +118,7 @@ export default class LinkManager extends Component<Signature> {
     }
   };
 
-  delete = async (refresh: Array<() => Promise<void>>, link: Link) => {
+  delete = async (link: Link) => {
     if (!window.confirm(`Delete ${link.shortUrl}? This cannot be undone.`)) {
       return;
     }
@@ -135,8 +127,7 @@ export default class LinkManager extends Component<Signature> {
     this.error = null;
 
     try {
-      await this.store.request(deleteLink(link.id, this.args.accountId));
-      await Promise.all(refresh.map((fn) => fn()));
+      await this.store.request(deleteLink(link, this.args.accountId));
     } catch (error) {
       this.error = messageFrom(error);
     } finally {
@@ -148,7 +139,7 @@ export default class LinkManager extends Component<Signature> {
     <div class="page-shell">
       <h1>Links</h1>
 
-      <Request @request={{@billing}}>
+      <Request @request={{@billing}} @autorefresh="invalid">
         <:loading>
           <p class="muted">Loading…</p>
         </:loading>
@@ -158,8 +149,8 @@ export default class LinkManager extends Component<Signature> {
             again.</p>
         </:error>
 
-        <:content as |billingDoc billingState|>
-          <Request @request={{@links}}>
+        <:content as |billingDoc|>
+          <Request @request={{@links}} @autorefresh="invalid">
             <:loading>
               <p class="muted">Loading your links…</p>
             </:loading>
@@ -170,11 +161,7 @@ export default class LinkManager extends Component<Signature> {
               <p class="warning">{{errorMessage error}}</p>
             </:error>
 
-            <:content as |linksDoc linksState|>
-              {{#let
-                (array billingState.refresh linksState.refresh)
-                as |refresh|
-              }}
+            <:content as |linksDoc|>
                 <section class="page-card surface">
                   <h2>Create a link</h2>
 
@@ -186,7 +173,7 @@ export default class LinkManager extends Component<Signature> {
                   {{else}}
                     <form
                       class="create-form"
-                      {{on "submit" (fn this.create refresh)}}
+                      {{on "submit" this.create}}
                     >
                       <label>
                         <span class="visually-hidden">Long URL</span>
@@ -196,7 +183,7 @@ export default class LinkManager extends Component<Signature> {
                           required
                         >
                       </label>
-                      <Request @request={{@domains}}>
+                      <Request @request={{@domains}} @autorefresh="invalid">
                         <:content as |domainsDoc|>
                           {{#if domainsDoc.data.length}}
                             <label>
@@ -251,12 +238,11 @@ export default class LinkManager extends Component<Signature> {
                   <LinksTable
                     @links={{linksDoc.data}}
                     @watermark={{isWatermarked billingDoc.data}}
-                    @onDelete={{fn this.delete refresh}}
+                    @onDelete={{this.delete}}
                     @isDeleting={{this.isWorking}}
-                    @editing={{this.editingFor refresh billingDoc.data}}
+                    @editing={{this.editingFor billingDoc.data}}
                   />
                 </section>
-              {{/let}}
             </:content>
           </Request>
         </:content>

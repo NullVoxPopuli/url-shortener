@@ -27,7 +27,7 @@ const Dashboard: TOC<Signature> = <template>
   <div class="dashboard-shell">
       <h1>Dashboard</h1>
 
-      <Request @request={{@billing}}>
+      <Request @request={{@billing}} @autorefresh="invalid">
         <:loading>
           <p class="muted">Loading your subscription…</p>
         </:loading>
@@ -46,7 +46,7 @@ const Dashboard: TOC<Signature> = <template>
           <section class="dashboard-card surface">
             <h2>Your links</h2>
 
-            <Request @request={{@links}}>
+            <Request @request={{@links}} @autorefresh="invalid">
               <:loading>
                 <p class="muted">Loading your links…</p>
               </:loading>

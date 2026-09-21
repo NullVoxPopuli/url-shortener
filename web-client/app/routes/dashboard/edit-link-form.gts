@@ -7,6 +7,8 @@ import { dataFromEvent } from 'ember-primitives/components/form';
 import { Button } from 'nvp.ui';
 import { getPromiseState } from 'reactiveweb/get-promise-state';
 
+import { text } from '#app/data/form';
+
 import type { Link } from '#app/data/types';
 
 /**
@@ -26,10 +28,6 @@ function toExpiresAt(value: unknown) {
   if (typeof value === 'string' && value) return `${value}T23:59:59.000Z`;
 
   return null;
-}
-
-function text(value: unknown) {
-  return typeof value === 'string' ? value.trim() : '';
 }
 
 interface Signature {

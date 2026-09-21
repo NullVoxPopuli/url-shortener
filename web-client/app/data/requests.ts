@@ -1,7 +1,17 @@
+import { cacheKeyFor } from '@warp-drive/core';
 import { withReactiveResponse } from '@warp-drive/core/request';
+import {
+  createRecord,
+  deleteRecord,
+  postQuery,
+  query,
+  serializePatch,
+  serializeResources,
+  updateRecord,
+} from '@warp-drive/utilities/json-api';
 
-import config from '#config';
-
+import type { Store } from '@warp-drive/core';
+import type { RequestInfo } from '@warp-drive/core/types/request';
 import type {
   ApiKey,
   BillingStatus,
@@ -12,231 +22,249 @@ import type {
   PlanResource,
 } from '#app/data/types';
 
-function url(path: string, params: Record<string, string | undefined>) {
-  const qs = Object.entries(params)
-    .filter(([, value]) => value)
-    .map(([key, value]) => `${key}=${value}`)
-    .join('&');
-
-  return `${config.apiOrigin}${path}${qs ? `?${qs}` : ''}`;
+/**
+ * The api scopes a request to an account with `?accountId=`; without
+ * it, the caller's personal account. The builders leave it out of
+ * mutation URLs, so it is appended here.
+ */
+interface Init {
+  url: string;
+  headers?: Headers;
+  body?: unknown;
+  cacheOptions?: object;
 }
 
-function jsonapiHeaders() {
-  return new Headers({
-    Accept: 'application/vnd.api+json',
-    'Content-Type': 'application/vnd.api+json',
-  });
+function scoped<T extends Init>(init: T, accountId?: string): T {
+  if (!accountId) return init;
+
+  const url = new URL(init.url);
+
+  url.searchParams.set('accountId', accountId);
+  init.url = url.toString();
+
+  return init;
 }
+
+/**
+ * Query params with undefined values left out; the builder would
+ * serialize them as the string "undefined".
+ */
+function params(source: Record<string, string | undefined>) {
+  return Object.fromEntries(Object.entries(source).filter(([, value]) => value)) as Record<
+    string,
+    string
+  >;
+}
+
+/**
+ * The types a query answers for. A mutation that touches one of them
+ * invalidates the query, and `<Request @autorefresh="invalid">`
+ * reloads it.
+ */
+function answersFor<T extends Init>(init: T, types: string[]): T {
+  init.cacheOptions = { ...init.cacheOptions, types };
+
+  return init;
+}
+
+function jsonBody<T extends Init>(init: T, body: unknown): T {
+  init.headers ??= new Headers();
+  init.headers.set('Content-Type', 'application/vnd.api+json');
+  init.body = JSON.stringify(body);
+
+  return init;
+}
+
+/**
+ * The mutation builders return their own option types, which
+ * `withReactiveResponse` does not accept; at runtime they are request
+ * options.
+ */
+function asRequest(init: Init): RequestInfo {
+  return init as unknown as RequestInfo;
+}
+
+/**
+ * The JSON:API document for a record that has no server id yet. The api
+ * refuses client ids, so the local `id` and `lid` stay out of the body.
+ */
+function newResourceBody(store: Store, record: object) {
+  const { data } = serializeResources(store.cache, cacheKeyFor(record));
+  const resource: Record<string, unknown> = { ...data };
+
+  delete resource.id;
+  delete resource.lid;
+
+  return { data: resource };
+}
+
+// Billing and plans
 
 export function getBillingStatus(accountId?: string) {
-  return withReactiveResponse<BillingStatus>({
-    url: url('/v1/billing/status', { accountId }),
-    method: 'GET',
-    op: 'query',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-    // 'link' is included so link mutations invalidate the cached
-    // usage numbers, which are derived from links.
-    cacheOptions: { types: ['billing-status', 'link'] },
-  });
+  return withReactiveResponse<BillingStatus>(
+    answersFor(
+      query('billing-status', params({ accountId }), { resourcePath: 'billing/status' }),
+      // 'link' too: link mutations change the usage numbers
+      ['billing-status', 'link']
+    )
+  );
 }
 
 /**
  * Public: no session needed, so the pricing page works before sign-in.
  */
 export function getPlans() {
-  return withReactiveResponse<PlanResource[]>({
-    url: `${config.apiOrigin}/v1/plans`,
-    method: 'GET',
-    op: 'query',
-    headers: jsonapiHeaders(),
-    cacheOptions: { types: ['plan'] },
-  });
+  return answersFor(query<PlanResource>('plan'), ['plan']);
 }
+
+// Links
 
 export function getLinks(accountId?: string) {
-  return withReactiveResponse<Link[]>({
-    url: url('/v1/links', { accountId, include: 'ownedBy,createdBy' }),
-    method: 'GET',
-    op: 'query',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-    cacheOptions: { types: ['link'] },
-  });
-}
-
-export function deleteLink(id: string, accountId?: string) {
-  return withReactiveResponse<null>({
-    url: url(`/v1/links/${id}`, { accountId }),
-    method: 'DELETE',
-    op: 'deleteRecord',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-  });
+  return answersFor(
+    query<Link>('link', params({ accountId, include: 'ownedBy,createdBy' })),
+    ['link']
+  );
 }
 
 export function createLink(
-  originalUrl: string,
-  domain?: string | null,
+  store: Store,
+  values: { original: string; domain?: string | null },
   accountId?: string
 ) {
-  return withReactiveResponse<Link>({
-    url: url('/v1/links', { accountId, include: 'ownedBy,createdBy' }),
-    method: 'POST',
-    op: 'createRecord',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-    body: JSON.stringify({
-      data: {
-        type: 'link',
-        attributes: domain ? { original: originalUrl, domain } : { original: originalUrl },
-      },
-    }),
+  const link = store.createRecord<Link>('link', {
+    original: values.original,
+    domain: values.domain ?? null,
   });
+  const init = scoped(createRecord(link), accountId);
+
+  init.url += `${init.url.includes('?') ? '&' : '?'}include=ownedBy,createdBy`;
+
+  return withReactiveResponse<Link>(asRequest(jsonBody(init, newResourceBody(store, link))));
 }
 
 /**
- * `patch` is the document from `serializePatch`: the record's changed
- * fields, as the cache tracked them on the editable copy.
+ * `editable` is a checked-out copy; the body carries the fields the
+ * cache tracked as changed on it.
  */
-export function updateLink(id: string, patch: object, accountId?: string) {
-  return withReactiveResponse<Link>({
-    url: url(`/v1/links/${id}`, { accountId, include: 'ownedBy,createdBy' }),
-    method: 'PATCH',
-    op: 'updateRecord',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-    body: JSON.stringify(patch),
-  });
+export function updateLink(store: Store, editable: Link, accountId?: string) {
+  const init = scoped(updateRecord(editable), accountId);
+
+  init.url += `${init.url.includes('?') ? '&' : '?'}include=ownedBy,createdBy`;
+
+  return withReactiveResponse<Link>(
+    asRequest(jsonBody(init, serializePatch(store.cache, cacheKeyFor(editable))))
+  );
 }
 
+export function deleteLink(link: Link, accountId?: string) {
+  return scoped(deleteRecord(link), accountId);
+}
+
+// Team
+
 export function getMemberships(accountId: string) {
-  return withReactiveResponse<Membership[]>({
-    url: url(`/v1/accounts/${accountId}/memberships`, { include: 'user,account.admin' }),
-    method: 'GET',
-    op: 'query',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-    cacheOptions: { types: ['membership'] },
-  });
+  return answersFor(
+    query<Membership>(
+      'membership',
+      { include: 'user,account.admin' },
+      { resourcePath: `accounts/${accountId}/memberships` }
+    ),
+    ['membership']
+  );
 }
 
 export function getInvitations(accountId: string) {
-  return withReactiveResponse<Invitation[]>({
-    url: url(`/v1/accounts/${accountId}/invitations`, { include: 'account.admin' }),
-    method: 'GET',
-    op: 'query',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-    cacheOptions: { types: ['invitation'] },
-  });
+  return answersFor(
+    query<Invitation>(
+      'invitation',
+      { include: 'account.admin' },
+      { resourcePath: `accounts/${accountId}/invitations` }
+    ),
+    ['invitation']
+  );
 }
 
-export function createInvitation(accountId: string) {
-  return withReactiveResponse<Invitation>({
-    url: url(`/v1/accounts/${accountId}/invitations`, { include: 'account.admin' }),
-    method: 'POST',
-    op: 'createRecord',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-  });
+/**
+ * The api mints the invitation; the request carries no body.
+ */
+export function createInvitation(store: Store, accountId: string) {
+  const invitation = store.createRecord<Invitation>('invitation', {});
+  const init = createRecord(invitation, { resourcePath: `accounts/${accountId}/invitations` });
+
+  init.url += '?include=account.admin';
+
+  return init;
 }
 
-export function revokeInvitation(id: string) {
-  return withReactiveResponse<null>({
-    url: `${config.apiOrigin}/v1/invitations/${id}`,
-    method: 'DELETE',
-    op: 'deleteRecord',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-  });
+export function revokeInvitation(invitation: Invitation) {
+  return deleteRecord(invitation);
 }
 
+/**
+ * Accepting is a POST that answers with the new membership, so it is a
+ * query that writes, not a record create.
+ */
 export function acceptInvitation(token: string) {
-  return withReactiveResponse<Membership>({
-    url: url('/v1/invitations/accept', { include: 'user,account.admin' }),
-    method: 'POST',
-    op: 'createRecord',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-    body: JSON.stringify({ token }),
-  });
+  const init = postQuery<Membership>('membership', { token }, { resourcePath: 'invitations/accept' });
+
+  init.url += '?include=user,account.admin';
+  init.headers.set('Content-Type', 'application/vnd.api+json');
+
+  return withReactiveResponse<Membership>(answersFor(init, ['membership']));
 }
 
-export function removeMembership(id: string) {
-  return withReactiveResponse<null>({
-    url: `${config.apiOrigin}/v1/memberships/${id}`,
-    method: 'DELETE',
-    op: 'deleteRecord',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-  });
+export function removeMembership(membership: Membership) {
+  return deleteRecord(membership);
 }
 
+// API keys
 
 export function getApiKeys(accountId?: string) {
-  return withReactiveResponse<ApiKey[]>({
-    url: url('/v1/api-keys', { accountId }),
-    method: 'GET',
-    op: 'query',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-    cacheOptions: { types: ['api-key'] },
-  });
+  return answersFor(query<ApiKey>('api-key', params({ accountId })), ['api-key']);
 }
 
+/**
+ * The api takes a plain object here, not a JSON:API document. The
+ * secret comes back once, on this response's record.
+ */
 export function createApiKey(
-  params: { name: string; scopes: string[]; expiresInDays?: number | null },
+  store: Store,
+  values: { name: string; scopes: string[]; expiresInDays?: number | null },
   accountId?: string
 ) {
-  return withReactiveResponse<ApiKey>({
-    url: url('/v1/api-keys', { accountId }),
-    method: 'POST',
-    op: 'createRecord',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-    body: JSON.stringify(params),
-  });
+  const key = store.createRecord<ApiKey>('api-key', { name: values.name, scopes: values.scopes });
+
+  return withReactiveResponse<ApiKey>(
+    asRequest(jsonBody(scoped(createRecord(key), accountId), values))
+  );
 }
 
-export function revokeApiKey(id: string, accountId?: string) {
-  return withReactiveResponse<null>({
-    url: url(`/v1/api-keys/${id}`, { accountId }),
-    method: 'DELETE',
-    op: 'deleteRecord',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-  });
+export function revokeApiKey(key: ApiKey, accountId?: string) {
+  return scoped(deleteRecord(key), accountId);
 }
+
+// Custom domains
 
 export function getDomains(accountId?: string) {
-  return withReactiveResponse<CustomDomain[]>({
-    url: url('/v1/domains', { accountId, include: 'account.admin' }),
-    method: 'GET',
-    op: 'query',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-    cacheOptions: { types: ['custom-domain'] },
-  });
+  return answersFor(
+    query<CustomDomain>('custom-domain', params({ accountId, include: 'account.admin' }), {
+      resourcePath: 'domains',
+    }),
+    ['custom-domain']
+  );
 }
 
-export function createDomain(hostname: string, accountId?: string) {
-  return withReactiveResponse<CustomDomain>({
-    url: url('/v1/domains', { accountId, include: 'account.admin' }),
-    method: 'POST',
-    op: 'createRecord',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-    body: JSON.stringify({ data: { type: 'custom-domain', attributes: { hostname } } }),
-  });
+export function createDomain(store: Store, hostname: string, accountId?: string) {
+  const domain = store.createRecord<CustomDomain>('custom-domain', { hostname });
+  const init = scoped(createRecord(domain, { resourcePath: 'domains' }), accountId);
+
+  init.url += `${init.url.includes('?') ? '&' : '?'}include=account.admin`;
+
+  return withReactiveResponse<CustomDomain>(
+    asRequest(jsonBody(init, newResourceBody(store, domain)))
+  );
 }
 
-export function deleteDomain(id: string, accountId?: string) {
-  return withReactiveResponse<null>({
-    url: url(`/v1/domains/${id}`, { accountId }),
-    method: 'DELETE',
-    op: 'deleteRecord',
-    credentials: 'include',
-    headers: jsonapiHeaders(),
-  });
+export function deleteDomain(domain: CustomDomain, accountId?: string) {
+  return scoped(deleteRecord(domain, { resourcePath: 'domains' }), accountId);
 }
