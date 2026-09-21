@@ -27,6 +27,11 @@ import { SidebarLink } from './sidebar-link.gts';
           {{! @glint-expect-error - route templates do not have typed @model }}
           <li><SidebarLink @href="/{{@model.accountSlug}}/api-keys">API Keys</SidebarLink></li>
         </NavigationList>
+
+        <NavigationList @label="Settings">
+          {{! @glint-expect-error - route templates do not have typed @model }}
+          <li><SidebarLink @href="/{{@model.accountSlug}}/settings/billing">Billing</SidebarLink></li>
+        </NavigationList>
       </Navigation>
     </:nav>
 

@@ -18,6 +18,7 @@ function isWatermarked(billing: BillingStatus) {
 
 interface Signature {
   Args: {
+    accountSlug: string;
     billing: Future<ReactiveDataDocument<BillingStatus>>;
     links: Future<ReactiveDataDocument<Link[]>>;
   };
@@ -39,7 +40,10 @@ const Dashboard: TOC<Signature> = <template>
 
         <:content as |billingDoc|>
           <div class="dashboard-grid">
-            <SubscriptionCard @billing={{billingDoc.data}} />
+            <SubscriptionCard
+              @billing={{billingDoc.data}}
+              @accountSlug={{@accountSlug}}
+            />
             <UsageCard @billing={{billingDoc.data}} />
           </div>
 

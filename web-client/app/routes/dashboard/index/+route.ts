@@ -9,9 +9,13 @@ export default class DashboardIndexRoute extends Route {
   @service declare store: Store;
 
   async model() {
-    const { accountId } = this.modelFor('dashboard') as { accountId: string };
+    const { accountId, accountSlug } = this.modelFor('dashboard') as {
+      accountId: string;
+      accountSlug: string;
+    };
 
     return {
+      accountSlug,
       billing: this.store.request(getBillingStatus(accountId)),
       links: this.store.request(getLinks(accountId)),
     };

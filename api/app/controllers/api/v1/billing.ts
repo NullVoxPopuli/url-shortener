@@ -4,7 +4,12 @@ import { DOMAIN } from '#start/env';
 import Account from '#models/account';
 import { syncStripeDataToAccount } from '#services/stripe_sync';
 import { action } from '../base.js';
-import { billingCheckout, billingPortal, billingStatus } from './actions/billing.js';
+import {
+  billingCheckout,
+  billingHistory,
+  billingPortal,
+  billingStatus,
+} from './actions/billing.js';
 
 /**
  * Guard against open-redirect attacks by only allowing redirects to
@@ -75,6 +80,13 @@ export default class BillingController {
    */
   async status(context: HttpContext) {
     return action(context, billingStatus);
+  }
+
+  /**
+   * Subscriptions, invoices, and a timeline, read live from Stripe.
+   */
+  async history(context: HttpContext) {
+    return action(context, billingHistory);
   }
 
   /**

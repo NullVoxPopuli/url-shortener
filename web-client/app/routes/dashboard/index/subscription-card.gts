@@ -19,6 +19,7 @@ function hasNoSubscription(billing: BillingStatus) {
 interface Signature {
   Args: {
     billing: BillingStatus;
+    accountSlug?: string;
   };
 }
 
@@ -82,6 +83,9 @@ export class SubscriptionCard extends Component<Signature> {
           >
             Manage billing
           </button>
+          {{#if @accountSlug}}
+            <a href="/{{@accountSlug}}/settings/billing">Billing details</a>
+          {{/if}}
         {{else}}
           <a href="/pricing">View pricing and plans</a>
         {{/if}}
@@ -124,6 +128,10 @@ export class SubscriptionCard extends Component<Signature> {
 
       .card-actions {
         margin-top: var(--gap-3);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--gap-3);
       }
     </style>
   </template>
