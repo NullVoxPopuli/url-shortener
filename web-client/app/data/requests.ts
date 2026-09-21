@@ -9,6 +9,7 @@ import type {
   Invitation,
   Link,
   Membership,
+  PlanResource,
 } from '#app/data/types';
 
 function url(path: string, params: Record<string, string | undefined>) {
@@ -37,6 +38,19 @@ export function getBillingStatus(accountId?: string) {
     // 'link' is included so link mutations invalidate the cached
     // usage numbers, which are derived from links.
     cacheOptions: { types: ['billing-status', 'link'] },
+  });
+}
+
+/**
+ * Public: no session needed, so the pricing page works before sign-in.
+ */
+export function getPlans() {
+  return withReactiveResponse<PlanResource[]>({
+    url: `${config.apiOrigin}/v1/plans`,
+    method: 'GET',
+    op: 'query',
+    headers: jsonapiHeaders(),
+    cacheOptions: { types: ['plan'] },
   });
 }
 

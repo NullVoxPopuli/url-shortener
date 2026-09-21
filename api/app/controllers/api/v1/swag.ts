@@ -330,7 +330,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       get: {
         summary: 'Billing status',
         description:
-          "The account's plan, usage (links used/remaining this period), Stripe subscription state, and the available plans.",
+          "The account's plan, usage (links and link edits used/remaining this period), and Stripe subscription state. The plan catalog is at /v1/plans.",
         parameters: [accountParam],
         responses: {
           200: {
@@ -359,6 +359,50 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
           },
           401: componentSchemaRef('Unauthenticated'),
           404: componentSchemaRef('NotFound'),
+          415: componentSchemaRef('UnsupportedMediaType'),
+        },
+      },
+    },
+    '/v1/plans': {
+      get: {
+        summary: 'List plans',
+        description:
+          'The paid plans with their Stripe product and price ids (monthly and yearly amounts in cents) and their limits. Public: no authentication.',
+        responses: {
+          200: {
+            description: 'OK',
+            content: {
+              [mimeType]: {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: {
+                      type: 'array',
+                      items: { $ref: jsonapiRef('definitions/resource') },
+                    },
+                  },
+                  example: {
+                    data: [
+                      {
+                        type: 'plan',
+                        id: 'vast',
+                        attributes: {
+                          name: 'Vast',
+                          prices: {
+                            month: { id: 'price_...', amountInCents: 5000 },
+                            year: { id: 'price_...', amountInCents: 55000 },
+                          },
+                          monthlyLinkLimit: 10000,
+                          linkEditsPerMonth: 500,
+                          linkExpiration: true,
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          },
           415: componentSchemaRef('UnsupportedMediaType'),
         },
       },
