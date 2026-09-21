@@ -5,7 +5,27 @@ import { API_DOMAIN } from '#start/env';
 import env from '#start/env';
 import { stripe } from '#services/stripe';
 import StripeWebhookEvent from '#models/stripe_webhook_event';
+import Account from '#models/account';
+import { createNewAccount } from '#tests/db';
 import { setup } from '#tests/helpers';
+
+/**
+ * Stand in for Stripe's subscription list for the duration of one test.
+ */
+async function withSubscriptionList<T>(
+  list: () => Promise<{ data: object[] }>,
+  run: () => Promise<T>
+) {
+  const original = stripe.subscriptions.list;
+
+  stripe.subscriptions.list = list as unknown as typeof original;
+
+  try {
+    return await run();
+  } finally {
+    stripe.subscriptions.list = original;
+  }
+}
 
 const WEBHOOK_URL = `http://${API_DOMAIN}/stripe/webhook`;
 
@@ -96,5 +116,79 @@ test.group('POST /stripe/webhook', (group) => {
     const rows = await StripeWebhookEvent.query().where('event_id', event.id);
     assert.lengthOf(rows, 1);
     assert.strictEqual(rows[0]?.eventType, event.type);
+  });
+
+  test('a tracked event for a known customer syncs the account', async ({ client }) => {
+    const { account } = await createNewAccount({ account: { stripeCustomerId: 'cus_known' } });
+    const event = {
+      id: 'evt_test_sync_1',
+      type: 'customer.subscription.updated',
+      data: { object: { id: 'sub_1', customer: 'cus_known' } },
+    };
+
+    const response = await withSubscriptionList(
+      async () => ({
+        data: [
+          {
+            id: 'sub_1',
+            status: 'active',
+            cancel_at_period_end: true,
+            cancel_at: null,
+            default_payment_method: null,
+            items: { data: [{ price: { id: 'price_1' } }] },
+          },
+        ],
+      }),
+      () => signedPost(client, event)
+    );
+
+    response.assertStatus(200);
+
+    const fresh = await Account.findOrFail(account.id);
+    assert.strictEqual(fresh.stripeSubscriptionId, 'sub_1');
+    assert.isTrue(fresh.stripeCancelAtPeriodEnd);
+  });
+
+  test('a failed sync → 500, and the same event is processed again on retry', async ({
+    client,
+  }) => {
+    const { account } = await createNewAccount({ account: { stripeCustomerId: 'cus_flaky' } });
+    const event = {
+      id: 'evt_test_retry_1',
+      type: 'customer.subscription.updated',
+      data: { object: { id: 'sub_1', customer: 'cus_flaky' } },
+    };
+
+    const failed = await withSubscriptionList(
+      async () => {
+        throw new Error('Stripe is down');
+      },
+      () => signedPost(client, event)
+    );
+
+    failed.assertStatus(500);
+    assert.lengthOf(await StripeWebhookEvent.query().where('event_id', event.id), 0);
+
+    const retried = await withSubscriptionList(
+      async () => ({
+        data: [
+          {
+            id: 'sub_1',
+            status: 'active',
+            cancel_at_period_end: false,
+            cancel_at: null,
+            default_payment_method: null,
+            items: { data: [{ price: { id: 'price_1' } }] },
+          },
+        ],
+      }),
+      () => signedPost(client, event)
+    );
+
+    retried.assertStatus(200);
+    assert.lengthOf(await StripeWebhookEvent.query().where('event_id', event.id), 1);
+
+    const fresh = await Account.findOrFail(account.id);
+    assert.strictEqual(fresh.stripeSubscriptionId, 'sub_1');
   });
 });
