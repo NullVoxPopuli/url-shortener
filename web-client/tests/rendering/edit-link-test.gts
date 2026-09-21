@@ -192,10 +192,10 @@ module('Rendering | dashboard | LinksTable editing', function (hooks) {
     await click('.edit-button');
 
     assert.verifySteps(['start:link-1']);
-    assert.dom('.editor-row').doesNotExist();
+    assert.dom('.editor').doesNotExist();
   });
 
-  test('the editor row opens for the link whose id is being edited', async function (assert) {
+  test('the editor opens above the table for the link whose id is being edited', async function (assert) {
     const links = [
       pushLink(this.owner, { id: 'link-1' }),
       pushLink(this.owner, { id: 'link-2' }),
@@ -212,11 +212,13 @@ module('Rendering | dashboard | LinksTable editing', function (hooks) {
       </template>
     );
 
-    assert.dom('.editor-row').exists({ count: 1 });
-    assert.dom('.editor-row td').hasAttribute('colspan', '6');
+    assert.dom('.editor').exists({ count: 1 });
+    assert.dom('.editor h3').containsText('Editing');
+    assert.dom('.editor h3').containsText('https://nvp.local/abc123');
+    assert.dom('tbody tr').exists({ count: 2 });
 
-    await fillIn('.editor-row input[name="original"]', 'https://example.com/changed');
-    await click('.editor-row button[type="submit"]');
+    await fillIn('.editor input[name="original"]', 'https://example.com/changed');
+    await click('.editor button[type="submit"]');
 
     assert.verifySteps(['save:link-2:original="https://example.com/changed"']);
   });
