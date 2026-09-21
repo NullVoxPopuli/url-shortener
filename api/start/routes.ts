@@ -35,6 +35,7 @@ router
       router.post('links', [links, 'create']).as('link.store');
       // Links are not updatable (for now?)
       router.get('links/:id', [links, 'show']).as('link.show');
+      router.patch('links/:id', [links, 'update']).as('link.update');
       router.delete('links/:id', [links, 'delete']).as('link.destroy');
       router.get('links/:id/visits', [links, 'visits']).as('visit.index');
 

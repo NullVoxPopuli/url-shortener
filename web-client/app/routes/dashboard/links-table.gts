@@ -3,11 +3,40 @@ import { tracked } from '@glimmer/tracking';
 import { fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 
+import { EditLinkForm } from './edit-link-form.gts';
 import { formatDate } from './format';
 import { QrCode } from './qr-code.gts';
 
+import type { LinkChanges } from './edit-link-form.gts';
 import type { TOC } from '@ember/component/template-only';
 import type { Link } from '#app/data/types';
+
+/**
+ * Everything the table needs to offer editing. The owner holds the
+ * editing state, so a save can close the editor after its refresh.
+ */
+export interface LinkEditing {
+  /** the link whose editor is open */
+  id: string | null;
+  /** null = unlimited. 0 disables the Edit button. */
+  remaining: number | null;
+  canSetExpiration: boolean;
+  start: (link: Link) => unknown;
+  cancel: () => unknown;
+  save: (link: Link, changes: LinkChanges) => unknown;
+}
+
+function isEditing(link: Link, editing: LinkEditing | undefined) {
+  return Boolean(editing) && link.id === editing?.id;
+}
+
+/**
+ * The Actions column spans one more cell than the data columns when
+ * it is shown, so the editor row can stretch under the whole table.
+ */
+function columnCount(hasActions: boolean) {
+  return hasActions ? 6 : 5;
+}
 
 interface QrDisclosureSignature {
   Args: {
@@ -57,7 +86,20 @@ interface Signature {
      */
     onDelete?: (link: Link) => unknown;
     isDeleting?: boolean;
+    /**
+     * When provided, an Edit button appears (the link-management page
+     * passes this; the overview does not).
+     */
+    editing?: LinkEditing;
   };
+}
+
+function hasActions(onDelete: unknown, editing: unknown) {
+  return Boolean(onDelete || editing);
+}
+
+function cannotEdit(editing: LinkEditing) {
+  return editing.remaining === 0;
 }
 
 export const LinksTable: TOC<Signature> = <template>
@@ -70,7 +112,7 @@ export const LinksTable: TOC<Signature> = <template>
           <th scope="col">Visits</th>
           <th scope="col">Created</th>
           <th scope="col">Expires</th>
-          {{#if @onDelete}}
+          {{#if (hasActions @onDelete @editing)}}
             <th scope="col">Actions</th>
           {{/if}}
         </tr>
@@ -106,19 +148,50 @@ export const LinksTable: TOC<Signature> = <template>
             <td>{{link.visits}}</td>
             <td>{{formatDate link.createdAt}}</td>
             <td>{{formatDate link.expiresAt}}</td>
-            {{#if @onDelete}}
-              <td>
-                <button
-                  type="button"
-                  class="delete-button"
-                  disabled={{@isDeleting}}
-                  {{on "click" (fn @onDelete link)}}
-                >
-                  Delete
-                </button>
+            {{#if (hasActions @onDelete @editing)}}
+              <td class="actions">
+                {{#if @editing}}
+                  <button
+                    type="button"
+                    class="edit-button"
+                    disabled={{if (cannotEdit @editing) true @isDeleting}}
+                    title={{if
+                      (cannotEdit @editing)
+                      "No link edits left on your plan this month"
+                    }}
+                    {{on "click" (fn @editing.start link)}}
+                  >
+                    Edit
+                  </button>
+                {{/if}}
+                {{#if @onDelete}}
+                  <button
+                    type="button"
+                    class="delete-button"
+                    disabled={{@isDeleting}}
+                    {{on "click" (fn @onDelete link)}}
+                  >
+                    Delete
+                  </button>
+                {{/if}}
               </td>
             {{/if}}
           </tr>
+          {{#if @editing}}
+            {{#if (isEditing link @editing)}}
+              <tr class="editor-row">
+                <td colspan={{columnCount (hasActions @onDelete @editing)}}>
+                  <EditLinkForm
+                    @link={{link}}
+                    @canSetExpiration={{@editing.canSetExpiration}}
+                    @isSaving={{if @isDeleting true false}}
+                    @onSave={{fn @editing.save link}}
+                    @onCancel={{@editing.cancel}}
+                  />
+                </td>
+              </tr>
+            {{/if}}
+          {{/if}}
         {{/each}}
       </tbody>
     </table>
@@ -153,6 +226,29 @@ export const LinksTable: TOC<Signature> = <template>
 
     .links-table tbody tr:last-child td {
       border-bottom: none;
+    }
+
+    .actions {
+      white-space: nowrap;
+    }
+
+    .edit-button {
+      color: var(--color-text);
+      background: none;
+      border: var(--border-width) var(--border-style) var(--border-color);
+      border-radius: var(--radius);
+      padding: var(--padding-1) var(--padding-2);
+      cursor: pointer;
+      margin-right: var(--gap-1);
+    }
+
+    .edit-button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .editor-row td {
+      background: var(--color-page-background);
     }
 
     .delete-button {

@@ -5,6 +5,11 @@ export interface Plan {
   name: string;
   priceInCents: number;
   monthlyLinkLimit: number | null;
+  /**
+   * null = unlimited, 0 = the plan has no editing
+   */
+  linkEditsPerMonth: number | null;
+  linkExpiration: boolean;
   stripePriceId?: string;
 }
 
@@ -27,6 +32,8 @@ export interface BillingStatus {
     remaining: number | null;
     periodStart: string | null;
     periodEnd: string | null;
+    editsUsed: number;
+    editsRemaining: number | null;
   };
   availablePlans: Plan[];
   paymentMethod: {

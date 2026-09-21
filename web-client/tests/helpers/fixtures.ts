@@ -8,6 +8,10 @@ export function makeBilling(overrides?: {
   remaining?: number | null;
   hasActiveSubscription?: boolean;
   cancelAtPeriodEnd?: boolean;
+  linkEditsPerMonth?: number | null;
+  linkExpiration?: boolean;
+  editsUsed?: number;
+  editsRemaining?: number | null;
 }): BillingStatus {
   const {
     planKey = 'none',
@@ -17,6 +21,10 @@ export function makeBilling(overrides?: {
     remaining = 5,
     hasActiveSubscription = false,
     cancelAtPeriodEnd = false,
+    linkEditsPerMonth = 0,
+    linkExpiration = false,
+    editsUsed = 0,
+    editsRemaining = linkEditsPerMonth === null ? null : linkEditsPerMonth - editsUsed,
   } = overrides ?? {};
 
   return {
@@ -37,12 +45,16 @@ export function makeBilling(overrides?: {
       name: planName,
       priceInCents: 0,
       monthlyLinkLimit,
+      linkEditsPerMonth,
+      linkExpiration,
     },
     usage: {
       used,
       remaining,
       periodStart: '2026-08-01T00:00:00.000Z',
       periodEnd: '2026-08-31T23:59:59.999Z',
+      editsUsed,
+      editsRemaining,
     },
     availablePlans: [],
     paymentMethod: { brand: null, last4: null },

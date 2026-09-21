@@ -8,10 +8,12 @@ import { Request } from '@warp-drive/ember';
 import { Button } from 'nvp.ui';
 
 import { messageFrom } from '#app/data/errors';
-import { createLink, deleteLink } from '#app/data/requests';
+import { createLink, deleteLink, updateLink } from '#app/data/requests';
 
 import { LinksTable } from '../links-table.gts';
 
+import type { LinkChanges } from '../edit-link-form.gts';
+import type { LinkEditing } from '../links-table.gts';
 import type { Store } from '@warp-drive/core';
 import type { ReactiveDataDocument } from '@warp-drive/core/reactive';
 import type { Future } from '@warp-drive/core/request';
@@ -23,6 +25,10 @@ function isWatermarked(billing: BillingStatus) {
 
 function isExhausted(billing: BillingStatus) {
   return billing.usage.remaining === 0;
+}
+
+function hasNoEdits(billing: BillingStatus) {
+  return billing.plan.linkEditsPerMonth === 0;
 }
 
 function errorMessage(error: unknown) {
@@ -43,6 +49,40 @@ export default class LinkManager extends Component<Signature> {
 
   @tracked isWorking = false;
   @tracked error: string | null = null;
+  @tracked editingId: string | null = null;
+
+  /**
+   * Built in the template so `save` can reach the refresh functions.
+   * Reading `editingId` here makes the table re-render on change.
+   */
+  editingFor = (refresh: Array<() => Promise<void>>, billing: BillingStatus): LinkEditing => ({
+    id: this.editingId,
+    remaining: billing.usage.editsRemaining,
+    canSetExpiration: billing.plan.linkExpiration,
+    start: (link: Link) => {
+      this.error = null;
+      this.editingId = link.id;
+    },
+    cancel: () => {
+      this.editingId = null;
+    },
+    save: (link: Link, changes: LinkChanges) => this.edit(refresh, link, changes),
+  });
+
+  edit = async (refresh: Array<() => Promise<void>>, link: Link, changes: LinkChanges) => {
+    this.isWorking = true;
+    this.error = null;
+
+    try {
+      await this.store.request(updateLink(link.id, changes, this.args.accountId));
+      await Promise.all(refresh.map((fn) => fn()));
+      this.editingId = null;
+    } catch (error) {
+      this.error = messageFrom(error);
+    } finally {
+      this.isWorking = false;
+    }
+  };
 
   /**
    * Refreshing both requests keeps the table and the quota numbers in
@@ -185,11 +225,25 @@ export default class LinkManager extends Component<Signature> {
                 <section class="page-card surface">
                   <h2>Your links</h2>
 
+                  {{#if (hasNoEdits billingDoc.data)}}
+                    <p class="muted">Your plan does not include link edits.
+                      <a href="/pricing">Upgrade to change destinations and
+                        expirations.</a></p>
+                  {{else if billingDoc.data.usage.editsRemaining}}
+                    <p class="muted">{{billingDoc.data.usage.editsRemaining}}
+                      link edits remaining this month</p>
+                  {{else if billingDoc.data.plan.linkEditsPerMonth}}
+                    <p class="warning">You've used your
+                      {{billingDoc.data.plan.linkEditsPerMonth}}
+                      link edits for this month.</p>
+                  {{/if}}
+
                   <LinksTable
                     @links={{linksDoc.data}}
                     @watermark={{isWatermarked billingDoc.data}}
                     @onDelete={{fn this.delete refresh}}
                     @isDeleting={{this.isWorking}}
+                    @editing={{this.editingFor refresh billingDoc.data}}
                   />
                 </section>
               {{/let}}
