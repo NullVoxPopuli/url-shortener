@@ -85,6 +85,8 @@ export const APP_ORIGIN = isProd ? `https://app.${DOMAIN}` : `http://app.${DOMAI
 export const API_ORIGIN = isProd ? `https://api.${DOMAIN}` : `http://api.${DOMAIN}`;
 export const AUTH_ORIGIN = isProd ? `https://${DOMAIN}` : `http://${DOMAIN}`;
 
+export const isTestingStripe = !isProd && DOMAIN === 'nvp.local';
+
 // Probably just for testing
 export const API_DOMAIN = `api.${DOMAIN}:${env.get('PORT')}`;
 

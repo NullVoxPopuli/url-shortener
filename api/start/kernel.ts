@@ -10,17 +10,12 @@
 
 import router from '@adonisjs/core/services/router';
 import server from '@adonisjs/core/services/server';
-import env from './env.js';
 
 /**
  * The error handler is used to convert an exception
  * to a HTTP response.
  */
 server.errorHandler(() => import('#exceptions/handler'));
-
-if (env.get('LOG_LEVEL') === 'trace') {
-  server.use([() => import('#middleware/logger')]);
-}
 
 /**
  * The server middleware stack runs middleware on all the HTTP

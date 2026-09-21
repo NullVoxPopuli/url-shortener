@@ -1,3 +1,5 @@
+import { isTestingStripe } from '#start/env';
+
 /**
  * Each paid plan is one Stripe product with one recurring price per
  * billing interval. `node ace stripe:prices` prints the products and
@@ -24,8 +26,14 @@ export const PLANS = [
     name: 'Base',
     stripeProductId: 'prod_base_TODO',
     prices: {
-      month: { id: 'price_base_month_TODO', amountInCents: 100 },
-      year: { id: 'price_base_year_TODO', amountInCents: 1100 },
+      month: {
+        id: isTestingStripe ? 'price_1PS5xgKsGhcICKKYhoMnFNcU' : 'TODO',
+        amountInCents: 100,
+      },
+      year: {
+        id: isTestingStripe ? 'price_1PS5yHKsGhcICKKYC4vOaFCf' : 'TODO',
+        amountInCents: 1100,
+      },
     },
     monthlyLinkLimit: 15,
     teammates: 0,
@@ -40,8 +48,14 @@ export const PLANS = [
     name: 'Essentials',
     stripeProductId: 'prod_essentials_TODO',
     prices: {
-      month: { id: 'price_essentials_month_TODO', amountInCents: 500 },
-      year: { id: 'price_essentials_year_TODO', amountInCents: 5500 },
+      month: {
+        id: isTestingStripe ? 'price_1PS5zAKsGhcICKKYMNHy5VPa' : 'TODO',
+        amountInCents: 500,
+      },
+      year: {
+        id: isTestingStripe ? 'price_1PS61FKsGhcICKKY3oeFkER3' : 'TODO',
+        amountInCents: 5500,
+      },
     },
     monthlyLinkLimit: 100,
     teammates: 0,
@@ -56,8 +70,14 @@ export const PLANS = [
     name: 'Pro',
     stripeProductId: 'prod_pro_TODO',
     prices: {
-      month: { id: 'price_pro_month_TODO', amountInCents: 1500 },
-      year: { id: 'price_pro_year_TODO', amountInCents: 16500 },
+      month: {
+        id: isTestingStripe ? 'price_1PS5zaKsGhcICKKYUFzy9Uxk' : 'TODO',
+        amountInCents: 1500,
+      },
+      year: {
+        id: isTestingStripe ? 'price_1PS61aKsGhcICKKYHCoAomIs' : 'TODO',
+        amountInCents: 16500,
+      },
     },
     monthlyLinkLimit: 1000,
     teammates: 2,
@@ -72,8 +92,14 @@ export const PLANS = [
     name: 'Vast',
     stripeProductId: 'prod_QIhPQZXW4aywu2',
     prices: {
-      month: { id: 'price_1PS60rKsGhcICKKYNgDoPVji', amountInCents: 5000 },
-      year: { id: 'price_1PS62AKsGhcICKKYNMVh8ywd', amountInCents: 55000 },
+      month: {
+        id: isTestingStripe ? 'price_1PS60rKsGhcICKKYNgDoPVji' : 'TODO',
+        amountInCents: 5000,
+      },
+      year: {
+        id: isTestingStripe ? 'price_1PS62AKsGhcICKKYNMVh8ywd' : 'TODO',
+        amountInCents: 55000,
+      },
     },
     monthlyLinkLimit: 10000,
     teammates: 10,
