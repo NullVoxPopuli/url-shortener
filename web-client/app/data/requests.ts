@@ -95,11 +95,7 @@ export function createLink(
   });
 }
 
-export function updateLink(
-  id: string,
-  changes: { original?: string; expiresAt?: string | null },
-  accountId?: string
-) {
+export function updateLink(id: string, changes: Record<string, unknown>, accountId?: string) {
   return withReactiveResponse<Link>({
     url: url(`/v1/links/${id}`, { accountId, include: 'ownedBy,createdBy' }),
     method: 'PATCH',

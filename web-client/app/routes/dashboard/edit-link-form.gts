@@ -9,11 +9,6 @@ import { getPromiseState } from 'reactiveweb/get-promise-state';
 
 import type { Link } from '#app/data/types';
 
-export interface LinkChanges {
-  original?: string;
-  expiresAt?: string | null;
-}
-
 /**
  * The date input works in whole days. An expiration set through it
  * means "through the end of that day, UTC".
@@ -37,19 +32,6 @@ function text(value: unknown) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-
-/**
- * The fields on the editable copy that differ from the saved record.
- */
-export function changesBetween(saved: Link, editable: Link): LinkChanges {
-  const changes: LinkChanges = {};
-
-  if (editable.original !== saved.original) changes.original = editable.original;
-  if (editable.expiresAt !== saved.expiresAt) changes.expiresAt = editable.expiresAt;
-
-  return changes;
-}
-
 interface Signature {
   Args: {
     /**
@@ -59,7 +41,11 @@ interface Signature {
     link: Link;
     canSetExpiration: boolean;
     isSaving: boolean;
-    onSave: (changes: LinkChanges) => unknown;
+    /**
+     * Receives the editable copy with the form's values applied. The
+     * cache knows which fields changed.
+     */
+    onSave: (editable: Link) => unknown;
     onCancel: () => unknown;
   };
 }
@@ -105,15 +91,7 @@ export class EditLinkForm extends Component<Signature> {
       this.editable.expiresAt = toExpiresAt(data.expiresAt);
     }
 
-    const changes = changesBetween(this.args.link, this.editable);
-
-    if (Object.keys(changes).length === 0) {
-      this.args.onCancel();
-
-      return;
-    }
-
-    this.args.onSave(changes);
+    this.args.onSave(this.editable);
   };
 
   <template>
