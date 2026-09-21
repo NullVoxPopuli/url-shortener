@@ -12,6 +12,7 @@ export function makeBilling(overrides?: {
   linkExpiration?: boolean;
   editsUsed?: number;
   editsRemaining?: number | null;
+  pendingChange?: BillingStatus['pendingChange'];
 }): BillingStatus {
   const {
     planKey = 'none',
@@ -25,6 +26,7 @@ export function makeBilling(overrides?: {
     linkExpiration = false,
     editsUsed = 0,
     editsRemaining = linkEditsPerMonth === null ? null : linkEditsPerMonth - editsUsed,
+    pendingChange = null,
   } = overrides ?? {};
 
   return {
@@ -37,10 +39,14 @@ export function makeBilling(overrides?: {
       subscriptionStatus: hasActiveSubscription ? 'active' : null,
       priceId: null,
       interval: null,
-      currentPeriodStart: hasActiveSubscription ? '2026-08-01T00:00:00Z' : null,
-      currentPeriodEnd: hasActiveSubscription ? '2026-09-01T00:00:00Z' : null,
+      // unix seconds, like the api sends
+      currentPeriodStart: hasActiveSubscription ? 1785585600 : null,
+      currentPeriodEnd: hasActiveSubscription ? 1788264000 : null,
       cancelAtPeriodEnd,
+      pendingPriceId: pendingChange?.plan.key ?? null,
+      pendingAt: pendingChange?.at ?? null,
     },
+    pendingChange,
     plan: {
       key: planKey,
       name: planName,

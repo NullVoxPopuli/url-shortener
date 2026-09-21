@@ -4,8 +4,10 @@ import {
   PLANS,
   billingIntervalFor,
   intervalForPriceId,
+  pendingPlanChangeFor,
   planFor,
   planForPriceId,
+  planRank,
 } from '#services/plans';
 
 const VAST = PLANS[3];
@@ -40,5 +42,49 @@ test.group('plans', () => {
   test('accounts without a paid price have no interval', () => {
     assert.isNull(billingIntervalFor({ isFree: true, stripePriceId: null }));
     assert.isNull(billingIntervalFor({ isFree: false, stripePriceId: null }));
+  });
+
+  test('plans rank cheapest first', () => {
+    assert.deepEqual(
+      PLANS.map((plan) => planRank(plan)),
+      [0, 1, 2, 3]
+    );
+  });
+
+  test('a pending cheaper price is a downgrade, a dearer one an upgrade', () => {
+    const onPro = {
+      isFree: false,
+      stripePriceId: PLANS[2].prices.month.id,
+      stripePendingPriceId: PLANS[0].prices.year.id,
+      stripePendingAt: 123,
+    };
+
+    assert.deepEqual(pendingPlanChangeFor(onPro), { kind: 'downgrade', plan: PLANS[0], at: 123 });
+
+    const onBase = {
+      ...onPro,
+      stripePriceId: PLANS[0].prices.month.id,
+      stripePendingPriceId: VAST.prices.month.id,
+    };
+
+    assert.strictEqual(pendingPlanChangeFor(onBase)?.kind, 'upgrade');
+  });
+
+  test('no pending change without a pending price, or when it is the same plan', () => {
+    const account = {
+      isFree: false,
+      stripePriceId: PLANS[2].prices.month.id,
+      stripePendingPriceId: null,
+      stripePendingAt: null,
+    };
+
+    assert.isNull(pendingPlanChangeFor(account));
+    assert.isNull(
+      pendingPlanChangeFor({
+        ...account,
+        stripePendingPriceId: PLANS[2].prices.year.id,
+        stripePendingAt: 1,
+      })
+    );
   });
 });

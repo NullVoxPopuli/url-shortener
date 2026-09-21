@@ -85,6 +85,15 @@ export default class Account extends BaseModel {
   @column.dateTime({ columnName: 'stripe_last_synced_at' })
   declare stripeLastSyncedAt: DateTime | null;
 
+  @column({ columnName: 'stripe_pending_price_id' })
+  declare stripePendingPriceId: string | null;
+
+  @column({
+    columnName: 'stripe_pending_at',
+    consume: (value) => (value === null || value === undefined ? null : Number(value)),
+  })
+  declare stripePendingAt: number | null;
+
   get hasActiveSubscription() {
     if (!this.stripeSubscriptionStatus) return false;
 

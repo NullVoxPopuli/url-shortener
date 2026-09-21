@@ -52,7 +52,7 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
     assert.dom('a[href="/pricing"]').doesNotExist();
   });
 
-  test('scheduled cancellation is called out', async function (assert) {
+  test('a cancellation says so, with the end date', async function (assert) {
     const billing = makeBilling({
       planKey: 'essentials',
       planName: 'Essentials',
@@ -62,6 +62,55 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
 
     await render(<template><SubscriptionCard @billing={{billing}} /></template>);
 
-    assert.dom('section').containsText('Cancellation is scheduled');
+    assert.dom('[data-test-cancelling]').containsText('Cancelling');
+    assert.dom('[data-test-cancelling]').containsText('Essentials plan ends Sep 1, 2026');
+  });
+
+  test('a scheduled downgrade says so, and that the current plan stays', async function (assert) {
+    const billing = makeBilling({
+      planKey: 'pro',
+      planName: 'Pro',
+      hasActiveSubscription: true,
+      pendingChange: {
+        kind: 'downgrade',
+        plan: {
+          key: 'base',
+          name: 'Base',
+          monthlyLinkLimit: 15,
+          linkEditsPerMonth: 0,
+          linkExpiration: false,
+        },
+        at: 1788264000,
+      },
+    });
+
+    await render(<template><SubscriptionCard @billing={{billing}} /></template>);
+
+    assert.dom('[data-test-downgrading]').containsText('Downgrading to Base on Sep 1, 2026');
+    assert.dom('[data-test-downgrading]').containsText('You keep Pro until then');
+    assert.dom('.plan-name').hasText('Pro');
+  });
+
+  test('a scheduled upgrade says so', async function (assert) {
+    const billing = makeBilling({
+      planKey: 'base',
+      planName: 'Base',
+      hasActiveSubscription: true,
+      pendingChange: {
+        kind: 'upgrade',
+        plan: {
+          key: 'pro',
+          name: 'Pro',
+          monthlyLinkLimit: 1000,
+          linkEditsPerMonth: 50,
+          linkExpiration: true,
+        },
+        at: 1788264000,
+      },
+    });
+
+    await render(<template><SubscriptionCard @billing={{billing}} /></template>);
+
+    assert.dom('[data-test-upgrading]').containsText('Upgrading to Pro on Sep 1, 2026');
   });
 });

@@ -184,3 +184,42 @@ export function billingIntervalFor(account: PlanHolder): BillingInterval | null 
 
   return plan ? intervalForPriceId(plan, account.stripePriceId) : null;
 }
+
+/**
+ * Position in PLANS, cheapest first. Unpaid plans rank below every paid one.
+ */
+export function planRank(plan: { key: string }) {
+  return PLANS.findIndex((candidate) => candidate.key === plan.key);
+}
+
+export interface PendingPlanChange {
+  kind: 'downgrade' | 'upgrade';
+  plan: Plan;
+  /** unix seconds, when Stripe switches the subscription */
+  at: number | null;
+}
+
+interface PendingChangeHolder extends PlanHolder {
+  stripePendingPriceId: string | null;
+  stripePendingAt: number | null;
+}
+
+/**
+ * The plan change Stripe has scheduled, if any. The account keeps its
+ * current plan until `at`.
+ */
+export function pendingPlanChangeFor(account: PendingChangeHolder): PendingPlanChange | null {
+  const pending = planForPriceId(account.stripePendingPriceId);
+
+  if (!pending) return null;
+
+  const current = planFor(account);
+
+  if (pending.key === current.key) return null;
+
+  return {
+    kind: planRank(pending) < planRank(current) ? 'downgrade' : 'upgrade',
+    plan: pending,
+    at: account.stripePendingAt,
+  };
+}

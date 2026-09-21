@@ -7,7 +7,13 @@ import { accountContext } from '#services/account_context';
 import { stripe } from '#services/stripe';
 import { getOrCreateStripeCustomerIdForAccount } from '#services/stripe_sync';
 import { editQuotaForAccount, quotaForAccount } from '#services/link_quota';
-import { PLANS, billingIntervalFor, isBillingInterval, planForKey } from '#services/plans';
+import {
+  PLANS,
+  billingIntervalFor,
+  isBillingInterval,
+  pendingPlanChangeFor,
+  planForKey,
+} from '#services/plans';
 
 function mustBeAccountAdmin(params: { userId: string; account: Account }) {
   const { userId, account } = params;
@@ -125,7 +131,14 @@ export async function billingStatus(context: HttpContext) {
           currentPeriodStart: account.stripeCurrentPeriodStart,
           currentPeriodEnd: account.stripeCurrentPeriodEnd,
           cancelAtPeriodEnd: account.stripeCancelAtPeriodEnd,
+          pendingPriceId: account.stripePendingPriceId,
+          pendingAt: account.stripePendingAt,
         },
+        /**
+         * A scheduled downgrade or upgrade. The account keeps `plan` until
+         * `pendingChange.at`.
+         */
+        pendingChange: pendingPlanChangeFor(account),
         plan: quota.plan,
         usage: {
           used: quota.used,

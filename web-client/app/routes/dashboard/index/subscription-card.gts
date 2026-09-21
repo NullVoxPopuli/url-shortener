@@ -16,6 +16,10 @@ function hasNoSubscription(billing: BillingStatus) {
   return billing.plan.key === 'none';
 }
 
+function isDowngrade(change: NonNullable<BillingStatus['pendingChange']>) {
+  return change.kind === 'downgrade';
+}
+
 interface Signature {
   Args: {
     billing: BillingStatus;
@@ -68,8 +72,24 @@ export class SubscriptionCard extends Component<Signature> {
           {{stripeDate @billing.stripe.currentPeriodEnd}}
         </p>
         {{#if @billing.stripe.cancelAtPeriodEnd}}
-          <p class="warning">Cancellation is scheduled for the end of the
-            current period.</p>
+          <p class="warning" data-test-cancelling>Cancelling. Your
+            {{@billing.plan.name}}
+            plan ends
+            {{stripeDate @billing.stripe.currentPeriodEnd}}.</p>
+        {{else if @billing.pendingChange}}
+          {{#if (isDowngrade @billing.pendingChange)}}
+            <p class="warning" data-test-downgrading>Downgrading to
+              {{@billing.pendingChange.plan.name}}
+              on
+              {{stripeDate @billing.pendingChange.at}}. You keep
+              {{@billing.plan.name}}
+              until then.</p>
+          {{else}}
+            <p class="muted" data-test-upgrading>Upgrading to
+              {{@billing.pendingChange.plan.name}}
+              on
+              {{stripeDate @billing.pendingChange.at}}.</p>
+          {{/if}}
         {{/if}}
       {{/if}}
 
