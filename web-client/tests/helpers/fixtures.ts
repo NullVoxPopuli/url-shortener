@@ -1,4 +1,4 @@
-import type { ApiKey, BillingStatus, Link } from '#app/data/types';
+import type { ApiKey, BillingStatus, Link, PlanResource } from '#app/data/types';
 
 export function makeBilling(overrides?: {
   planKey?: string;
@@ -56,7 +56,6 @@ export function makeBilling(overrides?: {
       editsUsed,
       editsRemaining,
     },
-    availablePlans: [],
     paymentMethod: { brand: null, last4: null },
     lastSyncedAt: null,
   } as unknown as BillingStatus;
@@ -87,3 +86,20 @@ export function makeLink(overrides?: Partial<Record<keyof Link, unknown>>): Link
   } as unknown as Link;
 }
 
+
+export function makePlan(overrides?: Partial<PlanResource>): PlanResource {
+  return {
+    id: 'pro',
+    key: 'pro',
+    name: 'Pro',
+    stripeProductId: 'prod_pro',
+    prices: {
+      month: { id: 'price_pro_month', amountInCents: 1500 },
+      year: { id: 'price_pro_year', amountInCents: 16500 },
+    },
+    monthlyLinkLimit: 1000,
+    linkEditsPerMonth: 50,
+    linkExpiration: true,
+    ...overrides,
+  } as unknown as PlanResource;
+}

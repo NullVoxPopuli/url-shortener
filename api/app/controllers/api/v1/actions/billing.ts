@@ -135,7 +135,6 @@ export async function billingStatus(context: HttpContext) {
           editsUsed: edits.used,
           editsRemaining: edits.remaining,
         },
-        availablePlans: PLANS.map((plan) => ({ ...plan })),
         paymentMethod: {
           brand: account.stripePaymentMethodBrand,
           last4: account.stripePaymentMethodLast4,

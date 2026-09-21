@@ -51,15 +51,8 @@ test.group('GET /v1/billing/status', (group) => {
     assert.strictEqual(attributes.usage.remaining, 5);
     assert.ok(attributes.usage.periodStart);
     assert.ok(attributes.usage.periodEnd);
-    assert.isArray(attributes.availablePlans);
-    assert.strictEqual(attributes.availablePlans.length, 4);
-    assert.deepEqual(
-      attributes.availablePlans.map((plan: { key: string }) => plan.key),
-      ['base', 'essentials', 'pro', 'vast']
-    );
-    assert.strictEqual(attributes.availablePlans[3].prices.month.amountInCents, 5000);
-    assert.strictEqual(attributes.availablePlans[3].prices.year.amountInCents, 55000);
     assert.isNull(attributes.stripe.interval);
+    assert.notProperty(attributes, 'availablePlans');
   });
 
   test('usage counts links created this period', async ({ client }) => {

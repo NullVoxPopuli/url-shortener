@@ -23,6 +23,15 @@ export interface Plan {
   linkExpiration: boolean;
 }
 
+/**
+ * A plan from GET /v1/plans. The id is the plan key.
+ */
+export interface PlanResource extends Plan {
+  id: string;
+  prices: Record<BillingInterval, PlanPrice>;
+  [Type]: 'plan';
+}
+
 export interface BillingStatus {
   id: string;
   isFree: boolean;
@@ -46,7 +55,6 @@ export interface BillingStatus {
     editsUsed: number;
     editsRemaining: number | null;
   };
-  availablePlans: Plan[];
   paymentMethod: {
     brand: string | null;
     last4: string | null;

@@ -24,6 +24,7 @@ router
     version('v1', () => {
       let links = () => import('#controllers/api/v1/links');
       let billing = () => import('#controllers/api/v1/billing');
+      let plans = () => import('#controllers/api/v1/plans');
       let accounts = () => import('#controllers/api/v1/accounts');
       let users = () => import('#controllers/api/v1/users');
 
@@ -90,6 +91,7 @@ router
       router.post('billing/checkout', [billing, 'checkout']);
       router.post('billing/portal', [billing, 'portal']);
       router.get('billing/status', [billing, 'status']);
+      router.get('plans', [plans, 'index']);
     });
   })
   .use([apiThrottle, forceMimeType])
