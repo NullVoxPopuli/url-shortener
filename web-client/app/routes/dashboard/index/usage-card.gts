@@ -13,6 +13,14 @@ function isExhausted(billing: BillingStatus) {
   return !isUnlimited(billing) && billing.usage.remaining === 0;
 }
 
+/**
+ * The free plan is the only one whose way out of an exhausted quota is
+ * an upgrade rather than a bigger plan's portal.
+ */
+function isFreePlan(billing: BillingStatus) {
+  return billing.plan.key === 'none';
+}
+
 function usagePercent(billing: BillingStatus) {
   const limit = billing.plan.monthlyLinkLimit;
 
@@ -40,12 +48,13 @@ export const UsageCard: TOC<Signature> = <template>
         <span class="stat-number">{{@billing.usage.used}}</span>
         links created this month
       </p>
-      <p class="muted">Unlimited links</p>
+      <p class="muted">Unlimited links. Nothing to count down.</p>
     {{else}}
       <p class="stat">
         <span class="stat-number">{{@billing.usage.used}}</span>
         of
         {{@billing.plan.monthlyLinkLimit}}
+        {{if (isFreePlan @billing) "free"}}
         links used this month
       </p>
       <div
@@ -62,12 +71,24 @@ export const UsageCard: TOC<Signature> = <template>
         ></div>
       </div>
       {{#if (isExhausted @billing)}}
-        <p class="warning">You've used your quota for this month. It resets on
-          {{formatUtcDateTime @billing.usage.periodEnd}}.</p>
+        {{#if (isFreePlan @billing)}}
+          <p class="warning" data-test-free-exhausted>You've used all
+            {{@billing.plan.monthlyLinkLimit}}
+            free links this month.
+            <a href="/pricing">Upgrade for more</a>, or wait until
+            {{formatUtcDateTime @billing.usage.periodEnd}}.</p>
+        {{else}}
+          <p class="warning">You've used your quota for this month. It resets on
+            {{formatUtcDateTime @billing.usage.periodEnd}}.</p>
+        {{/if}}
       {{else}}
         <p class="muted">{{@billing.usage.remaining}}
           remaining until
           {{formatUtcDateTime @billing.usage.periodEnd}}</p>
+        {{#if (isFreePlan @billing)}}
+          <p class="muted" data-test-free-hint>Paid plans start at 15 links a month.
+            <a href="/pricing">See plans</a></p>
+        {{/if}}
       {{/if}}
     {{/if}}
   </section>

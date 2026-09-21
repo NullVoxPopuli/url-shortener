@@ -13,9 +13,11 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
 
     await render(<template><SubscriptionCard @billing={{billing}} /></template>);
 
-    assert.dom('section').containsText('No subscription');
-    assert.dom('section').containsText('starter allowance of 5 links per month');
-    assert.dom('a[href="/pricing"]').exists();
+    assert.dom('[data-test-free-plan]').hasText('Free');
+    assert.dom('.plan-includes').containsText('5 links a month');
+    assert.dom('.plan-includes').containsText('Watermarked QR codes');
+    assert.dom('section').containsText('No card on file');
+    assert.dom('[data-test-upgrade]').hasAttribute('href', '/pricing');
     assert.dom('button').doesNotExist();
   });
 
@@ -29,9 +31,10 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
 
     await render(<template><SubscriptionCard @billing={{billing}} /></template>);
 
-    assert.dom('section').containsText('Free account');
-    assert.dom('section').containsText('Unlimited links');
+    assert.dom('[data-test-legacy-free]').hasText('Free, unlimited');
+    assert.dom('section').containsText('legacy account');
     assert.dom('button').doesNotExist();
+    assert.dom('a[href="/pricing"]').doesNotExist();
   });
 
   test('active subscription: plan, period, manage button', async function (assert) {

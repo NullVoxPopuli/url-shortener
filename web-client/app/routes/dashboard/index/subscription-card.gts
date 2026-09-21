@@ -68,13 +68,16 @@ export class SubscriptionCard extends Component<Signature> {
       <h2>Subscription</h2>
 
       {{#if (hasNoSubscription @billing)}}
-        <p class="plan-name">No subscription</p>
-        <p class="muted">You're on the starter allowance of
-          {{@billing.plan.monthlyLinkLimit}}
-          links per month.</p>
+        <p class="plan-name" data-test-free-plan>Free</p>
+        <ul class="plan-includes">
+          <li>{{@billing.plan.monthlyLinkLimit}} links a month</li>
+          <li>Watermarked QR codes</li>
+          <li>Basic click stats</li>
+        </ul>
+        <p class="muted">No card on file. Nothing renews.</p>
       {{else if (isFree @billing)}}
-        <p class="plan-name">Free account</p>
-        <p class="muted">Unlimited links, on the house.</p>
+        <p class="plan-name" data-test-legacy-free>Free, unlimited</p>
+        <p class="muted">A legacy account: unlimited links, and nothing to bill.</p>
       {{else}}
         <p class="plan-name">{{@billing.plan.name}}</p>
         <p class="muted">
@@ -101,19 +104,22 @@ export class SubscriptionCard extends Component<Signature> {
         {{/if}}
       {{/if}}
 
-      <div class="card-actions">
-        {{#if @billing.hasActiveSubscription}}
-          <button
-            type="button"
-            disabled={{this.isSubmitting}}
-            {{on "click" this.manageBilling}}
-          >
-            Manage billing
-          </button>
-        {{else}}
-          <a href="/pricing">View pricing and plans</a>
-        {{/if}}
-      </div>
+      {{#unless (isFree @billing)}}
+        <div class="card-actions">
+          {{#if @billing.hasActiveSubscription}}
+            <button
+              type="button"
+              disabled={{this.isSubmitting}}
+              {{on "click" this.manageBilling}}
+            >
+              Manage billing
+            </button>
+          {{else}}
+            <a href="/pricing" data-test-upgrade>Upgrade for more links, QR codes without
+              a watermark, and custom domains</a>
+          {{/if}}
+        </div>
+      {{/unless}}
     </section>
 
     <style scoped>
@@ -140,6 +146,13 @@ export class SubscriptionCard extends Component<Signature> {
       .plan-name {
         font-size: 1.5rem;
         font-weight: 600;
+      }
+
+      .plan-includes {
+        margin: 0 0 var(--gap-2);
+        padding-left: 1.1rem;
+        display: grid;
+        gap: var(--gap-1);
       }
 
       .muted {
