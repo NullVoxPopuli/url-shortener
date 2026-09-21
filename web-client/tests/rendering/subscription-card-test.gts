@@ -66,7 +66,7 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
     assert.dom('[data-test-cancelling]').containsText('Essentials plan ends Sep 1, 2026');
   });
 
-  test('a scheduled downgrade says so, and that the current plan stays', async function (assert) {
+  test('a downgrade in progress names both plans and the date', async function (assert) {
     const billing = makeBilling({
       planKey: 'pro',
       planName: 'Pro',
@@ -80,13 +80,42 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
           linkExpiration: false,
         },
         at: 1788264000,
+        overages: [],
       },
     });
 
     await render(<template><SubscriptionCard @billing={{billing}} /></template>);
 
-    assert.dom('[data-test-downgrading]').containsText('Downgrading to Base on Sep 1, 2026');
-    assert.dom('[data-test-downgrading]').containsText('You keep Pro until then');
     assert.dom('.plan-name').hasText('Pro');
+    assert.dom('[data-test-downgrading]').hasText('Pro until Sep 1, 2026, then Base.');
+    assert.dom('[data-test-overages]').doesNotExist();
+  });
+
+  test('a downgrade in progress warns about the limits the account is over', async function (assert) {
+    const billing = makeBilling({
+      planKey: 'pro',
+      planName: 'Pro',
+      hasActiveSubscription: true,
+      pendingDowngrade: {
+        plan: {
+          key: 'base',
+          name: 'Base',
+          monthlyLinkLimit: 15,
+          linkEditsPerMonth: 0,
+          linkExpiration: false,
+        },
+        at: 1788264000,
+        overages: [
+          { resource: 'links', used: 40, limit: 15 },
+          { resource: 'customDomains', used: 2, limit: 0 },
+        ],
+      },
+    });
+
+    await render(<template><SubscriptionCard @billing={{billing}} /></template>);
+
+    assert
+      .dom('[data-test-overages]')
+      .hasText("Over Base's limits: 40 links this month (limit 15), 2 custom domains (limit 0).");
   });
 });

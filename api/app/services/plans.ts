@@ -167,12 +167,41 @@ export function intervalForPriceId(plan: Plan, priceId: string | null): BillingI
 interface PlanHolder {
   isFree: boolean;
   stripePriceId: string | null;
+  /**
+   * After a downgrade: the plan paid for through `stripeDowngradedUntil`
+   * (unix seconds). Plan checks use it until then.
+   */
+  stripeDowngradedFromPriceId?: string | null;
+  stripeDowngradedUntil?: number | null;
 }
 
-export function planFor(account: PlanHolder) {
+function nowInSeconds() {
+  return Math.floor(Date.now() / 1000);
+}
+
+export function isDowngradeGraceActive(account: PlanHolder, now = nowInSeconds()) {
+  return Boolean(
+    account.stripeDowngradedFromPriceId &&
+      account.stripeDowngradedUntil !== null &&
+      account.stripeDowngradedUntil !== undefined &&
+      account.stripeDowngradedUntil > now
+  );
+}
+
+/**
+ * The price whose plan applies right now: the one paid for through the
+ * downgrade date while that lasts, else the subscription's price.
+ */
+export function effectivePriceId(account: PlanHolder, now = nowInSeconds()) {
+  return isDowngradeGraceActive(account, now)
+    ? (account.stripeDowngradedFromPriceId ?? null)
+    : account.stripePriceId;
+}
+
+export function planFor(account: PlanHolder, now = nowInSeconds()) {
   return account.isFree
     ? FREE_PLAN
-    : (planForPriceId(account.stripePriceId) ?? NO_SUBSCRIPTION_PLAN);
+    : (planForPriceId(effectivePriceId(account, now)) ?? NO_SUBSCRIPTION_PLAN);
 }
 
 /**
@@ -185,26 +214,34 @@ export function billingIntervalFor(account: PlanHolder): BillingInterval | null 
   return plan ? intervalForPriceId(plan, account.stripePriceId) : null;
 }
 
-export interface PendingDowngrade {
-  plan: Plan;
-  /** unix seconds, when Stripe switches the subscription */
-  at: number | null;
+/**
+ * Position in PLANS, cheapest first. Unpaid plans rank below every paid one.
+ */
+export function planRank(priceId: string | null) {
+  const plan = planForPriceId(priceId);
+
+  return plan ? PLANS.findIndex((candidate) => candidate.key === plan.key) : -1;
 }
 
-interface PendingDowngradeHolder extends PlanHolder {
-  stripePendingPriceId: string | null;
-  stripePendingAt: number | null;
+export interface PendingDowngrade {
+  /** the plan the subscription is on, which applies from `at` */
+  plan: Plan | typeof NO_SUBSCRIPTION_PLAN;
+  /** unix seconds */
+  at: number;
 }
 
 /**
- * The plan change Stripe has scheduled, if any. Upgrades apply at once,
- * so a scheduled change is a downgrade, and the account keeps its
- * current plan until `at`.
+ * The downgrade in progress: the account still checks against the
+ * higher plan until `at`, then drops to `plan`.
  */
-export function pendingDowngradeFor(account: PendingDowngradeHolder): PendingDowngrade | null {
-  const pending = planForPriceId(account.stripePendingPriceId);
+export function pendingDowngradeFor(
+  account: PlanHolder,
+  now = nowInSeconds()
+): PendingDowngrade | null {
+  if (account.isFree || !isDowngradeGraceActive(account, now)) return null;
 
-  if (!pending || pending.key === planFor(account).key) return null;
-
-  return { plan: pending, at: account.stripePendingAt };
+  return {
+    plan: planForPriceId(account.stripePriceId) ?? NO_SUBSCRIPTION_PLAN,
+    at: account.stripeDowngradedUntil!,
+  };
 }

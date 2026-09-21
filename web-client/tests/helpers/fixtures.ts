@@ -43,8 +43,8 @@ export function makeBilling(overrides?: {
       currentPeriodStart: hasActiveSubscription ? 1785585600 : null,
       currentPeriodEnd: hasActiveSubscription ? 1788264000 : null,
       cancelAtPeriodEnd,
-      pendingPriceId: pendingDowngrade?.plan.key ?? null,
-      pendingAt: pendingDowngrade?.at ?? null,
+      downgradedFromPriceId: pendingDowngrade ? `price_${planKey}` : null,
+      downgradedUntil: pendingDowngrade?.at ?? null,
     },
     pendingDowngrade,
     plan: {

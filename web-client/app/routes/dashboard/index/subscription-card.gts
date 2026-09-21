@@ -6,7 +6,7 @@ import { openBillingPortal } from '#app/data/billing';
 
 import { formatDate } from '../format.ts';
 
-import type { BillingStatus } from '#app/data/types';
+import type { BillingStatus, Overage } from '#app/data/types';
 
 function isFree(billing: BillingStatus) {
   return billing.plan.key === 'free';
@@ -14,6 +14,21 @@ function isFree(billing: BillingStatus) {
 
 function hasNoSubscription(billing: BillingStatus) {
   return billing.plan.key === 'none';
+}
+
+const OVERAGE_LABELS: Record<Overage['resource'], string> = {
+  links: 'links this month',
+  linkEdits: 'link edits this month',
+  expiringLinks: 'links with an expiration this month',
+  customDomains: 'custom domains',
+  apiKeys: 'API keys',
+  teammates: 'teammates',
+};
+
+function describeOverages(overages: Overage[]) {
+  return overages
+    .map((overage) => `${overage.used} ${OVERAGE_LABELS[overage.resource]} (limit ${overage.limit})`)
+    .join(', ');
 }
 
 
@@ -74,12 +89,15 @@ export class SubscriptionCard extends Component<Signature> {
             plan ends
             {{stripeDate @billing.stripe.currentPeriodEnd}}.</p>
         {{else if @billing.pendingDowngrade}}
-          <p class="warning" data-test-downgrading>Downgrading to
-            {{@billing.pendingDowngrade.plan.name}}
-            on
-            {{stripeDate @billing.pendingDowngrade.at}}. You keep
-            {{@billing.plan.name}}
-            until then.</p>
+          <p class="muted" data-test-downgrading>{{@billing.plan.name}}
+            until
+            {{stripeDate @billing.pendingDowngrade.at}}, then
+            {{@billing.pendingDowngrade.plan.name}}.</p>
+          {{#if @billing.pendingDowngrade.overages.length}}
+            <p class="warning" data-test-overages>Over
+              {{@billing.pendingDowngrade.plan.name}}'s limits:
+              {{describeOverages @billing.pendingDowngrade.overages}}.</p>
+          {{/if}}
         {{/if}}
       {{/if}}
 

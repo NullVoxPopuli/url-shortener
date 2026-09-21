@@ -3,7 +3,10 @@ import { assert } from 'chai';
 import type { ApiClient } from '@japa/api-client';
 import type User from '#models/user';
 import { API_DOMAIN } from '#start/env';
+import { DateTime } from 'luxon';
 import { createLink, createNewAccount } from '#tests/db';
+import LinkEdit from '#models/link_edit';
+import { PLANS } from '#services/plans';
 import { setup } from '#tests/helpers';
 import { assertUnauthorized } from '#tests/jsonapi';
 
@@ -95,6 +98,54 @@ test.group('GET /v1/billing/status', (group) => {
     const attributes = response.body().data.attributes;
     assert.isTrue(attributes.hasActiveSubscription);
     assert.strictEqual(attributes.stripe.subscriptionStatus, 'active');
+  });
+});
+
+test.group('GET /v1/billing/status [downgrade in progress]', (group) => {
+  setup(group);
+
+  test('reports the plan paid for, the plan it drops to, and the overages', async ({ client }) => {
+    const now = Math.floor(Date.now() / 1000);
+    const { user, account } = await createNewAccount({
+      account: {
+        stripeCustomerId: 'cus_downgrading',
+        stripeSubscriptionStatus: 'active',
+        stripePriceId: PLANS[0].prices.month.id,
+        stripeDowngradedFromPriceId: PLANS[2].prices.month.id,
+        stripeDowngradedUntil: now + 1000,
+      },
+    });
+
+    for (let i = 0; i < PLANS[0].monthlyLinkLimit; i++) {
+      await createLink(user, account, `https://example.com/${i}`);
+    }
+
+    // one more, with an expiration: Base has no link expiration
+    const expiring = await createLink(user, account, {
+      original: 'https://example.com/expiring',
+      expiresAt: DateTime.utc().plus({ days: 7 }),
+    });
+
+    // one edit this month: Base has no edits
+    await LinkEdit.create({
+      link_id: expiring.id,
+      account_id: account.id,
+      edited_by: user.id,
+      previousOriginal: 'https://example.com/before',
+      previousExpiresAt: null,
+    });
+
+    const response = await getStatus(client, user);
+    const attributes = response.body().data.attributes;
+
+    assert.strictEqual(attributes.plan.key, 'pro');
+    assert.strictEqual(attributes.pendingDowngrade.plan.key, 'base');
+    assert.strictEqual(attributes.pendingDowngrade.at, now + 1000);
+    assert.deepEqual(attributes.pendingDowngrade.overages, [
+      { resource: 'links', used: PLANS[0].monthlyLinkLimit + 1, limit: PLANS[0].monthlyLinkLimit },
+      { resource: 'linkEdits', used: 1, limit: 0 },
+      { resource: 'expiringLinks', used: 1, limit: 0 },
+    ]);
   });
 });
 

@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import Account from '#models/account';
 import { stripe } from '#services/stripe';
+import { effectivePriceId, isDowngradeGraceActive, planRank } from '#services/plans';
 import type Stripe from 'stripe';
 
 export type StripeSubCache =
@@ -11,8 +12,8 @@ export type StripeSubCache =
       currentPeriodStart: number | null;
       currentPeriodEnd: number | null;
       cancelAtPeriodEnd: boolean;
-      pendingPriceId: string | null;
-      pendingAt: number | null;
+      downgradedFromPriceId: string | null;
+      downgradedUntil: number | null;
       paymentMethod: {
         brand: string | null;
         last4: string | null;
@@ -96,7 +97,7 @@ export async function syncStripeDataToAccount(account: Account): Promise<StripeS
     customer: customerId,
     limit: 1,
     status: 'all',
-    expand: ['data.default_payment_method', 'data.schedule'],
+    expand: ['data.default_payment_method'],
   });
 
   // No subscription: clear all fields.
@@ -107,8 +108,8 @@ export async function syncStripeDataToAccount(account: Account): Promise<StripeS
     account.stripeCurrentPeriodStart = null;
     account.stripeCurrentPeriodEnd = null;
     account.stripeCancelAtPeriodEnd = null;
-    account.stripePendingPriceId = null;
-    account.stripePendingAt = null;
+    account.stripeDowngradedFromPriceId = null;
+    account.stripeDowngradedUntil = null;
     account.stripePaymentMethodBrand = null;
     account.stripePaymentMethodLast4 = null;
     account.stripeLastSyncedAt = DateTime.utc();
@@ -130,16 +131,21 @@ export async function syncStripeDataToAccount(account: Account): Promise<StripeS
         }
       : null;
 
-  const pending = pendingPhaseChange(subscription, priceId);
+  const currentPeriodEnd = item?.current_period_end ?? null;
+  const grace = downgradeGraceAfterSync(account, {
+    priceId,
+    currentPeriodEnd,
+    isActive: ACTIVE_STATUSES.has(subscription.status),
+  });
 
   const subData: StripeSubCache = {
     subscriptionId: subscription.id,
     status: subscription.status,
     priceId,
-    pendingPriceId: pending?.priceId ?? null,
-    pendingAt: pending?.at ?? null,
+    downgradedFromPriceId: grace?.fromPriceId ?? null,
+    downgradedUntil: grace?.until ?? null,
     currentPeriodStart: item?.current_period_start ?? null,
-    currentPeriodEnd: item?.current_period_end ?? null,
+    currentPeriodEnd,
     // The portal can schedule a cancellation as a `cancel_at` date
     // instead of the flag; both mean the plan ends and does not renew.
     cancelAtPeriodEnd: Boolean(subscription.cancel_at_period_end || subscription.cancel_at),
@@ -152,8 +158,8 @@ export async function syncStripeDataToAccount(account: Account): Promise<StripeS
   account.stripeCurrentPeriodStart = subData.currentPeriodStart;
   account.stripeCurrentPeriodEnd = subData.currentPeriodEnd;
   account.stripeCancelAtPeriodEnd = subData.cancelAtPeriodEnd;
-  account.stripePendingPriceId = subData.pendingPriceId;
-  account.stripePendingAt = subData.pendingAt;
+  account.stripeDowngradedFromPriceId = subData.downgradedFromPriceId;
+  account.stripeDowngradedUntil = subData.downgradedUntil;
   account.stripePaymentMethodBrand = subData.paymentMethod?.brand ?? null;
   account.stripePaymentMethodLast4 = subData.paymentMethod?.last4 ?? null;
   account.stripeLastSyncedAt = DateTime.utc();
@@ -163,33 +169,34 @@ export async function syncStripeDataToAccount(account: Account): Promise<StripeS
   return subData;
 }
 
-function idOf(value: string | { id: string } | null | undefined): string | null {
-  if (!value) return null;
-
-  return typeof value === 'string' ? value : value.id;
-}
+const ACTIVE_STATUSES = new Set(['active', 'trialing', 'past_due']);
 
 /**
- * A plan change scheduled for later lives on a subscription schedule:
- * the subscription's items stay on the current price until the next
- * phase starts. This finds that next phase, when its price differs.
+ * Stripe applies a downgrade at once, but the period was paid at the
+ * higher plan. When the price drops, remember the plan it dropped from
+ * and the end of the paid period. An upgrade, a cancellation, or the
+ * date passing ends the grace.
  */
-function pendingPhaseChange(subscription: Stripe.Subscription, currentPriceId: string | null) {
-  const schedule = subscription.schedule;
-
-  if (!schedule || typeof schedule === 'string') return null;
+function downgradeGraceAfterSync(
+  account: Account,
+  next: { priceId: string | null; currentPeriodEnd: number | null; isActive: boolean }
+): { fromPriceId: string; until: number } | null {
+  if (!next.isActive || !next.priceId) return null;
 
   const now = Math.floor(Date.now() / 1000);
-  const upcoming = schedule.phases
-    .filter((phase) => phase.start_date > now)
-    .sort((a, b) => a.start_date - b.start_date);
-  const next = upcoming[0];
+  const previousEffective = effectivePriceId(account, now);
+  const existing =
+    isDowngradeGraceActive(account, now) && account.stripeDowngradedFromPriceId
+      ? { fromPriceId: account.stripeDowngradedFromPriceId, until: account.stripeDowngradedUntil! }
+      : null;
 
-  if (!next) return null;
+  if (next.priceId === previousEffective) return existing;
 
-  const priceId = idOf(next.items[0]?.price);
+  if (planRank(next.priceId) >= planRank(previousEffective)) return null;
 
-  if (!priceId || priceId === currentPriceId) return null;
+  if (existing) return existing;
 
-  return { priceId, at: next.start_date };
+  if (!previousEffective || !next.currentPeriodEnd || next.currentPeriodEnd <= now) return null;
+
+  return { fromPriceId: previousEffective, until: next.currentPeriodEnd };
 }

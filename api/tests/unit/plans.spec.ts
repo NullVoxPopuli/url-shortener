@@ -43,31 +43,30 @@ test.group('plans', () => {
     assert.isNull(billingIntervalFor({ isFree: false, stripePriceId: null }));
   });
 
-  test('a pending price on another plan is a downgrade', () => {
-    const onPro = {
-      isFree: false,
-      stripePriceId: PLANS[2].prices.month.id,
-      stripePendingPriceId: PLANS[0].prices.year.id,
-      stripePendingAt: 123,
-    };
-
-    assert.deepEqual(pendingDowngradeFor(onPro), { plan: PLANS[0], at: 123 });
-  });
-
-  test('no pending downgrade without a pending price, or when it is the same plan', () => {
+  test('planFor honors the downgrade grace until its date', () => {
+    const now = 1_000_000;
     const account = {
       isFree: false,
-      stripePriceId: PLANS[2].prices.month.id,
-      stripePendingPriceId: null,
-      stripePendingAt: null,
+      stripePriceId: PLANS[0].prices.month.id,
+      stripeDowngradedFromPriceId: PLANS[2].prices.month.id,
+      stripeDowngradedUntil: now + 100,
     };
 
-    assert.isNull(pendingDowngradeFor(account));
+    assert.strictEqual(planFor(account, now).key, 'pro');
+    assert.deepEqual(pendingDowngradeFor(account, now), { plan: PLANS[0], at: now + 100 });
+
+    assert.strictEqual(planFor(account, now + 100).key, 'base');
+    assert.isNull(pendingDowngradeFor(account, now + 100));
+  });
+
+  test('no pending downgrade without a grace, or on a free account', () => {
+    assert.isNull(pendingDowngradeFor({ isFree: false, stripePriceId: PLANS[2].prices.month.id }));
     assert.isNull(
       pendingDowngradeFor({
-        ...account,
-        stripePendingPriceId: PLANS[2].prices.year.id,
-        stripePendingAt: 1,
+        isFree: true,
+        stripePriceId: null,
+        stripeDowngradedFromPriceId: PLANS[2].prices.month.id,
+        stripeDowngradedUntil: Number.MAX_SAFE_INTEGER,
       })
     );
   });
