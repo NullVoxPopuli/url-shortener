@@ -79,12 +79,6 @@ const env = await Env.create(new URL('../', import.meta.url), {
    * Example: https://app.example.com/billing
    */
   STRIPE_CANCEL_URL: Env.schema.string(),
-
-  /**
-   * Billing portal return URL.
-   * Example: https://app.example.com/settings/billing
-   */
-  STRIPE_PORTAL_RETURN_URL: Env.schema.string(),
 });
 
 export default env;

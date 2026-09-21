@@ -61,7 +61,9 @@ export async function billingCheckout(context: HttpContext) {
   // the user would land on the cancel URL after paying.
   const successUrl = new URL(env.get('STRIPE_SUCCESS_URL'));
   if (!successUrl.searchParams.has('return_to')) {
-    successUrl.searchParams.set('return_to', env.get('STRIPE_PORTAL_RETURN_URL'));
+    const url = `https://${env.get('DOMAIN')}/${account.id.split('-')[0]!}`;
+
+    successUrl.searchParams.set('return_to', url);
   }
 
   const customerId = await getOrCreateStripeCustomerIdForAccount({
