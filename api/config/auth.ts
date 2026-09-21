@@ -14,12 +14,14 @@ const authConfig = defineConfig({
     }),
 
     /**
-     * For self-provisioned tokens
+     * For self-provisioned API keys. The tokenable is an *account
+     * membership*, so a key authenticates as one user acting within
+     * one account.
      */
     api: tokensGuard({
       provider: tokensUserProvider({
-        tokens: 'accessTokens',
-        model: () => import('#models/user'),
+        tokens: 'apiKeys',
+        model: () => import('#models/account_membership'),
       }),
     }),
   },

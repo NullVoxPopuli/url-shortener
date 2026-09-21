@@ -1,0 +1,167 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Verdana, Geneva, Tahoma, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+h1 {
+  font-family: "Arial";
+  font-style: italic;
+  text-decoration: underline;
+
+  &.soft {
+    text-decoration: none;
+  }
+}
+
+.nvp__site-theme-toggle:has(:focus-visible) label {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--ring-shadow);
+  border-radius: var(--radius);
+  z-index: var(--z-focused);
+}
+
+/**
+* Opposite of aria-hidden=true
+*/
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/*
+ * Doubled selector out-specifies ember-primitives' own
+ * `width: 100dvw` rule, which overflows our nested scroll
+ * container (dvw ignores scrollbar widths).
+ */
+.ember-primitives__hero__wrapper.ember-primitives__hero__wrapper {
+  width: 100%;
+  height: 100dvh;
+  position: relative;
+  z-index: 0;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(-45deg in oklch, #1252e3, #485de5, #7812e5, #3512c5);
+  background-size: 400% 400%;
+  animation: gradient-animation 16s ease infinite;
+}
+
+.theme-dark .ember-primitives__hero__wrapper {
+  background-image: linear-gradient(-45deg in oklch,
+      #07133d,
+      #101c5c,
+      #32166d,
+      #090b2a);
+}
+
+.ember-primitives__sticky-footer__wrapper {
+  height: 100%;
+  overflow: auto;
+}
+
+.ember-primitives__sticky-footer__container {
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.auth-page {
+  min-height: calc(100dvh - 3.5rem);
+  display: grid;
+  place-items: center;
+  padding: 5rem 1rem 2rem;
+  background: var(--color-page-background);
+  color: var(--color-text);
+}
+
+.auth-card {
+  width: min(100%, 34rem);
+  display: grid;
+  gap: 2rem;
+  padding: 2rem;
+  border-radius: var(--radius);
+  background: var(--surface-background-color);
+  color: var(--color-text);
+}
+
+.auth-heading {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.auth-heading h1,
+.auth-heading p {
+  margin: 0;
+}
+
+.auth-heading h1 {
+  font-size: 2rem;
+}
+
+.auth-heading p {
+  line-height: 1.5;
+}
+
+.auth-actions {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.oauth-link {
+  text-decoration: none;
+}
+
+.nvp__header {
+  z-index: var(--z-site-nav, 50);
+}
+
+
+.nvp__header.home-header {
+  position: sticky;
+  top: 0;
+  margin-bottom: -3.5rem;
+  background: transparent !important;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.nvp__header.did-scroll {
+  background: rgba(100, 70, 200, 0.75);
+  box-shadow: var(--shadow-xl);
+  backdrop-filter: blur(5px);
+}
+
+.ember-primitives__sticky-footer__content:has(.auth-page) .nvp__header {
+  background: var(--surface-background-color) !important;
+  color: var(--color-text);
+}
+
+.ember-primitives__sticky-footer__content:has(.auth-page) .nvp__header a {
+  color: var(--color-text);
+}
+
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}

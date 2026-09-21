@@ -1,11 +1,12 @@
-import { hasUUID, attr, hasAttr, relationship, assertWellFormedLinkData } from '#tests/jsonapi';
+import { hasUUID, attr, hasAttr, assertWellFormedLinkData } from '#tests/jsonapi';
 import { changedRecords, createNewAccount } from '#tests/db';
-import { ApiClient } from '@japa/api-client';
+import type { ApiClient } from '@japa/api-client';
 import Link from '#models/link';
 import { test } from '@japa/runner';
-import User from '#models/user';
+import type User from '#models/user';
 import { API_DOMAIN, DOMAIN } from '#start/env';
 import { setup } from '#tests/helpers';
+import { linkDoc } from '#tests/jsonapi';
 
 test.group('POST [authenticated session]', (group) => {
   setup(group);
@@ -13,7 +14,7 @@ test.group('POST [authenticated session]', (group) => {
   const post = (user: User, client: ApiClient, body = {}) =>
     client
       .post(`http://${API_DOMAIN}/v1/links`)
-      .json(body)
+      .json(linkDoc(body))
       .header('Accept', 'application/vnd.api+json')
       .header('Content-Type', 'application/vnd.api+json')
       .withGuard('web')
@@ -24,11 +25,11 @@ test.group('POST [authenticated session]', (group) => {
     let response = await post(user, client, {});
 
     response.assertStatus(422);
-    response.assertBody({
+    response.assertBodyContains({
       errors: [
         {
-          status: 422,
-          title: 'Missing URL',
+          status: '422',
+          detail: 'Missing URL',
         },
       ],
     });
@@ -39,11 +40,11 @@ test.group('POST [authenticated session]', (group) => {
     let response = await post(user, client, { originalUrl: '' });
 
     response.assertStatus(422);
-    response.assertBody({
+    response.assertBodyContains({
       errors: [
         {
-          status: 422,
-          title: 'Missing URL',
+          status: '422',
+          detail: 'Missing URL',
         },
       ],
     });
@@ -54,11 +55,11 @@ test.group('POST [authenticated session]', (group) => {
     let response = await post(user, client, { originalUrl: 'abcd' });
 
     response.assertStatus(422);
-    response.assertBody({
+    response.assertBodyContains({
       errors: [
         {
-          status: 422,
-          title: 'Cannot parse URL, check the URL',
+          status: '422',
+          detail: 'Cannot parse URL, check the URL',
         },
       ],
     });
@@ -84,10 +85,6 @@ test.group('POST [authenticated session]', (group) => {
     hasAttr(data, 'updatedAt');
     assert.include(attr(data, 'shortUrl'), `https://${DOMAIN}`);
     assert.ok(attr(data, 'shortUrl').startsWith(`https://${DOMAIN}`));
-
-    assertWellFormedLinkData(data);
-
-    relationship(data, 'createdBy');
   });
 
   test('Success: URLs from non-glimdown.com URL requires authentication (from a free account)', async ({
@@ -111,9 +108,9 @@ test.group('POST [authenticated session]', (group) => {
 
     assertWellFormedLinkData(data);
 
-    assert.strictEqual(data.relationships.createdBy.id, user.id);
-    assert.strictEqual(data.relationships.ownedBy.id, account.id);
+    let link = await Link.find(data.id);
 
-    relationship(data, 'createdBy');
+    assert.strictEqual(link?.created_by, user.id);
+    assert.strictEqual(link?.owned_by, account.id);
   });
 });

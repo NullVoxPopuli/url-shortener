@@ -1,6 +1,6 @@
 import { test } from '@japa/runner';
 import { DOMAIN } from '#start/env';
-import { setup } from '#tests/helpers';
+import { apexUrl, setup } from '#tests/helpers';
 
 // `http://${env.get('DOMAIN')}:${env.get('PORT')}`;
 
@@ -11,7 +11,7 @@ import { setup } from '#tests/helpers';
 type Visit = Parameters<NonNullable<Parameters<typeof test>[1]>>[0]['visit'];
 
 async function goHome(visit: Visit) {
-  const page = await visit('/');
+  const page = await visit(apexUrl('/'));
   await page.assertTextContains('h1', 'nvp.gg');
 
   return {

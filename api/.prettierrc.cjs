@@ -2,7 +2,7 @@
 
 module.exports = {
   printWidth: 100,
-  plugins: ['prettier-edgejs'],
+  plugins: ['prettier-plugin-edgejs'],
   overrides: [
     {
       // Lol, JavaScript
@@ -41,7 +41,7 @@ module.exports = {
         quoteProps: 'consistent',
         bracketSpacing: true,
         arrowParens: 'always',
-        plugins: ['prettier-edgejs'],
+        plugins: ['prettier-plugin-edgejs'],
       },
     },
   ],

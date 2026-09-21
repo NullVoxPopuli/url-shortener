@@ -26,7 +26,10 @@ export default class AuthMiddleware {
 
     switch (provider) {
       case 'github':
-        let token = ctx.auth.user?.oauth_github_token;
+        // Only session users carry an OAuth token (the api guard's
+        // user is an account membership).
+        let authed = ctx.auth.user;
+        let token = authed && 'oauth_github_token' in authed ? authed.oauth_github_token : null;
         if (!token) {
           return ctx.response.redirect(this.redirectTo);
         }

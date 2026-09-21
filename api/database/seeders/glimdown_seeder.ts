@@ -4,6 +4,7 @@ import Account from '#models/account';
 import db from '@adonisjs/lucid/services/db';
 import User from '#models/user';
 
+import AccountMembership from '#models/account_membership';
 import { glimdownOwner } from '#consts';
 
 /**
@@ -14,7 +15,7 @@ import { glimdownOwner } from '#consts';
 export default class extends BaseSeeder {
   async run() {
     let existingAccount = await Account.find(glimdownOwner.id);
-    let existingUser = await Account.find(glimdownOwner.id);
+    let existingUser = await User.find(glimdownOwner.id);
 
     await db.transaction(async (trx) => {
       if (!existingAccount) {
@@ -24,6 +25,7 @@ export default class extends BaseSeeder {
           name: glimdownOwner.name,
           created_at: DateTime.utc().toSQLDate(),
           is_free: true,
+          is_personal: false,
         });
       }
 
@@ -35,6 +37,12 @@ export default class extends BaseSeeder {
           created_at: DateTime.utc().toSQLDate(),
         });
       }
+    });
+
+    await AccountMembership.ensure({
+      accountId: glimdownOwner.id,
+      userId: glimdownOwner.id,
+      role: 'admin',
     });
   }
 }

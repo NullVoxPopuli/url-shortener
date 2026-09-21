@@ -1,4 +1,5 @@
 import { assert } from '@japa/assert';
+import { chromium } from 'playwright';
 import { browserClient } from '@japa/browser-client';
 import { apiClient } from '@japa/api-client';
 import app from '@adonisjs/core/services/app';
@@ -24,6 +25,17 @@ export const plugins: Config['plugins'] = [
   sessionApiClient(app),
   browserClient({
     runInSuites: ['browser'],
+
+    /**
+     * Playwright does not ship chromium builds for every OS release.
+     * Set PLAYWRIGHT_CHANNEL=chrome to use the system Chrome locally;
+     * CI (playwright container) uses the bundled chromium by default.
+     */
+    launcher: (launcherOptions) =>
+      chromium.launch({
+        ...launcherOptions,
+        channel: process.env.PLAYWRIGHT_CHANNEL || undefined,
+      }),
 
     contextOptions: {
       ignoreHTTPSErrors: true,
