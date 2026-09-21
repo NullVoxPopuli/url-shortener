@@ -3,6 +3,7 @@ import { cached } from '@glimmer/tracking';
 import { on } from '@ember/modifier';
 
 import { checkout } from '@warp-drive/core/reactive';
+import { dataFromEvent } from 'ember-primitives/components/form';
 import { Button } from 'nvp.ui';
 import { getPromiseState } from 'reactiveweb/get-promise-state';
 
@@ -21,14 +22,19 @@ function toDateInputValue(iso: string | null) {
   return iso ? iso.slice(0, 10) : '';
 }
 
-function toExpiresAt(dateInputValue: string) {
-  return dateInputValue ? `${dateInputValue}T23:59:59.000Z` : null;
+/**
+ * The form data utility hands a date input back as a Date (UTC
+ * midnight of that day) or, when empty, nothing.
+ */
+function toExpiresAt(value: unknown) {
+  if (value instanceof Date) return `${value.toISOString().slice(0, 10)}T23:59:59.000Z`;
+  if (typeof value === 'string' && value) return `${value}T23:59:59.000Z`;
+
+  return null;
 }
 
-function field(data: FormData, name: string) {
-  const value = data.get(name);
-
-  return typeof value === 'string' ? value : '';
+function text(value: unknown) {
+  return typeof value === 'string' ? value.trim() : '';
 }
 
 
@@ -91,12 +97,12 @@ export class EditLinkForm extends Component<Signature> {
 
     if (!this.editable) return;
 
-    const data = new FormData(event.currentTarget as HTMLFormElement);
+    const data = dataFromEvent(event);
 
-    this.editable.original = field(data, 'original').trim();
+    this.editable.original = text(data.original);
 
     if (this.args.canSetExpiration) {
-      this.editable.expiresAt = toExpiresAt(field(data, 'expiresAt'));
+      this.editable.expiresAt = toExpiresAt(data.expiresAt);
     }
 
     const changes = changesBetween(this.args.link, this.editable);
