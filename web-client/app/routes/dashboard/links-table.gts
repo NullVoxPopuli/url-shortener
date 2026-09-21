@@ -7,7 +7,6 @@ import { EditLinkForm } from './edit-link-form.gts';
 import { formatDate } from './format';
 import { QrCode } from './qr-code.gts';
 
-import type { LinkChanges } from './edit-link-form.gts';
 import type { TOC } from '@ember/component/template-only';
 import type { Link } from '#app/data/types';
 
@@ -23,7 +22,7 @@ export interface LinkEditing {
   canSetExpiration: boolean;
   start: (link: Link) => unknown;
   cancel: () => unknown;
-  save: (link: Link, changes: LinkChanges) => unknown;
+  save: (link: Link, editable: Link) => unknown;
 }
 
 function isEditing(link: Link, editing: LinkEditing | undefined) {

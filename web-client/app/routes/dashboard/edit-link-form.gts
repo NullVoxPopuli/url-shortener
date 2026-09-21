@@ -1,14 +1,13 @@
 import Component from '@glimmer/component';
+import { cached } from '@glimmer/tracking';
 import { on } from '@ember/modifier';
 
+import { checkout } from '@warp-drive/core/reactive';
+import { dataFromEvent } from 'ember-primitives/components/form';
 import { Button } from 'nvp.ui';
+import { getPromiseState } from 'reactiveweb/get-promise-state';
 
 import type { Link } from '#app/data/types';
-
-export interface LinkChanges {
-  original?: string;
-  expiresAt?: string | null;
-}
 
 /**
  * The date input works in whole days. An expiration set through it
@@ -18,83 +17,120 @@ function toDateInputValue(iso: string | null) {
   return iso ? iso.slice(0, 10) : '';
 }
 
-function toExpiresAt(dateInputValue: string) {
-  return dateInputValue ? `${dateInputValue}T23:59:59.000Z` : null;
+/**
+ * The form data utility hands a date input back as a Date (UTC
+ * midnight of that day) or, when empty, nothing.
+ */
+function toExpiresAt(value: unknown) {
+  if (value instanceof Date) return `${value.toISOString().slice(0, 10)}T23:59:59.000Z`;
+  if (typeof value === 'string' && value) return `${value}T23:59:59.000Z`;
+
+  return null;
 }
 
-function field(data: FormData, name: string) {
-  const value = data.get(name);
-
-  return typeof value === 'string' ? value : '';
+function text(value: unknown) {
+  return typeof value === 'string' ? value.trim() : '';
 }
 
 interface Signature {
   Args: {
+    /**
+     * The immutable record from the store. The form edits a checked-out
+     * copy; the save response updates the cache, which commits the copy.
+     */
     link: Link;
     canSetExpiration: boolean;
     isSaving: boolean;
-    onSave: (changes: LinkChanges) => unknown;
+    /**
+     * Receives the editable copy with the form's values applied. The
+     * cache knows which fields changed.
+     */
+    onSave: (editable: Link) => unknown;
     onCancel: () => unknown;
   };
 }
 
 export class EditLinkForm extends Component<Signature> {
-  get expiresValue() {
-    return toDateInputValue(this.args.link.expiresAt);
+  @cached
+  get checkout() {
+    return checkout<Link>(this.args.link);
   }
 
+  get state() {
+    return getPromiseState(this.checkout);
+  }
+
+  get editable() {
+    return this.state.resolved ?? null;
+  }
+
+  get expiresValue() {
+    return toDateInputValue(this.editable?.expiresAt ?? null);
+  }
+
+  clearExpires = (event: Event) => {
+    const form = (event.currentTarget as HTMLElement).closest('form');
+    const input = form?.elements.namedItem('expiresAt');
+
+    if (input instanceof HTMLInputElement) input.value = '';
+  };
+
+  /**
+   * The form's values land on the editable copy only on submit.
+   */
   submit = (event: SubmitEvent) => {
     event.preventDefault();
 
-    const form = event.currentTarget as HTMLFormElement;
-    const data = new FormData(form);
-    const original = field(data, 'original').trim();
-    const changes: LinkChanges = {};
+    if (!this.editable) return;
 
-    if (original && original !== this.args.link.original) {
-      changes.original = original;
-    }
+    const data = dataFromEvent(event);
+
+    this.editable.original = text(data.original);
 
     if (this.args.canSetExpiration) {
-      const expiresAt = toExpiresAt(field(data, 'expiresAt'));
-
-      if (expiresAt !== this.args.link.expiresAt) {
-        changes.expiresAt = expiresAt;
-      }
+      this.editable.expiresAt = toExpiresAt(data.expiresAt);
     }
 
-    if (Object.keys(changes).length === 0) {
-      this.args.onCancel();
-
-      return;
-    }
-
-    this.args.onSave(changes);
+    this.args.onSave(this.editable);
   };
 
   <template>
-    <form class="edit-link-form" {{on "submit" this.submit}}>
-      <label>
-        <span>Destination</span>
-        <input name="original" type="url" required value={{@link.original}}>
-      </label>
-
-      {{#if @canSetExpiration}}
+    {{#if this.editable}}
+      <form class="edit-link-form" {{on "submit" this.submit}}>
         <label>
-          <span>Expires</span>
-          <input name="expiresAt" type="date" value={{this.expiresValue}}>
+          <span>Destination</span>
+          <input name="original" type="url" required value={{this.editable.original}}>
         </label>
-      {{/if}}
 
-      <div class="edit-link-actions">
-        <Button type="submit" @variant="primary" @disabled={{if @isSaving "Saving..."}}>
-          Save
-        </Button>
-        <button type="button" class="cancel-button" {{on "click" @onCancel}}>
-          Cancel
-        </button>
-      </div>
-    </form>
+        {{#if @canSetExpiration}}
+          <div class="expires-field">
+            <label>
+              <span>Expires</span>
+              <input name="expiresAt" type="date" value={{this.expiresValue}}>
+            </label>
+                          <Button
+                type="button"
+                @variant="bare"
+                @onClick={{this.clearExpires}}
+                data-test-clear-expires
+              >
+                Clear
+              </Button>
+          </div>
+        {{/if}}
+
+        <div class="edit-link-actions">
+          <Button type="submit" @variant="primary" @disabled={{if @isSaving "Saving..."}}>
+            Save
+          </Button>
+          <Button type="button" @variant="secondary" @onClick={{@onCancel}}>
+            Cancel
+          </Button>
+        </div>
+      </form>
+    {{else if this.state.error}}
+      <p class="warning">Could not open this link for editing.</p>
+    {{/if}}
 
     <style scoped>
       .edit-link-form {
@@ -124,19 +160,24 @@ export class EditLinkForm extends Component<Signature> {
         color: var(--color-text);
       }
 
+      .expires-field {
+        display: flex;
+        gap: var(--gap-2);
+        align-items: end;
+      }
+
+      .expires-field label {
+        flex: 1;
+      }
+
       .edit-link-actions {
         display: flex;
         gap: var(--gap-2);
         align-items: center;
       }
 
-      .cancel-button {
-        background: none;
-        border: var(--border-width) var(--border-style) var(--border-color);
-        border-radius: var(--radius);
-        padding: var(--padding-1) var(--padding-2);
-        cursor: pointer;
-        color: var(--color-text);
+      .warning {
+        color: var(--color-danger);
       }
     </style>
   </template>

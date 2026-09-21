@@ -2,13 +2,29 @@ import { click, fillIn, render } from '@ember/test-helpers';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 
+import { cacheKeyFor } from '@warp-drive/core';
+import { serializePatch } from '@warp-drive/utilities/json-api';
+
 import { EditLinkForm } from '#app/routes/dashboard/edit-link-form.gts';
 import { LinksTable } from '#app/routes/dashboard/links-table.gts';
 import { makeLink } from '#test-helpers/fixtures';
+import { pushLink } from '#test-helpers/store';
 
+import type { Store } from '@warp-drive/core';
 import type { Link } from '#app/data/types';
-import type { LinkChanges } from '#app/routes/dashboard/edit-link-form.gts';
 import type { LinkEditing } from '#app/routes/dashboard/links-table.gts';
+
+/**
+ * The attributes the PATCH body would carry for the editable copy.
+ */
+function changedOn(owner: object, editable: Link) {
+  const store = (owner as { lookup(name: string): unknown }).lookup('service:store') as Store;
+  const { attributes } = serializePatch(store.cache, cacheKeyFor(editable)).data;
+
+  return Object.entries(attributes ?? {})
+    .map(([name, value]) => `${name}=${JSON.stringify(value)}`)
+    .join('&');
+}
 
 function editing(overrides?: Partial<LinkEditing>): LinkEditing {
   return {
@@ -26,8 +42,8 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
   setupRenderingTest(hooks);
 
   test('saves only what changed', async function (assert) {
-    const link = makeLink({ original: 'https://example.com/old', expiresAt: null });
-    const onSave = (changes: LinkChanges) => assert.step(JSON.stringify(changes));
+    const link = pushLink(this.owner, { original: 'https://example.com/old', expiresAt: null });
+    const onSave = (editable: Link) => assert.step(changedOn(this.owner, editable));
     const onCancel = () => assert.step('cancel');
 
     await render(
@@ -48,12 +64,12 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
     await fillIn('input[name="original"]', 'https://example.com/new');
     await click('button[type="submit"]');
 
-    assert.verifySteps(['{"original":"https://example.com/new"}']);
+    assert.verifySteps(['original="https://example.com/new"']);
   });
 
   test('an expiration date means the end of that day, UTC', async function (assert) {
-    const link = makeLink({ expiresAt: '2026-10-01T23:59:59.000Z' });
-    const onSave = (changes: LinkChanges) => assert.step(JSON.stringify(changes));
+    const link = pushLink(this.owner, { expiresAt: '2026-10-01T23:59:59.000Z' });
+    const onSave = (editable: Link) => assert.step(changedOn(this.owner, editable));
     const onCancel = () => assert.step('cancel');
 
     await render(
@@ -73,12 +89,12 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
     await fillIn('input[name="expiresAt"]', '2026-12-31');
     await click('button[type="submit"]');
 
-    assert.verifySteps(['{"expiresAt":"2026-12-31T23:59:59.000Z"}']);
+    assert.verifySteps(['expiresAt="2026-12-31T23:59:59.000Z"']);
   });
 
-  test('clearing the date sends null', async function (assert) {
-    const link = makeLink({ expiresAt: '2026-10-01T23:59:59.000Z' });
-    const onSave = (changes: LinkChanges) => assert.step(JSON.stringify(changes));
+  test('the Clear button empties the date and sends null', async function (assert) {
+    const link = pushLink(this.owner, { expiresAt: '2026-10-01T23:59:59.000Z' });
+    const onSave = (editable: Link) => assert.step(changedOn(this.owner, editable));
     const onCancel = () => assert.step('cancel');
 
     await render(
@@ -93,15 +109,20 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
       </template>
     );
 
-    await fillIn('input[name="expiresAt"]', '');
+    assert.dom('[data-test-clear-expires]').exists();
+
+    await click('[data-test-clear-expires]');
+
+    assert.dom('input[name="expiresAt"]').hasValue('');
+
     await click('button[type="submit"]');
 
-    assert.verifySteps(['{"expiresAt":null}']);
+    assert.verifySteps(['expiresAt=null']);
   });
 
   test('no expiration input when the plan has none', async function (assert) {
-    const link = makeLink();
-    const onSave = () => assert.step('save');
+    const link = pushLink(this.owner);
+    const onSave = (editable: Link) => assert.step(`save:${changedOn(this.owner, editable)}`);
     const onCancel = () => assert.step('cancel');
 
     await render(
@@ -118,10 +139,37 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
 
     assert.dom('input[name="expiresAt"]').doesNotExist();
 
-    // nothing changed: submitting is the same as cancelling
+    // nothing changed: the cache reports no changed fields
     await click('button[type="submit"]');
 
-    assert.verifySteps(['cancel']);
+    assert.verifySteps(['save:']);
+  });
+});
+
+module('Rendering | dashboard | EditLinkForm record', function (hooks) {
+  setupRenderingTest(hooks);
+
+  test('typing touches neither the record nor the copy until submit', async function (assert) {
+    const link = pushLink(this.owner, { original: 'https://example.com/old' });
+    const onSave = () => assert.step('save');
+    const onCancel = () => assert.step('cancel');
+
+    await render(
+      <template>
+        <EditLinkForm
+          @link={{link}}
+          @canSetExpiration={{true}}
+          @isSaving={{false}}
+          @onSave={{onSave}}
+          @onCancel={{onCancel}}
+        />
+      </template>
+    );
+
+    await fillIn('input[name="original"]', 'https://example.com/new');
+
+    assert.strictEqual(link.original, 'https://example.com/old');
+    assert.verifySteps([]);
   });
 });
 
@@ -148,11 +196,14 @@ module('Rendering | dashboard | LinksTable editing', function (hooks) {
   });
 
   test('the editor row opens for the link whose id is being edited', async function (assert) {
-    const links = [makeLink({ id: 'link-1' }), makeLink({ id: 'link-2' })];
+    const links = [
+      pushLink(this.owner, { id: 'link-1' }),
+      pushLink(this.owner, { id: 'link-2' }),
+    ];
     const options = editing({
       id: 'link-2',
-      save: (link: Link, changes: LinkChanges) =>
-        assert.step(`save:${link.id}:${JSON.stringify(changes)}`),
+      save: (link: Link, editable: Link) =>
+        assert.step(`save:${link.id}:${changedOn(this.owner, editable)}`),
     });
 
     await render(
@@ -167,7 +218,7 @@ module('Rendering | dashboard | LinksTable editing', function (hooks) {
     await fillIn('.editor-row input[name="original"]', 'https://example.com/changed');
     await click('.editor-row button[type="submit"]');
 
-    assert.verifySteps(['save:link-2:{"original":"https://example.com/changed"}']);
+    assert.verifySteps(['save:link-2:original="https://example.com/changed"']);
   });
 
   test('no edits left disables the Edit button', async function (assert) {

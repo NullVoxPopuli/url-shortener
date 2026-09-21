@@ -4,7 +4,9 @@ import { array, fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 import { service } from '@ember/service';
 
+import { cacheKeyFor } from '@warp-drive/core';
 import { Request } from '@warp-drive/ember';
+import { serializePatch } from '@warp-drive/utilities/json-api';
 import { Button } from 'nvp.ui';
 
 import { messageFrom } from '#app/data/errors';
@@ -12,7 +14,6 @@ import { createLink, deleteLink, updateLink } from '#app/data/requests';
 
 import { LinksTable } from '../links-table.gts';
 
-import type { LinkChanges } from '../edit-link-form.gts';
 import type { LinkEditing } from '../links-table.gts';
 import type { Store } from '@warp-drive/core';
 import type { ReactiveDataDocument } from '@warp-drive/core/reactive';
@@ -66,15 +67,24 @@ export default class LinkManager extends Component<Signature> {
     cancel: () => {
       this.editingId = null;
     },
-    save: (link: Link, changes: LinkChanges) => this.edit(refresh, link, changes),
+    save: (link: Link, editable: Link) => this.edit(refresh, link, editable),
   });
 
-  edit = async (refresh: Array<() => Promise<void>>, link: Link, changes: LinkChanges) => {
+  edit = async (refresh: Array<() => Promise<void>>, link: Link, editable: Link) => {
+    // The patch holds only what the checkout changed.
+    const patch = serializePatch(this.store.cache, cacheKeyFor(editable));
+
+    if (!patch.data.attributes) {
+      this.editingId = null;
+
+      return;
+    }
+
     this.isWorking = true;
     this.error = null;
 
     try {
-      await this.store.request(updateLink(link.id, changes, this.args.accountId));
+      await this.store.request(updateLink(link.id, patch, this.args.accountId));
       await Promise.all(refresh.map((fn) => fn()));
       this.editingId = null;
     } catch (error) {
