@@ -98,7 +98,7 @@ export default class CurrentUserService extends Service {
         const data = (await response.json()) as CurrentUserResponse;
 
         if (data.authenticated) {
-          console.debug('Authenticated', data);
+          console.debug('Authenticated');
 
           return data.user;
         }
