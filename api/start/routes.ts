@@ -89,6 +89,7 @@ router
       router.post('billing/checkout', [billing, 'checkout']);
       router.post('billing/portal', [billing, 'portal']);
       router.get('billing/status', [billing, 'status']);
+      router.get('billing/history', [billing, 'history']);
     });
   })
   .use([apiThrottle, forceMimeType])

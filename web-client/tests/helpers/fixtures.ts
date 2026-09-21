@@ -1,4 +1,11 @@
-import type { ApiKey, BillingStatus, Link } from '#app/data/types';
+import type {
+  ApiKey,
+  BillingEvent,
+  BillingInvoice,
+  BillingStatus,
+  BillingSubscription,
+  Link,
+} from '#app/data/types';
 
 export function makeBilling(overrides?: {
   planKey?: string;
@@ -73,4 +80,60 @@ export function makeLink(overrides?: Partial<Record<keyof Link, unknown>>): Link
     expiresAt: null,
     ...overrides,
   } as unknown as Link;
+}
+
+export function makeSubscription(overrides?: Partial<BillingSubscription>): BillingSubscription {
+  return {
+    id: 'sub_1',
+    status: 'active',
+    planKey: 'hobby',
+    planName: 'Hobby',
+    priceId: 'price_hobby',
+    amountInCents: 500,
+    currency: 'usd',
+    interval: 'month',
+    createdAt: '2026-08-01T12:00:00.000Z',
+    startedAt: '2026-08-01T12:00:00.000Z',
+    currentPeriodStart: '2026-09-01T12:00:00.000Z',
+    currentPeriodEnd: '2026-10-01T12:00:00.000Z',
+    cancelAtPeriodEnd: false,
+    cancelAt: null,
+    canceledAt: null,
+    endedAt: null,
+    trialEnd: null,
+    ...overrides,
+  };
+}
+
+export function makeInvoice(overrides?: Partial<BillingInvoice>): BillingInvoice {
+  return {
+    id: 'in_1',
+    number: 'ABCD-0001',
+    status: 'paid',
+    subscriptionId: 'sub_1',
+    planName: 'Hobby',
+    createdAt: '2026-09-01T12:00:00.000Z',
+    paidAt: '2026-09-01T12:00:00.000Z',
+    periodStart: '2026-09-01T12:00:00.000Z',
+    periodEnd: '2026-10-01T12:00:00.000Z',
+    totalInCents: 500,
+    amountPaidInCents: 500,
+    amountDueInCents: 0,
+    currency: 'usd',
+    hostedInvoiceUrl: 'https://invoice.stripe.com/in_1',
+    invoicePdf: 'https://invoice.stripe.com/in_1.pdf',
+    ...overrides,
+  };
+}
+
+export function makeBillingEvent(overrides?: Partial<BillingEvent>): BillingEvent {
+  return {
+    at: '2026-08-01T12:00:00.000Z',
+    kind: 'subscribed',
+    subscriptionId: 'sub_1',
+    planName: 'Hobby',
+    previousPlanName: null,
+    endsAt: null,
+    ...overrides,
+  };
 }

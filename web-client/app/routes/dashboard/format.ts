@@ -34,3 +34,22 @@ export function formatUtcDateTime(value: number | string | null | undefined) {
 
   return Number.isNaN(date.getTime()) ? '—' : utcDateTimeFormat.format(date);
 }
+
+const moneyFormats = new Map<string, Intl.NumberFormat>();
+
+/**
+ * Stripe amounts are integer minor units (cents for USD).
+ */
+export function formatMoney(cents: number | null | undefined, currency = 'usd') {
+  if (cents === null || cents === undefined) return '—';
+
+  const code = currency.toUpperCase();
+  let format = moneyFormats.get(code);
+
+  if (!format) {
+    format = new Intl.NumberFormat('en-US', { style: 'currency', currency: code });
+    moneyFormats.set(code, format);
+  }
+
+  return format.format(cents / 100);
+}

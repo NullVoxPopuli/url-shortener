@@ -1,11 +1,13 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { on } from '@ember/modifier';
+import { service } from '@ember/service';
 
 import { openBillingPortal } from '#app/data/billing';
 
 import { formatDate } from '../format.ts';
 
+import type RouterService from '@ember/routing/router-service';
 import type { BillingStatus } from '#app/data/types';
 
 function isFree(billing: BillingStatus) {
@@ -35,7 +37,19 @@ function stripeDate(value: number | string | null) {
 }
 
 export class SubscriptionCard extends Component<Signature> {
+  @service declare router: RouterService;
+
   @tracked isSubmitting = false;
+
+  /**
+   * The account is the first URL segment, the `dashboard` route's param.
+   */
+  get billingHref() {
+    const dashboard = this.router.currentRoute?.find((info) => info.name === 'dashboard');
+    const slug = dashboard?.params?.['account_id'];
+
+    return typeof slug === 'string' ? `/${slug}/settings/billing` : null;
+  }
 
   manageBilling = async () => {
     this.isSubmitting = true;
@@ -82,6 +96,9 @@ export class SubscriptionCard extends Component<Signature> {
           >
             Manage billing
           </button>
+          {{#if this.billingHref}}
+            <a href={{this.billingHref}}>Billing details</a>
+          {{/if}}
         {{else}}
           <a href="/pricing">View pricing and plans</a>
         {{/if}}
@@ -124,6 +141,10 @@ export class SubscriptionCard extends Component<Signature> {
 
       .card-actions {
         margin-top: var(--gap-3);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--gap-3);
       }
     </style>
   </template>

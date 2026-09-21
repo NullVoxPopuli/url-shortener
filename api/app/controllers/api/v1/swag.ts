@@ -329,6 +329,68 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
         },
       },
     },
+    '/v1/billing/history': {
+      get: {
+        summary: 'Billing history',
+        description:
+          'Every subscription and invoice Stripe holds for the account (account admins only), plus a timeline of subscriptions, plan changes, and cancellations derived from them. Empty when the account never reached Stripe.',
+        parameters: [accountParam],
+        responses: {
+          200: {
+            description: 'OK',
+            content: {
+              [mimeType]: {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { $ref: jsonapiRef('definitions/resource') },
+                  },
+                  example: {
+                    data: {
+                      type: 'billing-history',
+                      id: 'account-uuid',
+                      attributes: {
+                        subscriptions: [
+                          {
+                            id: 'sub_123',
+                            status: 'active',
+                            planName: 'Hobby',
+                            currentPeriodEnd: '2026-10-01T00:00:00.000Z',
+                            cancelAtPeriodEnd: false,
+                          },
+                        ],
+                        invoices: [
+                          {
+                            id: 'in_123',
+                            number: 'ABCD-0001',
+                            status: 'paid',
+                            totalInCents: 500,
+                            currency: 'usd',
+                            hostedInvoiceUrl: 'https://invoice.stripe.com/...',
+                          },
+                        ],
+                        events: [
+                          {
+                            at: '2026-09-01T00:00:00.000Z',
+                            kind: 'subscribed',
+                            subscriptionId: 'sub_123',
+                            planName: 'Hobby',
+                          },
+                        ],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: componentSchemaRef('Unauthenticated'),
+          403: componentSchemaRef('Forbidden'),
+          404: componentSchemaRef('NotFound'),
+          415: componentSchemaRef('UnsupportedMediaType'),
+        },
+      },
+    },
     '/v1/billing/checkout': {
       post: {
         summary: 'Start a Stripe Checkout session',

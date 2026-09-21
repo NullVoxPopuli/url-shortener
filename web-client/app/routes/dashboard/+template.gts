@@ -5,27 +5,27 @@ import HeaderLinks from '../application/header-links.gts';
 import { AccountSwitcher } from './account-switcher.gts';
 import { SidebarLink } from './sidebar-link.gts';
 
+import type { TOC } from '@ember/component/template-only';
+
 <template>
   <ApplicationShell>
     <:nav>
       <Navigation>
-        {{! @glint-expect-error - route templates do not have typed @model }}
         <AccountSwitcher @accountId={{@model.accountId}} />
 
         <NavigationList>
-          {{! @glint-expect-error - route templates do not have typed @model }}
           <li><SidebarLink @href="/{{@model.accountSlug}}">Dashboard</SidebarLink></li>
         </NavigationList>
 
         <NavigationList @label="Manage">
-          {{! @glint-expect-error - route templates do not have typed @model }}
           <li><SidebarLink @href="/{{@model.accountSlug}}/links">Links</SidebarLink></li>
-          {{! @glint-expect-error - route templates do not have typed @model }}
           <li><SidebarLink @href="/{{@model.accountSlug}}/users">Users</SidebarLink></li>
-          {{! @glint-expect-error - route templates do not have typed @model }}
           <li><SidebarLink @href="/{{@model.accountSlug}}/domains">Domains</SidebarLink></li>
-          {{! @glint-expect-error - route templates do not have typed @model }}
           <li><SidebarLink @href="/{{@model.accountSlug}}/api-keys">API Keys</SidebarLink></li>
+        </NavigationList>
+
+        <NavigationList @label="Settings">
+          <li><SidebarLink @href="/{{@model.accountSlug}}/settings/billing">Billing</SidebarLink></li>
         </NavigationList>
       </Navigation>
     </:nav>
@@ -45,4 +45,13 @@ import { SidebarLink } from './sidebar-link.gts';
       {{outlet}}
     </:default>
   </ApplicationShell>
-</template>
+</template> satisfies TOC<{
+  Args: {
+    model: {
+      accountId: string;
+      accountSlug: string;
+      accountName: string;
+      isAdmin: boolean;
+    };
+  };
+}>;

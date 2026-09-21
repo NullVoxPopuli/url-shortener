@@ -37,6 +37,68 @@ export interface BillingStatus {
   [Type]: 'billing-status';
 }
 
+export interface BillingSubscription {
+  id: string;
+  status: string;
+  planKey: string | null;
+  planName: string;
+  priceId: string | null;
+  amountInCents: number | null;
+  currency: string;
+  interval: string | null;
+  createdAt: string;
+  startedAt: string;
+  currentPeriodStart: string | null;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+  cancelAt: string | null;
+  canceledAt: string | null;
+  endedAt: string | null;
+  trialEnd: string | null;
+}
+
+export interface BillingInvoice {
+  id: string;
+  number: string | null;
+  status: string | null;
+  subscriptionId: string | null;
+  planName: string | null;
+  createdAt: string;
+  paidAt: string | null;
+  periodStart: string;
+  periodEnd: string;
+  totalInCents: number;
+  amountPaidInCents: number;
+  amountDueInCents: number;
+  currency: string;
+  hostedInvoiceUrl: string | null;
+  invoicePdf: string | null;
+}
+
+export type BillingEventKind =
+  | 'subscribed'
+  | 'plan-changed'
+  | 'cancellation-scheduled'
+  | 'canceled'
+  | 'ended';
+
+export interface BillingEvent {
+  at: string;
+  kind: BillingEventKind;
+  subscriptionId: string;
+  planName: string | null;
+  previousPlanName: string | null;
+  endsAt: string | null;
+}
+
+export interface BillingHistory {
+  id: string;
+  subscriptions: BillingSubscription[];
+  invoices: BillingInvoice[];
+  events: BillingEvent[];
+  [Type]: 'billing-history';
+}
+
 export interface Link {
   id: string;
   shortUrl: string;
