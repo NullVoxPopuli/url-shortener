@@ -7,7 +7,7 @@ import { planFor } from '#services/plans';
 function makeAccount(overrides?: Partial<Account>) {
   const account = new Account();
 
-  account.isFree = false;
+  account.isInternal = false;
   account.stripePriceId = null;
   account.stripeSubscriptionStatus = null;
   Object.assign(account, overrides);
@@ -26,26 +26,26 @@ test.group('overridePlan', () => {
 
     assert.strictEqual(planFor(account).key, 'pro');
     assert.strictEqual(account.stripeSubscriptionStatus, 'active');
-    assert.isFalse(account.isFree);
+    assert.isFalse(account.isInternal);
   });
 
-  test('free sets the unlimited legacy plan', async () => {
+  test('internal sets the unlimited plan', async () => {
     const account = makeAccount({ stripePriceId: 'price_x', stripeSubscriptionStatus: 'active' });
 
-    await overridePlan(account, 'free');
+    await overridePlan(account, 'internal');
 
-    assert.strictEqual(planFor(account).key, 'free');
-    assert.isTrue(account.isFree);
+    assert.strictEqual(planFor(account).key, 'internal');
+    assert.isTrue(account.isInternal);
     assert.isNull(account.stripePriceId);
   });
 
   test('none resets to the starter allowance', async () => {
-    const account = makeAccount({ isFree: true });
+    const account = makeAccount({ isInternal: true });
 
     await overridePlan(account, 'none');
 
     assert.strictEqual(planFor(account).key, 'none');
-    assert.isFalse(account.isFree);
+    assert.isFalse(account.isInternal);
   });
 
   test('unknown plans throw', async () => {

@@ -7,7 +7,7 @@ import { planFor } from '#services/plans';
 /**
  * Additional (non-personal) accounts, gated by the creator's PERSONAL
  * account plan: base 1, essentials 2, pro 3, vast 10, unpaid 0,
- * staff/legacy-free unlimited.
+ * internal unlimited.
  */
 export async function createAccount(context: HttpContext) {
   let { auth, response } = context;
@@ -40,7 +40,7 @@ export async function createAccount(context: HttpContext) {
 
   account.name = name;
   account.isPersonal = false;
-  account.isFree = false;
+  account.isInternal = false;
   account.admin_id = user.id;
   await account.save();
 

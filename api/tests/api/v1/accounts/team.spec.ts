@@ -72,7 +72,7 @@ test.group('Team | memberships + invitations', (group) => {
   });
 
   test('invite + accept: full flow on an unlimited (free) account', async ({ client }) => {
-    const { user, account } = await createNewAccount({ account: { isFree: true } });
+    const { user, account } = await createNewAccount({ account: { isInternal: true } });
     const invitee = await createNewAccount();
 
     const created = await invite(client, account.id, user);
@@ -112,7 +112,7 @@ test.group('Team | memberships + invitations', (group) => {
   });
 
   test('invite: non-admin members cannot invite', async ({ client }) => {
-    const { account } = await createNewAccount({ account: { isFree: true } });
+    const { account } = await createNewAccount({ account: { isInternal: true } });
     const member = await createNewAccount();
 
     await AccountMembership.ensure({ accountId: account.id, userId: member.user.id });
@@ -123,7 +123,7 @@ test.group('Team | memberships + invitations', (group) => {
   });
 
   test('accept: unknown or expired tokens → 404', async ({ client }) => {
-    const { user, account } = await createNewAccount({ account: { isFree: true } });
+    const { user, account } = await createNewAccount({ account: { isInternal: true } });
     const invitee = await createNewAccount();
 
     const bad = await accept(client, 'ffffffff-ffff-4fff-8fff-ffffffffffff', invitee.user);
@@ -143,7 +143,7 @@ test.group('Team | memberships + invitations', (group) => {
   });
 
   test('remove: members can leave, owners cannot be removed', async ({ client }) => {
-    const { user, account } = await createNewAccount({ account: { isFree: true } });
+    const { user, account } = await createNewAccount({ account: { isInternal: true } });
     const member = await createNewAccount();
 
     const membership = await AccountMembership.ensure({
@@ -182,7 +182,7 @@ test.group('Team | memberships + invitations', (group) => {
   });
 
   test('revoke: admins can revoke pending invitations', async ({ client }) => {
-    const { user, account } = await createNewAccount({ account: { isFree: true } });
+    const { user, account } = await createNewAccount({ account: { isInternal: true } });
 
     const created = await invite(client, account.id, user);
     const id = created.body().data.id;

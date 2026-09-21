@@ -11,6 +11,6 @@ export default class AccountResource extends JsonApiResource<Account> {
    * endpoints.
    */
   attributes() {
-    return this.pick(['name', 'isFree', 'createdAt', 'updatedAt']);
+    return this.pick(['name', 'isInternal', 'createdAt', 'updatedAt']);
   }
 }

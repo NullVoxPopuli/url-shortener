@@ -50,7 +50,7 @@ components:
         admin_id:
           type: "string"
           example: "Lorem Ipsum"
-        isFree:
+        isInternal:
           type: "boolean"
           example: true
         admin:

@@ -4,7 +4,7 @@ export const SCHEMAS = [
   withDefaults({
     type: 'billing-status',
     fields: [
-      { kind: 'field', name: 'isFree' },
+      { kind: 'field', name: 'isInternal' },
       { kind: 'field', name: 'hasActiveSubscription' },
       { kind: 'object', name: 'stripe' },
       { kind: 'object', name: 'plan' },
@@ -58,7 +58,7 @@ export const SCHEMAS = [
     type: 'account',
     fields: [
       { kind: 'field', name: 'name' },
-      { kind: 'field', name: 'isFree' },
+      { kind: 'field', name: 'isInternal' },
       { kind: 'field', name: 'createdAt' },
       { kind: 'field', name: 'updatedAt' },
       {

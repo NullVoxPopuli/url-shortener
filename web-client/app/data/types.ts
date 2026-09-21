@@ -40,7 +40,7 @@ export interface Overage {
 
 export interface BillingStatus {
   id: string;
-  isFree: boolean;
+  isInternal: boolean;
   hasActiveSubscription: boolean;
   stripe: {
     customerId: string | null;
@@ -104,7 +104,7 @@ export interface ApiUser {
 export interface ApiAccount {
   id: string;
   name: string;
-  isFree: boolean | null;
+  isInternal: boolean | null;
   createdAt: string;
   updatedAt: string | null;
   admin: ApiUser;
