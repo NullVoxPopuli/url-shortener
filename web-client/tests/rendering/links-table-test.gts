@@ -17,8 +17,8 @@ module('Rendering | dashboard | LinksTable', function (hooks) {
       <template><LinksTable @links={{links}} @watermark={{true}} /></template>
     );
 
-    assert.dom('table').doesNotExist();
-    assert.dom().containsText('No links yet');
+    assert.dom('tbody').doesNotExist();
+    assert.dom('.nvp__table__empty').hasText('No links yet.');
   });
 
   test('rows show the short link, visits, and details', async function (assert) {

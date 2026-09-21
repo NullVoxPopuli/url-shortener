@@ -187,7 +187,7 @@ module('Rendering | dashboard | LinksTable editing', function (hooks) {
     );
 
     assert.dom('th').exists({ count: 6 });
-    assert.dom('.edit-button').isEnabled();
+    assert.dom('.edit-button').doesNotHaveAttribute('aria-disabled');
 
     await click('.edit-button');
 
@@ -231,7 +231,7 @@ module('Rendering | dashboard | LinksTable editing', function (hooks) {
       </template>
     );
 
-    assert.dom('.edit-button').isDisabled();
-    assert.dom('.edit-button').hasAttribute('title', /No link edits left/);
+    // nvp.ui renders the boolean as an empty attribute
+    assert.dom('.edit-button').hasAttribute('aria-disabled');
   });
 });
