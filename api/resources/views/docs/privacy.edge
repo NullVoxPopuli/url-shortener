@@ -1,6 +1,6 @@
-@layout.app()
+@layout.app({ title: 'Privacy Policy' })
   @slot('meta')
-    <meta name="description" content="Privacy Policy" />
+    <meta name="description" content="How nvp.gg collects, uses, and keeps your information." />
   @endslot
   
   <div class="ember-primitives__hero__wrapper">
@@ -8,19 +8,294 @@
       <h1>
         Privacy Policy
       </h1>
+      <em>Last updated: September 21, 2026</em>
     </div>
   </div>
 
-  <main>
-    (wip)
+  <main class="legal">
     <p>
-      There are no analytics on this platform.
+      nvp.gg is a URL shortener. This policy explains what information we collect when you use it,
+      why we collect it, and what we do with it. We keep it short because we collect little.
+    </p>
+
+    <p>
+      Our principles:
+    </p>
+    <ul>
+      <li>
+        We only ask for information we need to run the service.
+      </li>
+      <li>
+        We keep information only as long as we have a reason to keep it.
+      </li>
+      <li>
+        We do not sell your information, and we do not run ads or third-party analytics.
+      </li>
+      <li>
+        We say plainly who else sees your information and why.
+      </li>
+    </ul>
+
+    <h2 id="scope">
+      Who we are and what this policy covers
+    </h2>
+    <p>
+      nvp.gg is run by NullVoxPopuli. This policy applies to information we collect when you use
+      nvp.gg, api.nvp.gg, docs.nvp.gg, and any short link served by them. Together we call these
+      the "Service".
     </p>
     <p>
-      Your data is not sold.
+      When you visit a short link, the site it sends you to has its own privacy policy. That site is
+      not covered here.
     </p>
+
+    <h2 id="information-we-collect">
+      Information we collect
+    </h2>
+
+    <h3>
+      Information you give us
+    </h3>
+    <ul>
+      <li>
+        <strong>Account information.</strong>
+        You sign in with GitHub. GitHub sends us your GitHub
+        user id, your display name, and an access token. We store all three. We do not store your
+        email address or your password.
+      </li>
+      <li>
+        <strong>Account and team names.</strong>
+        The name of your account, the names of any team
+        accounts you create, and the invitations you send.
+      </li>
+      <li>
+        <strong>Links.</strong>
+        Every long URL you shorten, the short code we assign, when you made
+        it, when it expires, and any custom domain you attach.
+      </li>
+      <li>
+        <strong>Custom domains.</strong>
+        The hostnames you add to your account.
+      </li>
+      <li>
+        <strong>API keys.</strong>
+        The name, scopes, and expiry of each key. We store a hash of the
+        key, not the key itself.
+      </li>
+      <li>
+        <strong>Payment information.</strong>
+        Stripe handles payment. Your card number never
+        reaches our servers. We store the Stripe customer id, the subscription status and period,
+        the card brand, and the last four digits of the card.
+      </li>
+    </ul>
+
+    <h3>
+      Information we collect automatically
+    </h3>
+    <ul>
+      <li>
+        <strong>Link visits.</strong>
+        When someone opens a short link, we record the time, the
+        referring page, and the browser's user agent string. We do not store the visitor's IP
+        address. Visit counts appear on your dashboard.
+      </li>
+      <li>
+        <strong>Session cookie.</strong>
+        When you sign in, we set a cookie that keeps you signed in.
+        It is the only cookie we set.
+      </li>
+      <li>
+        <strong>Server logs.</strong>
+        Our hosting provider keeps standard web server logs, which
+        include IP addresses, for a short time for security and debugging.
+      </li>
+    </ul>
+
+    <h3>
+      Information from other sources
+    </h3>
+    <ul>
+      <li>
+        <strong>GitHub.</strong>
+        The account information above, when you sign in.
+      </li>
+      <li>
+        <strong>Stripe.</strong>
+        Subscription and payment events, so we know what plan you are on.
+      </li>
+    </ul>
+
+    <h2 id="how-we-use-information">
+      How and why we use information
+    </h2>
+    <ul>
+      <li>
+        <strong>To run the Service.</strong>
+        To keep you signed in, serve your short links, count visits, and enforce plan limits.
+      </li>
+      <li>
+        <strong>To bill you.</strong>
+        To start, renew, change, and cancel a paid plan through Stripe.
+      </li>
+      <li>
+        <strong>To protect the Service.</strong>
+        To detect abuse, spam, malware links, and security incidents, and to meet our legal obligations.
+      </li>
+      <li>
+        <strong>To fix problems.</strong>
+        To debug errors and keep the Service up.
+      </li>
+      <li>
+        <strong>To contact you.</strong>
+        Only about your account, such as a change to these terms or a problem with a link. We do not send marketing.
+      </li>
+    </ul>
     <p>
-      Your data is never leaves the server.
+      If you are in the European Economic Area or the United Kingdom, our legal bases are: the
+      contract we have with you when you use the Service, our legitimate interest in running and
+      protecting it, and our legal obligations.
+    </p>
+
+    <h2 id="sharing-information">
+      Sharing information
+    </h2>
+    <p>
+      We share information only in these cases:
+    </p>
+    <ul>
+      <li>
+        <strong>Stripe</strong>, to process payments and manage subscriptions.
+      </li>
+      <li>
+        <strong>GitHub</strong>, to sign you in.
+      </li>
+      <li>
+        <strong>Our hosting provider</strong>, which stores the database and serves the site.
+      </li>
+      <li>
+        <strong>Legal requests.</strong>
+        If a subpoena, court order, or other lawful request requires it.
+      </li>
+      <li>
+        <strong>To protect people.</strong>
+        If we believe in good faith that sharing is needed to prevent harm, fraud, or abuse.
+      </li>
+      <li>
+        <strong>Team members.</strong>
+        Members of a team account can see the links, domains, and visit counts of that account, and the names of the other members.
+      </li>
+      <li>
+        <strong>With your consent.</strong>
+        When you ask us to.
+      </li>
+    </ul>
+    <p>
+      Short links are public by design. Anyone with a short link can open it and reach the long
+      URL. Visit counts are visible only to the account that owns the link.
+    </p>
+
+    <h2 id="retention">
+      How long we keep information
+    </h2>
+    <ul>
+      <li>
+        Account information stays while your account exists.
+      </li>
+      <li>
+        A link and its visit records stay until you delete the link, the link expires, or you close your account.
+      </li>
+      <li>
+        Stripe records stay as long as tax and accounting law require, after which we delete what we hold.
+      </li>
+      <li>
+        Hosting provider logs are kept for about 30 days.
+      </li>
+    </ul>
+    <p>
+      Backups can hold deleted data for a short time after deletion.
+    </p>
+
+    <h2 id="security">
+      Security
+    </h2>
+    <p>
+      No online service is fully secure. We use HTTPS everywhere, store API keys as hashes, keep
+      card data out of our systems, and limit who can reach the database.
+    </p>
+
+    <h2 id="choices">
+      Your choices
+    </h2>
+    <ul>
+      <li>
+        Delete any link from your dashboard. Its visit records go with it.
+      </li>
+      <li>
+        Revoke any API key from your dashboard.
+      </li>
+      <li>
+        Cancel a paid plan at any time through the billing portal.
+      </li>
+      <li>
+        Close your account by contacting us. We delete your account, links, and visit records.
+      </li>
+      <li>
+        Reject cookies in your browser. You will not be able to sign in.
+      </li>
+    </ul>
+
+    <h2 id="your-rights">
+      Your rights
+    </h2>
+    <p>
+      Depending on where you live, you can have the right to access, correct, export, or delete
+      the information we hold about you, or to object to how we use it. Contact us and we will
+      act on the request. If we refuse, we will say why, and you can complain to your local data
+      protection authority.
+    </p>
+
+    <h2 id="children">
+      Children
+    </h2>
+    <p>
+      The Service is not for children. You must be at least 13 years old, or 16 in the European
+      Economic Area, to use it. We do not knowingly collect information from children. If you
+      believe a child gave us information, contact us and we will delete it.
+    </p>
+
+    <h2 id="transfers">
+      Where information is stored
+    </h2>
+    <p>
+      The Service runs on servers in the United States. If you use it from elsewhere, your
+      information moves to the United States.
+    </p>
+
+    <h2 id="changes">
+      Changes to this policy
+    </h2>
+    <p>
+      We can change this policy. When we do, we update the date at the top. If a change is
+      material, we will also say so on the site. Your continued use after a change means you
+      accept it.
+    </p>
+
+    <h2 id="contact">
+      How to reach us
+    </h2>
+    <p>
+      Open an issue on
+      <a href="https://github.com/NullVoxPopuli/url-shortener">GitHub</a>
+      or ask in the Discord linked in the footer.
+    </p>
+
+    <p class="attribution">
+      Adapted from
+      <a href="https://github.com/Automattic/legalmattic">Automattic's Legalmattic</a>
+      privacy policy, under the
+      <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons BY-SA 4.0</a>
+      license. This policy is available under the same license.
     </p>
   </main>
 @end
