@@ -1,7 +1,6 @@
-@layout.app()
-
+@layout.app({ title: 'Terms and Conditions' })
   @slot('meta')
-    <meta name="description" content="Terms and Conditions" />
+    <meta name="description" content="The terms for using the nvp.gg URL shortener." />
   @endslot
   
   <div class="ember-primitives__hero__wrapper">
@@ -9,12 +8,262 @@
       <h1>
         Terms and Conditions
       </h1>
+      <em>Last updated: September 21, 2026</em>
     </div>
   </div>
 
-  <main>
+  <main class="legal">
+    <h2 id="gist">
+      The gist
+    </h2>
     <p>
-      Don't do stupid stuff. (wip)
+      nvp.gg shortens URLs. These terms describe what you can expect from us and what we expect
+      from you. Read them. If you do not agree to them, do not use the Service.
+    </p>
+    <p>
+      Short version: do not shorten links to anything illegal, harmful, or deceptive. Keep your
+      account secure. Paid plans renew monthly until you cancel. The Service comes as is.
+    </p>
+
+    <h2 id="who">
+      1. Who's who
+    </h2>
+    <p>
+      "We" and "us" mean NullVoxPopuli, who runs nvp.gg. "You" means anyone who uses the Service.
+      The "Service" means nvp.gg, api.nvp.gg, docs.nvp.gg, and every short link they serve. If you
+      use the Service for a company or another person, you confirm that you can accept these
+      terms for them.
+    </p>
+
+    <h2 id="account">
+      2. Your account
+    </h2>
+    <p>
+      You sign in with GitHub. You are responsible for everything done with your account, your
+      API keys, and your team accounts. Keep your keys secret. Tell us at once if you believe
+      someone else has used your account. If we believe your account is compromised, we can
+      suspend it.
+    </p>
+    <p>
+      Our <a href="/privacy">Privacy Policy</a>
+      explains what we do with the information you give
+      us.
+    </p>
+
+    <h2 id="age">
+      3. Minimum age
+    </h2>
+    <p>
+      You must be at least 13 years old, or 16 in the European Economic Area, to use the Service.
+      If you are under 18, you can use it only with a parent or guardian who agrees to these terms.
+    </p>
+
+    <h2 id="links">
+      4. Your links
+    </h2>
+    <p>
+      You are responsible for every URL you shorten and every domain you attach. You must not use
+      the Service to link to, or to spread:
+    </p>
+    <ul>
+      <li>
+        malware, phishing pages, or anything that steals credentials or data;
+      </li>
+      <li>
+        spam, or links sent in bulk to people who did not ask for them;
+      </li>
+      <li>
+        content that is illegal where you or the visitor live;
+      </li>
+      <li>
+        content that infringes someone's copyright, trademark, or privacy;
+      </li>
+      <li>
+        content that harasses, threatens, or exploits people;
+      </li>
+      <li>
+        anything that hides the true destination to deceive the visitor.
+      </li>
+    </ul>
+    <p>
+      We do not review links before they go live, and we cannot review all of them afterwards. We
+      can disable or delete any link, and suspend any account, that we believe breaks these rules,
+      without notice.
+    </p>
+    <p>
+      Short links are public. Anyone with the link can open it. Deleting a link stops it from
+      resolving, but copies of the short URL can remain elsewhere.
+    </p>
+
+    <h2 id="fees">
+      5. Fees, payment, and renewal
+    </h2>
+    <p>
+      Some features need a paid plan. The plans and prices are on the
+      <a href="https://nvp.gg/pricing">pricing page</a>. Stripe processes payment. By starting a
+      plan you allow us and Stripe to charge the card you provide.
+    </p>
+    <ul>
+      <li>
+        Plans are billed monthly and renew automatically until you cancel.
+      </li>
+      <li>
+        Cancel any time through the billing portal. Access continues until the end of the period you paid for.
+      </li>
+      <li>
+        We do not refund a partial period, unless the law where you live requires it.
+      </li>
+      <li>
+        If a payment fails, we can downgrade the account to the free allowance until it succeeds.
+      </li>
+      <li>
+        Plan limits, such as links per month, apply as described on the pricing page. We can change prices and plans, with notice before the next renewal.
+      </li>
+      <li>
+        You are responsible for any taxes that apply to your purchase.
+      </li>
+    </ul>
+
+    <h2 id="api">
+      6. The API
+    </h2>
+    <p>
+      You can use the Service through its API with an API key. Keys are limited to the scopes and
+      the account they were created for. Do not share keys or use them to get around plan limits or
+      rate limits. We can revoke keys and change rate limits to protect the Service.
+    </p>
+
+    <h2 id="domains">
+      7. Custom domains
+    </h2>
+    <p>
+      You can only attach a domain that you own or control. You are responsible for its DNS and for
+      its content. We can remove a domain that you do not control or that is used against these
+      terms.
+    </p>
+
+    <h2 id="teams">
+      8. Teams
+    </h2>
+    <p>
+      The admin of a team account is responsible for the account, its billing, its members, and
+      its links. Members can see and manage the account's links. An admin can remove a member at
+      any time.
+    </p>
+
+    <h2 id="feedback">
+      9. Feedback
+    </h2>
+    <p>
+      If you send us ideas or suggestions, we can use them without owing you anything.
+    </p>
+
+    <h2 id="ip">
+      10. Intellectual property
+    </h2>
+    <p>
+      The source code of the Service is published under the GNU AGPL v3 license on
+      <a href="https://github.com/NullVoxPopuli/url-shortener">GitHub</a>. That license covers the
+      code. It does not cover the nvp.gg name, the domains, or the hosted Service. You keep every
+      right to the URLs and content you link to.
+    </p>
+
+    <h2 id="third-party">
+      11. Third-party services
+    </h2>
+    <p>
+      The Service uses GitHub for sign-in and Stripe for payment. Their terms apply to your use of
+      them. We are not responsible for third-party services, or for the sites your short links go
+      to.
+    </p>
+
+    <h2 id="changes">
+      12. Changes
+    </h2>
+    <p>
+      We can change these terms, for example when the Service changes or the law changes. When we
+      do, we update the date at the top. If a change is material, we will also say so on the site.
+      Changes apply from the date they are posted. If you keep using the Service after a change,
+      you accept it.
+    </p>
+
+    <h2 id="termination">
+      13. Termination
+    </h2>
+    <p>
+      We can end or suspend your access to all or part of the Service at any time, with or without
+      cause or notice, including when we believe you broke these terms. We can also reclaim short
+      codes or domains after long inactivity. You can stop using the Service at any time, and you
+      can cancel a paid plan as described in section 5.
+    </p>
+
+    <h2 id="disclaimers">
+      14. Disclaimers
+    </h2>
+    <p>
+      The Service is provided "as is", to the extent the law allows. We make no warranty that it
+      will be error free, uninterrupted, or that short links will resolve forever. You use it at
+      your own risk.
+    </p>
+
+    <h2 id="law">
+      15. Jurisdiction and applicable law
+    </h2>
+    <p>
+      Except where the law says otherwise, these terms and your use of the Service are governed by
+      the laws of the United States and of the State of
+      <!-- Set the state where the operator resides before publishing. -->
+      [State], without regard to conflict of law rules, and disputes go to the state and federal
+      courts of that state. Nothing here removes rights you have as a consumer under the law where
+      you live.
+    </p>
+
+    <h2 id="liability">
+      16. Limitation of liability
+    </h2>
+    <p>
+      To the extent the law allows, we are not liable for special, incidental, or consequential
+      damages, for the cost of substitute services, for lost or corrupted data, or for any amount
+      above the greater of $50 and the fees you paid us in the twelve months before the claim.
+      For consumers in Europe, our liability is limited to the maximum the law of your country
+      allows, and this section does not limit liability for death, personal injury, willful
+      misconduct, or gross negligence.
+    </p>
+
+    <h2 id="indemnification">
+      17. Indemnification
+    </h2>
+    <p>
+      You agree to defend us against, and cover, any claim, loss, or cost, including reasonable
+      legal fees, that arises from your use of the Service, from the links you create, or from
+      your breach of these terms.
+    </p>
+
+    <h2 id="misc">
+      18. Miscellaneous
+    </h2>
+    <p>
+      These terms are the whole agreement between you and us about the Service. If a part of them
+      is unenforceable, the rest still applies. If we do not enforce a term once, we can still
+      enforce it later. We can assign these terms. You can assign them only with our written
+      consent. These terms are written in English, and the English version controls.
+    </p>
+
+    <h2 id="contact">
+      Contact
+    </h2>
+    <p>
+      Open an issue on
+      <a href="https://github.com/NullVoxPopuli/url-shortener">GitHub</a>
+      or ask in the Discord linked in the footer.
+    </p>
+
+    <p class="attribution">
+      Adapted from
+      <a href="https://github.com/Automattic/legalmattic">Automattic's Legalmattic</a>
+      terms of service, under the
+      <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons BY-SA 4.0</a>
+      license. These terms are available under the same license.
     </p>
   </main>
 @end
