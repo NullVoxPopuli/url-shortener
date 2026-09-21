@@ -132,7 +132,9 @@ export async function syncStripeDataToAccount(account: Account): Promise<StripeS
     priceId,
     currentPeriodStart: item?.current_period_start ?? null,
     currentPeriodEnd: item?.current_period_end ?? null,
-    cancelAtPeriodEnd: subscription.cancel_at_period_end ?? false,
+    // The portal can schedule a cancellation as a `cancel_at` date
+    // instead of the flag; both mean the plan ends and does not renew.
+    cancelAtPeriodEnd: Boolean(subscription.cancel_at_period_end || subscription.cancel_at),
     paymentMethod,
   };
 

@@ -27,3 +27,11 @@ export async function markStripeEventProcessed(params: {
 
   return affectedRows > 0;
 }
+
+/**
+ * Undo `markStripeEventProcessed` when the work for the event failed,
+ * so Stripe's retry of the same event id is processed again.
+ */
+export async function forgetStripeEvent(eventId: string): Promise<void> {
+  await db.from('stripe_webhook_events').where('event_id', eventId).delete();
+}

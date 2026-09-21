@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import env from '#start/env';
 import { stripe } from '#services/stripe';
-import { markStripeEventProcessed } from '#services/stripe_webhook_dedupe';
+import { forgetStripeEvent, markStripeEventProcessed } from '#services/stripe_webhook_dedupe';
 import { syncStripeDataToAccountByCustomerId } from '#services/stripe_sync';
 
 const allowedEvents = new Set([
@@ -95,6 +95,8 @@ export default class StripeWebhookController {
       await syncStripeDataToAccountByCustomerId(normalizedCustomerId);
     } catch (error) {
       console.error(`[STRIPE HOOK] Error processing ${event.type}`, error);
+      // Forget the delivery, or the retry would be deduped as a repeat.
+      await forgetStripeEvent(eventId);
       response.status(500);
       return response.json({ error: 'Sync failed' });
     }

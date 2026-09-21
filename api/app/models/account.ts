@@ -69,7 +69,11 @@ export default class Account extends BaseModel {
   })
   declare stripeCurrentPeriodEnd: number | null;
 
-  @column({ columnName: 'stripe_cancel_at_period_end' })
+  // sqlite hands booleans back as 0 / 1
+  @column({
+    columnName: 'stripe_cancel_at_period_end',
+    consume: (value) => (value === null || value === undefined ? null : Boolean(value)),
+  })
   declare stripeCancelAtPeriodEnd: boolean | null;
 
   @column({ columnName: 'stripe_payment_method_brand' })

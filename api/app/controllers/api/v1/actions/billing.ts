@@ -156,9 +156,15 @@ export async function billingPortal(context: HttpContext) {
   const accountShortId = account.id.split('-')[0]!;
   const returnUrl = `${APP_ORIGIN}/${accountShortId}`;
 
+  // Come back through the success handler, like checkout does: it syncs
+  // the subscription before the dashboard renders, so a cancellation or
+  // a plan change made in the portal shows without waiting on webhooks.
+  const syncUrl = new URL(env.get('STRIPE_SUCCESS_URL'));
+  syncUrl.searchParams.set('return_to', returnUrl);
+
   const session = await stripe.billingPortal.sessions.create({
     customer: customerId,
-    return_url: returnUrl,
+    return_url: syncUrl.toString(),
   });
 
   return {
