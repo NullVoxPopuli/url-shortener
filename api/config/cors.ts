@@ -13,7 +13,7 @@ const allowedOrigins = [APP_ORIGIN, `http://app.${DOMAIN}`, `https://app.${DOMAI
 const corsConfig = defineConfig({
   enabled: true,
   origin: allowedOrigins,
-  methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
   headers: true,
   exposeHeaders: [],
   credentials: true,
