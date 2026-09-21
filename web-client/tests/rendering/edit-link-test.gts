@@ -45,7 +45,6 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
 
     assert.dom('input[name="original"]').hasValue('https://example.com/old');
     assert.dom('input[name="expiresAt"]').hasValue('');
-    assert.dom('[data-test-clear-expires]').doesNotExist();
 
     await fillIn('input[name="original"]', 'https://example.com/new');
     await click('button[type="submit"]');
@@ -100,7 +99,6 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
     await click('[data-test-clear-expires]');
 
     assert.dom('input[name="expiresAt"]').hasValue('');
-    assert.dom('[data-test-clear-expires]').doesNotExist();
 
     await click('button[type="submit"]');
 
@@ -136,7 +134,7 @@ module('Rendering | dashboard | EditLinkForm', function (hooks) {
 module('Rendering | dashboard | EditLinkForm record', function (hooks) {
   setupRenderingTest(hooks);
 
-  test('typing edits a checked-out copy, not the record', async function (assert) {
+  test('typing touches neither the record nor the copy until submit', async function (assert) {
     const link = pushLink(this.owner, { original: 'https://example.com/old' });
     const onSave = () => assert.step('save');
     const onCancel = () => assert.step('cancel');

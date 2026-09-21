@@ -25,6 +25,12 @@ function toExpiresAt(dateInputValue: string) {
   return dateInputValue ? `${dateInputValue}T23:59:59.000Z` : null;
 }
 
+function field(data: FormData, name: string) {
+  const value = data.get(name);
+
+  return typeof value === 'string' ? value : '';
+}
+
 
 /**
  * The fields on the editable copy that differ from the saved record.
@@ -70,34 +76,28 @@ export class EditLinkForm extends Component<Signature> {
     return toDateInputValue(this.editable?.expiresAt ?? null);
   }
 
+  clearExpires = (event: Event) => {
+    const form = (event.currentTarget as HTMLElement).closest('form');
+    const input = form?.elements.namedItem('expiresAt');
+
+    if (input instanceof HTMLInputElement) input.value = '';
+  };
+
   /**
-   * One listener on the form; the input's name says which field.
+   * The form's values land on the editable copy only on submit.
    */
-  onInput = (event: Event) => {
-    const input = event.target as HTMLInputElement;
-
-    if (!this.editable) return;
-
-    switch (input.name) {
-      case 'original':
-        this.editable.original = input.value.trim();
-
-        break;
-      case 'expiresAt':
-        this.editable.expiresAt = toExpiresAt(input.value);
-
-        break;
-    }
-  };
-
-  clearExpires = () => {
-    if (this.editable) this.editable.expiresAt = null;
-  };
-
   submit = (event: SubmitEvent) => {
     event.preventDefault();
 
     if (!this.editable) return;
+
+    const data = new FormData(event.currentTarget as HTMLFormElement);
+
+    this.editable.original = field(data, 'original').trim();
+
+    if (this.args.canSetExpiration) {
+      this.editable.expiresAt = toExpiresAt(field(data, 'expiresAt'));
+    }
 
     const changes = changesBetween(this.args.link, this.editable);
 
@@ -112,11 +112,7 @@ export class EditLinkForm extends Component<Signature> {
 
   <template>
     {{#if this.editable}}
-      <form
-        class="edit-link-form"
-        {{on "submit" this.submit}}
-        {{on "input" this.onInput}}
-      >
+      <form class="edit-link-form" {{on "submit" this.submit}}>
         <label>
           <span>Destination</span>
           <input name="original" type="url" required value={{this.editable.original}}>
@@ -128,8 +124,7 @@ export class EditLinkForm extends Component<Signature> {
               <span>Expires</span>
               <input name="expiresAt" type="date" value={{this.expiresValue}}>
             </label>
-            {{#if this.editable.expiresAt}}
-              <Button
+                          <Button
                 type="button"
                 @variant="bare"
                 @onClick={{this.clearExpires}}
@@ -137,7 +132,6 @@ export class EditLinkForm extends Component<Signature> {
               >
                 Clear
               </Button>
-            {{/if}}
           </div>
         {{/if}}
 
