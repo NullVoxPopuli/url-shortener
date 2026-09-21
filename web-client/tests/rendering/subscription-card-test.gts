@@ -31,8 +31,8 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
 
     await render(<template><SubscriptionCard @billing={{billing}} /></template>);
 
-    assert.dom('[data-test-legacy-free]').hasText('Free, unlimited');
-    assert.dom('section').containsText('legacy account');
+    assert.dom('[data-test-free-unlimited]').hasText('Free, unlimited');
+    assert.dom('section').doesNotContainText('legacy');
     assert.dom('button').doesNotExist();
     assert.dom('a[href="/pricing"]').doesNotExist();
   });

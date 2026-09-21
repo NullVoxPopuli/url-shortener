@@ -76,8 +76,8 @@ export class SubscriptionCard extends Component<Signature> {
         </ul>
         <p class="muted">No card on file. Nothing renews.</p>
       {{else if (isFree @billing)}}
-        <p class="plan-name" data-test-legacy-free>Free, unlimited</p>
-        <p class="muted">A legacy account: unlimited links, and nothing to bill.</p>
+        <p class="plan-name" data-test-free-unlimited>Free, unlimited</p>
+        <p class="muted">Unlimited links, and nothing to bill.</p>
       {{else}}
         <p class="plan-name">{{@billing.plan.name}}</p>
         <p class="muted">
