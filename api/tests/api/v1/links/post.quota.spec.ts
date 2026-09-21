@@ -46,7 +46,7 @@ test.group('POST /v1/links [quota]', (group) => {
   });
 
   test('a free (unlimited) account is never limited', async ({ client }) => {
-    let { user, account } = await createNewAccount({ account: { isFree: true } });
+    let { user, account } = await createNewAccount({ account: { isInternal: true } });
 
     for (let i = 0; i < NO_SUBSCRIPTION_PLAN.monthlyLinkLimit; i++) {
       await createLink(user, account, `https://example.com/${i}`);

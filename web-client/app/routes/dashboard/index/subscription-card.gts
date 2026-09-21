@@ -8,8 +8,8 @@ import { formatDate } from '../format.ts';
 
 import type { BillingStatus, Overage } from '#app/data/types';
 
-function isFree(billing: BillingStatus) {
-  return billing.plan.key === 'free';
+function isInternal(billing: BillingStatus) {
+  return billing.plan.key === 'internal';
 }
 
 function hasNoSubscription(billing: BillingStatus) {
@@ -75,9 +75,9 @@ export class SubscriptionCard extends Component<Signature> {
           <li>Basic click stats</li>
         </ul>
         <p class="muted">No card on file. Nothing renews.</p>
-      {{else if (isFree @billing)}}
-        <p class="plan-name" data-test-legacy-free>Free, unlimited</p>
-        <p class="muted">A legacy account: unlimited links, and nothing to bill.</p>
+      {{else if (isInternal @billing)}}
+        <p class="plan-name" data-test-internal>Internal</p>
+        <p class="muted">Unlimited links, and nothing to bill.</p>
       {{else}}
         <p class="plan-name">{{@billing.plan.name}}</p>
         <p class="muted">
@@ -104,7 +104,7 @@ export class SubscriptionCard extends Component<Signature> {
         {{/if}}
       {{/if}}
 
-      {{#unless (isFree @billing)}}
+      {{#unless (isInternal @billing)}}
         <div class="card-actions">
           {{#if @billing.hasActiveSubscription}}
             <button

@@ -125,7 +125,7 @@ export async function billingStatus(context: HttpContext) {
       type: 'billing-status',
       id: account.id,
       attributes: {
-        isFree: account.isFree,
+        isInternal: account.isInternal,
         hasActiveSubscription: account.hasActiveSubscription,
         stripe: {
           customerId: account.stripeCustomerId,

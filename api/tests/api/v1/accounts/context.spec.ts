@@ -35,7 +35,7 @@ test.group('Account context (?accountId=)', (group) => {
 
   test('operates on another account when the caller is a member', async ({ client }) => {
     const { user } = await createNewAccount();
-    const team = await createNewAccount({ account: { isFree: true } });
+    const team = await createNewAccount({ account: { isInternal: true } });
 
     await AccountMembership.ensure({ accountId: team.account.id, userId: user.id });
     await createLink(team.user, team.account, 'https://example.com/theirs');
@@ -63,7 +63,7 @@ test.group('Account context (?accountId=)', (group) => {
 
   test('billing status follows the account context', async ({ client }) => {
     const { user } = await createNewAccount();
-    const team = await createNewAccount({ account: { isFree: true } });
+    const team = await createNewAccount({ account: { isInternal: true } });
 
     await AccountMembership.ensure({ accountId: team.account.id, userId: user.id });
 
@@ -75,6 +75,6 @@ test.group('Account context (?accountId=)', (group) => {
 
     response.assertStatus(200);
     assert.strictEqual(response.body().data.id, team.account.id);
-    assert.strictEqual(response.body().data.attributes.plan.key, 'free');
+    assert.strictEqual(response.body().data.attributes.plan.key, 'internal');
   });
 });

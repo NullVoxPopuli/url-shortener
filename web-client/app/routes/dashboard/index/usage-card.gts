@@ -17,7 +17,7 @@ function isExhausted(billing: BillingStatus) {
  * The free plan is the only one whose way out of an exhausted quota is
  * an upgrade rather than a bigger plan's portal.
  */
-function isFreePlan(billing: BillingStatus) {
+function isInternalPlan(billing: BillingStatus) {
   return billing.plan.key === 'none';
 }
 
@@ -54,7 +54,7 @@ export const UsageCard: TOC<Signature> = <template>
         <span class="stat-number">{{@billing.usage.used}}</span>
         of
         {{@billing.plan.monthlyLinkLimit}}
-        {{if (isFreePlan @billing) "free"}}
+        {{if (isInternalPlan @billing) "free"}}
         links used this month
       </p>
       <div
@@ -71,7 +71,7 @@ export const UsageCard: TOC<Signature> = <template>
         ></div>
       </div>
       {{#if (isExhausted @billing)}}
-        {{#if (isFreePlan @billing)}}
+        {{#if (isInternalPlan @billing)}}
           <p class="warning" data-test-free-exhausted>You've used all
             {{@billing.plan.monthlyLinkLimit}}
             free links this month.
@@ -85,7 +85,7 @@ export const UsageCard: TOC<Signature> = <template>
         <p class="muted">{{@billing.usage.remaining}}
           remaining until
           {{formatUtcDateTime @billing.usage.periodEnd}}</p>
-        {{#if (isFreePlan @billing)}}
+        {{#if (isInternalPlan @billing)}}
           <p class="muted" data-test-free-hint>Paid plans start at 15 links a month.
             <a href="/pricing">See plans</a></p>
         {{/if}}

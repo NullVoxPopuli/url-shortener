@@ -210,7 +210,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
                     data: {
                       type: 'account',
                       id: 'uuid',
-                      attributes: { name: 'Acme', isFree: false },
+                      attributes: { name: 'Acme', isInternal: false },
                     },
                     included: [],
                   },

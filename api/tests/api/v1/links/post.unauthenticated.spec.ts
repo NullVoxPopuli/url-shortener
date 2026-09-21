@@ -126,7 +126,7 @@ test.group('POST [unauthenticated]', (group) => {
 
     assert.ok(link?.owned_by);
     assert.ok(link?.ownedBy.id);
-    assert.ok(link?.ownedBy.isFree);
+    assert.ok(link?.ownedBy.isInternal);
   });
 
   test('Success: The same URL shortened twice results in the same short URL', async ({

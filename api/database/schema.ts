@@ -46,7 +46,7 @@ export class AccountMembershipSchema extends BaseModel {
 }
 
 export class AccountSchema extends BaseModel {
-  static $columns = ['adminId', 'createdAt', 'id', 'isFree', 'isPersonal', 'name', 'stripeCancelAtPeriodEnd', 'stripeCurrentPeriodEnd', 'stripeCurrentPeriodStart', 'stripeCustomerId', 'stripeDowngradedFromPriceId', 'stripeDowngradedUntil', 'stripeLastSyncedAt', 'stripePaymentMethodBrand', 'stripePaymentMethodLast4', 'stripePriceId', 'stripeSubscriptionId', 'stripeSubscriptionStatus', 'updatedAt'] as const
+  static $columns = ['adminId', 'createdAt', 'id', 'isInternal', 'isPersonal', 'name', 'stripeCancelAtPeriodEnd', 'stripeCurrentPeriodEnd', 'stripeCurrentPeriodStart', 'stripeCustomerId', 'stripeDowngradedFromPriceId', 'stripeDowngradedUntil', 'stripeLastSyncedAt', 'stripePaymentMethodBrand', 'stripePaymentMethodLast4', 'stripePriceId', 'stripeSubscriptionId', 'stripeSubscriptionStatus', 'updatedAt'] as const
   $columns = AccountSchema.$columns
   @column()
   declare adminId: string | null
@@ -55,7 +55,7 @@ export class AccountSchema extends BaseModel {
   @column({ isPrimary: true })
   declare id: string
   @column()
-  declare isFree: boolean | null
+  declare isInternal: boolean | null
   @column()
   declare isPersonal: boolean
   @column()

@@ -21,18 +21,18 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
     assert.dom('button').doesNotExist();
   });
 
-  test('free account: unlimited, no billing button', async function (assert) {
+  test('internal account: unlimited, no billing button', async function (assert) {
     const billing = makeBilling({
-      planKey: 'free',
-      planName: 'Free',
+      planKey: 'internal',
+      planName: 'Internal',
       monthlyLinkLimit: null,
       remaining: null,
     });
 
     await render(<template><SubscriptionCard @billing={{billing}} /></template>);
 
-    assert.dom('[data-test-legacy-free]').hasText('Free, unlimited');
-    assert.dom('section').containsText('legacy account');
+    assert.dom('[data-test-internal]').hasText('Internal');
+    assert.dom('section').doesNotContainText('legacy');
     assert.dom('button').doesNotExist();
     assert.dom('a[href="/pricing"]').doesNotExist();
   });
