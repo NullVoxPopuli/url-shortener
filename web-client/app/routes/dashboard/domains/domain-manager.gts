@@ -31,7 +31,7 @@ export default class DomainManager extends Component<Signature> {
   @tracked isWorking = false;
   @tracked error: string | null = null;
 
-  add = async (refresh: () => Promise<void>, event: SubmitEvent) => {
+  add = async (event: SubmitEvent) => {
     event.preventDefault();
 
     const form = event.currentTarget as HTMLFormElement;
@@ -44,8 +44,7 @@ export default class DomainManager extends Component<Signature> {
     this.error = null;
 
     try {
-      await this.store.request(createDomain(hostname, this.args.accountId));
-      await refresh();
+      await this.store.request(createDomain(this.store, hostname, this.args.accountId));
       form.reset();
     } catch (error) {
       this.error = messageFrom(error);
@@ -54,7 +53,7 @@ export default class DomainManager extends Component<Signature> {
     }
   };
 
-  remove = async (refresh: () => Promise<void>, domain: CustomDomain) => {
+  remove = async (domain: CustomDomain) => {
     if (!window.confirm(`Remove ${domain.hostname}? Links on it will stop resolving.`)) {
       return;
     }
@@ -63,8 +62,7 @@ export default class DomainManager extends Component<Signature> {
     this.error = null;
 
     try {
-      await this.store.request(deleteDomain(domain.id, this.args.accountId));
-      await refresh();
+      await this.store.request(deleteDomain(domain, this.args.accountId));
     } catch (error) {
       this.error = messageFrom(error);
     } finally {
@@ -79,7 +77,7 @@ export default class DomainManager extends Component<Signature> {
       <section class="page-card surface">
         <h2>Custom domains</h2>
 
-        <Request @request={{@domains}}>
+        <Request @request={{@domains}} @autorefresh="invalid">
           <:loading>
             <p class="muted">Loading domains…</p>
           </:loading>
@@ -88,7 +86,7 @@ export default class DomainManager extends Component<Signature> {
             <p class="warning">Could not load domains. Refresh to try again.</p>
           </:error>
 
-          <:content as |doc state|>
+          <:content as |doc|>
             {{#if doc.data.length}}
               <table class="domain-table">
                 <thead>
@@ -111,7 +109,7 @@ export default class DomainManager extends Component<Signature> {
                             type="button"
                             class="danger-button"
                             disabled={{this.isWorking}}
-                            {{on "click" (fn this.remove state.refresh domain)}}
+                            {{on "click" (fn this.remove domain)}}
                           >
                             Remove
                           </button>
@@ -127,7 +125,7 @@ export default class DomainManager extends Component<Signature> {
             {{/if}}
 
             {{#if @isAdmin}}
-              <form class="add-form" {{on "submit" (fn this.add state.refresh)}}>
+              <form class="add-form" {{on "submit" this.add}}>
                 <label>
                   <span class="visually-hidden">Hostname</span>
                   <input name="hostname" placeholder="links.example.com" required>

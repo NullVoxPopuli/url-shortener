@@ -31,7 +31,7 @@ export class ShortenURLForm extends Component {
     this.shortUrl = null;
 
     try {
-      const result = await this.store.request(createLink(url));
+      const result = await this.store.request(createLink(this.store, { original: url }));
 
       this.shortUrl = result.content.data?.shortUrl ?? null;
       form.reset();

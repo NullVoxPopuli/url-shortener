@@ -319,7 +319,7 @@ export default class Pricing extends Component<Signature> {
             </div>
 
             {{#if @billing}}
-              <Request @request={{@billing}}>
+              <Request @request={{@billing}} @autorefresh="invalid">
                 <:loading>
                   <p>Loading your subscription…</p>
                 </:loading>

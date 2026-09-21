@@ -12,7 +12,7 @@ import type { Link } from '#app/data/types';
 
 /**
  * Everything the table needs to offer editing. The owner holds the
- * editing state, so a save can close the editor after its refresh.
+ * editing state, so a save can close the editor.
  */
 export interface LinkEditing {
   /** the link whose editor is open */

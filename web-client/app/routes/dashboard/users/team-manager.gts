@@ -38,13 +38,12 @@ export default class TeamManager extends Component<Signature> {
   @tracked isWorking = false;
   @tracked error: string | null = null;
 
-  invite = async (refresh: () => Promise<void>) => {
+  invite = async () => {
     this.isWorking = true;
     this.error = null;
 
     try {
-      await this.store.request(createInvitation(this.args.accountId));
-      await refresh();
+      await this.store.request(createInvitation(this.store, this.args.accountId));
     } catch (error) {
       this.error = messageFrom(error);
     } finally {
@@ -52,13 +51,12 @@ export default class TeamManager extends Component<Signature> {
     }
   };
 
-  revoke = async (refresh: () => Promise<void>, invitation: Invitation) => {
+  revoke = async (invitation: Invitation) => {
     this.isWorking = true;
     this.error = null;
 
     try {
-      await this.store.request(revokeInvitation(invitation.id));
-      await refresh();
+      await this.store.request(revokeInvitation(invitation));
     } catch (error) {
       this.error = messageFrom(error);
     } finally {
@@ -66,7 +64,7 @@ export default class TeamManager extends Component<Signature> {
     }
   };
 
-  remove = async (refresh: () => Promise<void>, membership: Membership) => {
+  remove = async (membership: Membership) => {
     const name = membership.user?.name ?? 'this member';
 
     if (!window.confirm(`Remove ${name} from the account?`)) return;
@@ -75,8 +73,7 @@ export default class TeamManager extends Component<Signature> {
     this.error = null;
 
     try {
-      await this.store.request(removeMembership(membership.id));
-      await refresh();
+      await this.store.request(removeMembership(membership));
     } catch (error) {
       this.error = messageFrom(error);
     } finally {
@@ -95,7 +92,7 @@ export default class TeamManager extends Component<Signature> {
       <section class="page-card surface">
         <h2>Members</h2>
 
-        <Request @request={{@memberships}}>
+        <Request @request={{@memberships}} @autorefresh="invalid">
           <:loading>
             <p class="muted">Loading members…</p>
           </:loading>
@@ -104,7 +101,7 @@ export default class TeamManager extends Component<Signature> {
             <p class="warning">Could not load members. Refresh to try again.</p>
           </:error>
 
-          <:content as |doc state|>
+          <:content as |doc|>
             <table class="team-table">
               <thead>
                 <tr>
@@ -129,7 +126,7 @@ export default class TeamManager extends Component<Signature> {
                             type="button"
                             class="danger-button"
                             disabled={{this.isWorking}}
-                            {{on "click" (fn this.remove state.refresh membership)}}
+                            {{on "click" (fn this.remove membership)}}
                           >
                             Remove
                           </button>
@@ -148,7 +145,7 @@ export default class TeamManager extends Component<Signature> {
         <section class="page-card surface">
           <h2>Invitations</h2>
 
-          <Request @request={{@invitations}}>
+          <Request @request={{@invitations}} @autorefresh="invalid">
             <:loading>
               <p class="muted">Loading invitations…</p>
             </:loading>
@@ -158,7 +155,7 @@ export default class TeamManager extends Component<Signature> {
                 again.</p>
             </:error>
 
-            <:content as |doc state|>
+            <:content as |doc|>
               {{#if doc.data.length}}
                 <ul class="invitation-list">
                   {{#each doc.data as |invitation|}}
@@ -174,7 +171,7 @@ export default class TeamManager extends Component<Signature> {
                           type="button"
                           class="danger-button"
                           disabled={{this.isWorking}}
-                          {{on "click" (fn this.revoke state.refresh invitation)}}
+                          {{on "click" (fn this.revoke invitation)}}
                         >
                           Revoke
                         </button>
@@ -190,7 +187,7 @@ export default class TeamManager extends Component<Signature> {
               <div class="invite-actions">
                 <Button
                   @variant="primary"
-                  @onClick={{fn this.invite state.refresh}}
+                  @onClick={{this.invite}}
                   @disabled={{if this.isWorking "Working..."}}
                 >
                   New invitation link

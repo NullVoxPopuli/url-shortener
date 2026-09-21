@@ -1,6 +1,5 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { fn } from '@ember/helper';
 import { on } from '@ember/modifier';
 import { service } from '@ember/service';
 
@@ -17,6 +16,10 @@ import type { Store } from '@warp-drive/core';
 import type { ReactiveDataDocument } from '@warp-drive/core/reactive';
 import type { Future } from '@warp-drive/core/request';
 import type { ApiKey, ApiKeyQuota } from '#app/data/types';
+
+function text(value: FormDataEntryValue | null) {
+  return typeof value === 'string' ? value : '';
+}
 
 interface Signature {
   Args: {
@@ -36,17 +39,18 @@ export default class ApiKeyManager extends Component<Signature> {
     return (doc.meta ?? {}) as Partial<ApiKeyQuota>;
   };
 
-  create = async (refresh: () => Promise<void>, event: SubmitEvent) => {
+  create = async (event: SubmitEvent) => {
     event.preventDefault();
 
     const form = event.currentTarget as HTMLFormElement;
     const data = new FormData(form);
-    const name = String(data.get('name') ?? '').trim();
+    const name = text(data.get('name')).trim();
     const scopes = data.getAll('scopes').map(String);
-    const expires = String(data.get('expiresInDays') ?? '');
+    const expires = text(data.get('expiresInDays'));
 
     if (!name || scopes.length === 0) {
       this.error = 'A name and at least one scope are required.';
+
       return;
     }
 
@@ -56,6 +60,7 @@ export default class ApiKeyManager extends Component<Signature> {
     try {
       const result = await this.store.request(
         createApiKey(
+          this.store,
           { name, scopes, ...(expires ? { expiresInDays: Number(expires) } : {}) },
           this.args.accountId
         )
@@ -65,7 +70,6 @@ export default class ApiKeyManager extends Component<Signature> {
 
       this.newKey = created?.token ? { name: created.name, token: created.token } : null;
 
-      await refresh();
       form.reset();
     } catch (error) {
       this.error = messageFrom(error);
@@ -74,7 +78,7 @@ export default class ApiKeyManager extends Component<Signature> {
     }
   };
 
-  revoke = async (refresh: () => Promise<void>, key: ApiKey) => {
+  revoke = async (key: ApiKey) => {
     if (!window.confirm(`Revoke "${key.name}"? Anything using it stops working immediately.`)) {
       return;
     }
@@ -83,13 +87,11 @@ export default class ApiKeyManager extends Component<Signature> {
     this.error = null;
 
     try {
-      await this.store.request(revokeApiKey(key.id, this.args.accountId));
+      await this.store.request(revokeApiKey(key, this.args.accountId));
 
       if (this.newKey?.name === key.name) {
         this.newKey = null;
       }
-
-      await refresh();
     } catch (error) {
       this.error = messageFrom(error);
     } finally {
@@ -104,7 +106,7 @@ export default class ApiKeyManager extends Component<Signature> {
       <section class="page-card surface">
         <h2>Your keys</h2>
 
-        <Request @request={{@apiKeys}}>
+        <Request @request={{@apiKeys}} @autorefresh="invalid">
           <:loading>
             <p class="muted">Loading API keys…</p>
           </:loading>
@@ -113,7 +115,7 @@ export default class ApiKeyManager extends Component<Signature> {
             <p class="warning">Could not load API keys. Refresh to try again.</p>
           </:error>
 
-          <:content as |doc state|>
+          <:content as |doc|>
             {{#if this.newKey}}
               <NewApiKey @name={{this.newKey.name}} @token={{this.newKey.token}} />
             {{/if}}
@@ -121,7 +123,7 @@ export default class ApiKeyManager extends Component<Signature> {
             <ApiKeyTable
               @keys={{doc.data}}
               @isWorking={{this.isWorking}}
-              @onRevoke={{fn this.revoke state.refresh}}
+              @onRevoke={{this.revoke}}
             />
 
             {{#let (this.quotaOf doc) as |quota|}}
@@ -130,7 +132,7 @@ export default class ApiKeyManager extends Component<Signature> {
                   from the account's plan.</p>
               {{/if}}
 
-              <form class="add-form" {{on "submit" (fn this.create state.refresh)}}>
+              <form class="add-form" {{on "submit" this.create}}>
                 <label class="name-field">
                   <span>Name</span>
                   <input name="name" placeholder="CI deploys" required>
