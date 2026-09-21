@@ -39,10 +39,6 @@ interface ActionsConfig {
   isDeleting?: boolean;
 }
 
-function isEditing(link: Link, editing: LinkEditing | undefined) {
-  return Boolean(editing) && link.id === editing?.id;
-}
-
 function actionsOf(column: { config: object }) {
   return column.config as ActionsConfig;
 }
@@ -234,36 +230,54 @@ export class LinksTable extends Component<Signature> {
     return columns;
   }
 
-  isEditorFor = (row: Row<Link>) => isEditing(row.data, this.args.editing);
+  /**
+   * The editor sits above the table. Extra rows inside a table are
+   * not accessible.
+   */
+  get linkBeingEdited() {
+    const id = this.args.editing?.id;
+
+    if (!id) return undefined;
+
+    return this.args.links.find((link) => link.id === id);
+  }
 
   <template>
-    <Table @caption="Your links" @columns={{this.columns}} @data={{@links}} class="links-table">
-      <:afterRow as |row count|>
-        {{#if @editing}}
-          {{#if (this.isEditorFor row)}}
-            <tr class="editor-row">
-              <td colspan={{count}}>
-                <EditLinkForm
-                  @link={{row.data}}
-                  @canSetExpiration={{@editing.canSetExpiration}}
-                  @isSaving={{if @isDeleting true false}}
-                  @onSave={{fn @editing.save row.data}}
-                  @onCancel={{@editing.cancel}}
-                />
-              </td>
-            </tr>
-          {{/if}}
+    {{#if @editing}}
+      {{#let this.linkBeingEdited as |link|}}
+        {{#if link}}
+          <section class="editor" aria-labelledby="link-editor-heading">
+            <h3 id="link-editor-heading">Editing {{link.shortUrl}}</h3>
+            <EditLinkForm
+              @link={{link}}
+              @canSetExpiration={{@editing.canSetExpiration}}
+              @isSaving={{if @isDeleting true false}}
+              @onSave={{fn @editing.save link}}
+              @onCancel={{@editing.cancel}}
+            />
+          </section>
         {{/if}}
-      </:afterRow>
+      {{/let}}
+    {{/if}}
 
+    <Table @caption="Your links" @columns={{this.columns}} @data={{@links}} class="links-table">
       <:empty>No links yet.</:empty>
 
       <:footer>{{yield to="footer"}}</:footer>
     </Table>
 
     <style scoped>
-      .editor-row td {
+      .editor {
+        margin: 0 0 var(--gap-3);
+        padding: var(--padding-3);
+        border: var(--border-width) var(--border-style) var(--border-color);
+        border-radius: var(--radius);
         background: var(--color-page-background);
+      }
+
+      .editor h3 {
+        margin: 0 0 var(--gap-2);
+        font-size: 1rem;
       }
     </style>
   </template>
