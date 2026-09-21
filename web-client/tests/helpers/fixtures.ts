@@ -12,7 +12,7 @@ export function makeBilling(overrides?: {
   linkExpiration?: boolean;
   editsUsed?: number;
   editsRemaining?: number | null;
-  pendingChange?: BillingStatus['pendingChange'];
+  pendingDowngrade?: BillingStatus['pendingDowngrade'];
 }): BillingStatus {
   const {
     planKey = 'none',
@@ -26,7 +26,7 @@ export function makeBilling(overrides?: {
     linkExpiration = false,
     editsUsed = 0,
     editsRemaining = linkEditsPerMonth === null ? null : linkEditsPerMonth - editsUsed,
-    pendingChange = null,
+    pendingDowngrade = null,
   } = overrides ?? {};
 
   return {
@@ -43,10 +43,10 @@ export function makeBilling(overrides?: {
       currentPeriodStart: hasActiveSubscription ? 1785585600 : null,
       currentPeriodEnd: hasActiveSubscription ? 1788264000 : null,
       cancelAtPeriodEnd,
-      pendingPriceId: pendingChange?.plan.key ?? null,
-      pendingAt: pendingChange?.at ?? null,
+      pendingPriceId: pendingDowngrade?.plan.key ?? null,
+      pendingAt: pendingDowngrade?.at ?? null,
     },
-    pendingChange,
+    pendingDowngrade,
     plan: {
       key: planKey,
       name: planName,

@@ -11,7 +11,7 @@ import {
   PLANS,
   billingIntervalFor,
   isBillingInterval,
-  pendingPlanChangeFor,
+  pendingDowngradeFor,
   planForKey,
 } from '#services/plans';
 
@@ -135,10 +135,10 @@ export async function billingStatus(context: HttpContext) {
           pendingAt: account.stripePendingAt,
         },
         /**
-         * A scheduled downgrade or upgrade. The account keeps `plan` until
-         * `pendingChange.at`.
+         * A scheduled downgrade. The account keeps `plan` until
+         * `pendingDowngrade.at`. Upgrades apply at once.
          */
-        pendingChange: pendingPlanChangeFor(account),
+        pendingDowngrade: pendingDowngradeFor(account),
         plan: quota.plan,
         usage: {
           used: quota.used,

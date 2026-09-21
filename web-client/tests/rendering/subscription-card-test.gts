@@ -71,8 +71,7 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
       planKey: 'pro',
       planName: 'Pro',
       hasActiveSubscription: true,
-      pendingChange: {
-        kind: 'downgrade',
+      pendingDowngrade: {
         plan: {
           key: 'base',
           name: 'Base',
@@ -89,28 +88,5 @@ module('Rendering | dashboard | SubscriptionCard', function (hooks) {
     assert.dom('[data-test-downgrading]').containsText('Downgrading to Base on Sep 1, 2026');
     assert.dom('[data-test-downgrading]').containsText('You keep Pro until then');
     assert.dom('.plan-name').hasText('Pro');
-  });
-
-  test('a scheduled upgrade says so', async function (assert) {
-    const billing = makeBilling({
-      planKey: 'base',
-      planName: 'Base',
-      hasActiveSubscription: true,
-      pendingChange: {
-        kind: 'upgrade',
-        plan: {
-          key: 'pro',
-          name: 'Pro',
-          monthlyLinkLimit: 1000,
-          linkEditsPerMonth: 50,
-          linkExpiration: true,
-        },
-        at: 1788264000,
-      },
-    });
-
-    await render(<template><SubscriptionCard @billing={{billing}} /></template>);
-
-    assert.dom('[data-test-upgrading]').containsText('Upgrading to Pro on Sep 1, 2026');
   });
 });

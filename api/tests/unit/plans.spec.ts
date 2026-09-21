@@ -4,10 +4,9 @@ import {
   PLANS,
   billingIntervalFor,
   intervalForPriceId,
-  pendingPlanChangeFor,
+  pendingDowngradeFor,
   planFor,
   planForPriceId,
-  planRank,
 } from '#services/plans';
 
 const VAST = PLANS[3];
@@ -44,14 +43,7 @@ test.group('plans', () => {
     assert.isNull(billingIntervalFor({ isFree: false, stripePriceId: null }));
   });
 
-  test('plans rank cheapest first', () => {
-    assert.deepEqual(
-      PLANS.map((plan) => planRank(plan)),
-      [0, 1, 2, 3]
-    );
-  });
-
-  test('a pending cheaper price is a downgrade, a dearer one an upgrade', () => {
+  test('a pending price on another plan is a downgrade', () => {
     const onPro = {
       isFree: false,
       stripePriceId: PLANS[2].prices.month.id,
@@ -59,18 +51,10 @@ test.group('plans', () => {
       stripePendingAt: 123,
     };
 
-    assert.deepEqual(pendingPlanChangeFor(onPro), { kind: 'downgrade', plan: PLANS[0], at: 123 });
-
-    const onBase = {
-      ...onPro,
-      stripePriceId: PLANS[0].prices.month.id,
-      stripePendingPriceId: VAST.prices.month.id,
-    };
-
-    assert.strictEqual(pendingPlanChangeFor(onBase)?.kind, 'upgrade');
+    assert.deepEqual(pendingDowngradeFor(onPro), { plan: PLANS[0], at: 123 });
   });
 
-  test('no pending change without a pending price, or when it is the same plan', () => {
+  test('no pending downgrade without a pending price, or when it is the same plan', () => {
     const account = {
       isFree: false,
       stripePriceId: PLANS[2].prices.month.id,
@@ -78,9 +62,9 @@ test.group('plans', () => {
       stripePendingAt: null,
     };
 
-    assert.isNull(pendingPlanChangeFor(account));
+    assert.isNull(pendingDowngradeFor(account));
     assert.isNull(
-      pendingPlanChangeFor({
+      pendingDowngradeFor({
         ...account,
         stripePendingPriceId: PLANS[2].prices.year.id,
         stripePendingAt: 1,

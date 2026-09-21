@@ -5,7 +5,7 @@ import type Stripe from 'stripe';
 import Account from '#models/account';
 import { stripe } from '#services/stripe';
 import { syncStripeDataToAccount } from '#services/stripe_sync';
-import { PLANS, pendingPlanChangeFor } from '#services/plans';
+import { PLANS, pendingDowngradeFor } from '#services/plans';
 import { createNewAccount } from '#tests/db';
 import { setup } from '#tests/helpers';
 
@@ -132,10 +132,9 @@ test.group('syncStripeDataToAccount', (group) => {
     assert.strictEqual(fresh.stripePendingPriceId, base.prices.month.id);
     assert.strictEqual(fresh.stripePendingAt, now + 1000);
 
-    const change = pendingPlanChangeFor(fresh);
-    assert.strictEqual(change?.kind, 'downgrade');
-    assert.strictEqual(change?.plan.key, 'base');
-    assert.strictEqual(change?.at, now + 1000);
+    const downgrade = pendingDowngradeFor(fresh);
+    assert.strictEqual(downgrade?.plan.key, 'base');
+    assert.strictEqual(downgrade?.at, now + 1000);
   });
 
   test('a schedule whose next phase keeps the price is not a pending change', async () => {

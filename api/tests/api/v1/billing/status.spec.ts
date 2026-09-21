@@ -52,7 +52,7 @@ test.group('GET /v1/billing/status', (group) => {
     assert.ok(attributes.usage.periodStart);
     assert.ok(attributes.usage.periodEnd);
     assert.isNull(attributes.stripe.interval);
-    assert.isNull(attributes.pendingChange);
+    assert.isNull(attributes.pendingDowngrade);
     assert.notProperty(attributes, 'availablePlans');
   });
 

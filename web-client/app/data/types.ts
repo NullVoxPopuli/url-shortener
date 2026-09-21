@@ -50,10 +50,10 @@ export interface BillingStatus {
   };
   plan: Plan;
   /**
-   * A scheduled plan change. The account keeps `plan` until `at`.
+   * A scheduled downgrade. The account keeps `plan` until `at`.
+   * Upgrades apply at once.
    */
-  pendingChange: {
-    kind: 'downgrade' | 'upgrade';
+  pendingDowngrade: {
     plan: Plan;
     at: number | null;
   } | null;
