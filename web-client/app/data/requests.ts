@@ -120,8 +120,8 @@ export function getPlans() {
 // Links
 
 /**
- * One page of links, newest first. The document carries the
- * first / prev / next / last links that <Paginate> follows.
+ * One page of links, newest first.
+ * The document's `meta.page` says where the page sits.
  */
 export function getLinks(accountId?: string, page?: { number?: number; size?: number }) {
   return answersFor(

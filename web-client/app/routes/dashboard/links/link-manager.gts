@@ -5,14 +5,13 @@ import { service } from '@ember/service';
 
 import { cacheKeyFor } from '@warp-drive/core';
 import { Request } from '@warp-drive/ember';
-import { EachLink, Paginate } from '@warp-drive/ember/experiments';
 import { dataFromEvent } from 'ember-primitives/components/form';
 import { Button } from 'nvp.ui';
 import { Pagination } from 'nvp.ui/pagination';
 
 import { messageFrom } from '#app/data/errors';
 import { text } from '#app/data/form';
-import { pageHints } from '#app/data/pagination';
+import { pageOf } from '#app/data/pagination';
 import { createLink, deleteLink, updateLink } from '#app/data/requests';
 
 import { LinksTable } from '../links-table.gts';
@@ -41,14 +40,6 @@ function errorMessage(error: unknown) {
 
 function isPaged(totalPages: number) {
   return totalPages > 1;
-}
-
-/**
- * A page that has not loaded yet has no data; the table shows nothing
- * rather than crashing.
- */
-function linksOn(page: { data: Link[] | null }) {
-  return page.data ?? [];
 }
 
 interface Signature {
@@ -165,7 +156,7 @@ export default class LinkManager extends Component<Signature> {
         </:error>
 
         <:content as |billingDoc|>
-          <Paginate @request={{@links}} @pageHints={{pageHints}} @autorefresh="invalid">
+          <Request @request={{@links}} @autorefresh="invalid">
             <:loading>
               <p class="muted">Loading your links…</p>
             </:loading>
@@ -176,7 +167,7 @@ export default class LinkManager extends Component<Signature> {
               <p class="warning">{{errorMessage error}}</p>
             </:error>
 
-            <:content as |pages|>
+            <:content as |linksDoc|>
                 <section class="page-card surface">
                   <h2>Create a link</h2>
 
@@ -250,30 +241,28 @@ export default class LinkManager extends Component<Signature> {
                       link edits for this month.</p>
                   {{/if}}
 
-                  {{#if pages.activePage}}
+                  {{#let (pageOf linksDoc) as |page|}}
                     <LinksTable
-                      @links={{linksOn pages.activePage}}
+                      @links={{linksDoc.data}}
                       @watermark={{isWatermarked billingDoc.data}}
                       @onDelete={{this.delete}}
                       @isDeleting={{this.isWorking}}
                       @editing={{this.editingFor billingDoc.data}}
                     >
                       <:footer>
-                        {{#if (isPaged pages.totalPages)}}
+                        {{#if (isPaged page.totalPages)}}
                           <span class="muted">Page
-                            {{pages.activePage.pageNumber}}
+                            {{page.currentPage}}
                             of
-                            {{pages.totalPages}}</span>
-                          <EachLink @pages={{pages}} as |links|>
-                            <Pagination @links={{links}} @label="Link pages" />
-                          </EachLink>
+                            {{page.totalPages}}</span>
+                          <Pagination @totalPages={{page.totalPages}} aria-label="Link pages" />
                         {{/if}}
                       </:footer>
                     </LinksTable>
-                  {{/if}}
+                  {{/let}}
                 </section>
             </:content>
-          </Paginate>
+          </Request>
         </:content>
       </Request>
     </div>
