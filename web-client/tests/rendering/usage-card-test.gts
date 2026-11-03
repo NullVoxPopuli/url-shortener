@@ -35,8 +35,8 @@ module('Rendering | dashboard | UsageCard', function (hooks) {
 
   test('an unlimited plan shows no meter', async function (assert) {
     const billing = makeBilling({
-      planKey: 'free',
-      planName: 'Free',
+      planKey: 'internal',
+      planName: 'Internal',
       monthlyLinkLimit: null,
       used: 12,
       remaining: null,

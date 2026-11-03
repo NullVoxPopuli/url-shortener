@@ -127,11 +127,11 @@ export const NO_SUBSCRIPTION_PLAN = {
 } as const;
 
 /**
- * Grandfathered/internal accounts: unlimited (null) everything.
+ * Internal accounts: unlimited (null) everything.
  */
-export const FREE_PLAN = {
-  key: 'free',
-  name: 'Free',
+export const INTERNAL_PLAN = {
+  key: 'internal',
+  name: 'Internal',
   monthlyLinkLimit: null,
   teammates: null,
   customDomains: null,
@@ -165,7 +165,7 @@ export function intervalForPriceId(plan: Plan, priceId: string | null): BillingI
 }
 
 interface PlanHolder {
-  isFree: boolean;
+  isInternal: boolean;
   stripePriceId: string | null;
   /**
    * After a downgrade: the plan paid for through `stripeDowngradedUntil`
@@ -199,8 +199,8 @@ export function effectivePriceId(account: PlanHolder, now = nowInSeconds()) {
 }
 
 export function planFor(account: PlanHolder, now = nowInSeconds()) {
-  return account.isFree
-    ? FREE_PLAN
+  return account.isInternal
+    ? INTERNAL_PLAN
     : (planForPriceId(effectivePriceId(account, now)) ?? NO_SUBSCRIPTION_PLAN);
 }
 
@@ -238,7 +238,7 @@ export function pendingDowngradeFor(
   account: PlanHolder,
   now = nowInSeconds()
 ): PendingDowngrade | null {
-  if (account.isFree || !isDowngradeGraceActive(account, now)) return null;
+  if (account.isInternal || !isDowngradeGraceActive(account, now)) return null;
 
   return {
     plan: planForPriceId(account.stripePriceId) ?? NO_SUBSCRIPTION_PLAN,

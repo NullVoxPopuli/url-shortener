@@ -32,8 +32,8 @@ export default class Account extends BaseModel {
   @column()
   declare admin_id: string;
 
-  @column({ columnName: 'is_free' })
-  declare isFree: boolean;
+  @column({ columnName: 'is_internal' })
+  declare isInternal: boolean;
 
   @column({ columnName: 'is_personal', consume: (value) => Boolean(value) })
   declare isPersonal: boolean;

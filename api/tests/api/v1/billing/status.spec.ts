@@ -72,13 +72,13 @@ test.group('GET /v1/billing/status', (group) => {
     assert.strictEqual(attributes.usage.remaining, 3);
   });
 
-  test('a legacy free account is unlimited', async ({ client }) => {
-    const { user } = await createNewAccount({ account: { isFree: true } });
+  test('an internal account is unlimited', async ({ client }) => {
+    const { user } = await createNewAccount({ account: { isInternal: true } });
 
     const response = await getStatus(client, user);
     const attributes = response.body().data.attributes;
 
-    assert.strictEqual(attributes.plan.key, 'free');
+    assert.strictEqual(attributes.plan.key, 'internal');
     assert.isNull(attributes.plan.monthlyLinkLimit);
     assert.isNull(attributes.usage.remaining);
   });

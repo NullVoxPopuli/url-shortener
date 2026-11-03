@@ -1,9 +1,9 @@
 import type Account from '#models/account';
-import { FREE_PLAN, NO_SUBSCRIPTION_PLAN, PLANS } from './plans.js';
+import { INTERNAL_PLAN, NO_SUBSCRIPTION_PLAN, PLANS } from './plans.js';
 
 export const OVERRIDABLE_PLAN_KEYS = [
   ...PLANS.map((plan) => plan.key),
-  FREE_PLAN.key,
+  INTERNAL_PLAN.key,
   NO_SUBSCRIPTION_PLAN.key,
 ];
 
@@ -16,15 +16,15 @@ export async function overridePlan(account: Account, planKey: string) {
   const paid = PLANS.find((plan) => plan.key === planKey);
 
   if (paid) {
-    account.isFree = false;
+    account.isInternal = false;
     account.stripePriceId = paid.prices.month.id;
     account.stripeSubscriptionStatus = 'active';
-  } else if (planKey === FREE_PLAN.key) {
-    account.isFree = true;
+  } else if (planKey === INTERNAL_PLAN.key) {
+    account.isInternal = true;
     account.stripePriceId = null;
     account.stripeSubscriptionStatus = null;
   } else if (planKey === NO_SUBSCRIPTION_PLAN.key) {
-    account.isFree = false;
+    account.isInternal = false;
     account.stripePriceId = null;
     account.stripeSubscriptionStatus = null;
   } else {

@@ -31,7 +31,7 @@ export function makeBilling(overrides?: {
 
   return {
     id: 'account-1',
-    isFree: planKey === 'free',
+    isInternal: planKey === 'internal',
     hasActiveSubscription,
     stripe: {
       customerId: null,

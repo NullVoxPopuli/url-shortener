@@ -69,7 +69,7 @@ test.group('POST [authenticated session]', (group) => {
     let data: any;
     let { user } = await createNewAccount({
       account: {
-        isFree: true,
+        isInternal: true,
       },
     });
     await changedRecords(Link, async () => {
@@ -94,7 +94,7 @@ test.group('POST [authenticated session]', (group) => {
     let data: any;
     let { user, account } = await createNewAccount({
       account: {
-        isFree: true,
+        isInternal: true,
       },
     });
 

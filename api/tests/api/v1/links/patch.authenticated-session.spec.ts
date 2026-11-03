@@ -128,10 +128,10 @@ test.group('PATCH /v1/links/:id [authenticated session]', (group) => {
   });
 
   test('a plan without expiration → 402 for expiresAt', async ({ client }) => {
-    let { user, account } = await createNewAccount({ account: { isFree: false } });
+    let { user, account } = await createNewAccount({ account: { isInternal: false } });
     let link = await createLink(user, account);
 
-    // the free (legacy) plan edits without limit but is the only unpaid plan with expiration,
+    // the internal plan edits without limit but is the only unpaid plan with expiration,
     // so use a paid plan without it
     await overridePlan(account, PLANS[1].key);
 
@@ -143,8 +143,8 @@ test.group('PATCH /v1/links/:id [authenticated session]', (group) => {
     assert.lengthOf(await LinkEdit.query().where('link_id', link.id), 0);
   });
 
-  test('a legacy free account edits without limits', async ({ client }) => {
-    let { user, account } = await createNewAccount({ account: { isFree: true } });
+  test('an internal account edits without limits', async ({ client }) => {
+    let { user, account } = await createNewAccount({ account: { isInternal: true } });
     let link = await createLink(user, account);
 
     let response = await patch(client, user, link.id, {
