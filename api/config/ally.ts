@@ -1,22 +1,19 @@
-import env from '#start/env';
+import env, { AUTH_ORIGIN } from '#start/env';
 import { defineConfig, services } from '@adonisjs/ally';
 
-const baseUrl =
-  env.get('NODE_ENV') === 'development'
-    ? 'http://nvp.gg/_/auth/callback'
-    : 'https://nvp.gg/_/auth/callback';
+const callbackBase = `${AUTH_ORIGIN}/_/auth/callback`;
 
 const allyConfig = defineConfig({
   github: services.github({
     clientId: env.get('GITHUB_CLIENT_ID')!,
     clientSecret: env.get('GITHUB_CLIENT_SECRET')!,
-    callbackUrl: `${baseUrl}/github`,
-    scopes: ['user:name'],
+    callbackUrl: `${callbackBase}/github`,
+    scopes: ['read:user', 'user:email'],
   }),
   google: services.google({
-    clientId: env.get('TWITTER_CLIENT_ID')!,
-    clientSecret: env.get('TWITTER_CLIENT_SECRET')!,
-    callbackUrl: `${baseUrl}/google`,
+    clientId: env.get('GOOGLE_CLIENT_ID')!,
+    clientSecret: env.get('GOOGLE_CLIENT_SECRET')!,
+    callbackUrl: `${callbackBase}/google`,
 
     // Google specific
     prompt: 'select_account',
@@ -28,7 +25,7 @@ const allyConfig = defineConfig({
   twitter: services.twitter({
     clientId: env.get('TWITTER_CLIENT_ID')!,
     clientSecret: env.get('TWITTER_CLIENT_SECRET')!,
-    callbackUrl: `${baseUrl}/twitter`,
+    callbackUrl: `${callbackBase}/twitter`,
     // Twitter doesn't support scopes
     //scopes: ['email'],
   }),

@@ -13,6 +13,12 @@ export default class Link extends BaseModel {
   @column()
   declare original: string;
 
+  /**
+   * null = the default short domain
+   */
+  @column()
+  declare domain: string | null;
+
   @column()
   declare visits: number;
 
@@ -53,7 +59,11 @@ export default class Link extends BaseModel {
   });
 
   static notExpired = scope((query) => {
-    query.whereNull('expiresAt').orWhereNot('expiresAt', '<', DateTime.utc().toSQLDate());
+    // Grouped: an ungrouped OR would let every account's unexpired
+    // links through the owner filter that precedes this scope.
+    query.where((group) => {
+      group.whereNull('expires_at').orWhere('expires_at', '>=', DateTime.utc().toSQLDate());
+    });
   });
 
   static expired = scope((query) => {

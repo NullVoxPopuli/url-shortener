@@ -1,44 +1,29 @@
-import { jsonapi } from '#jsonapi';
 import type { HttpContext } from '@adonisjs/core/http';
-import type { Response } from '#jsonapi';
+import { toErrorDocument } from '@evoactivity/jsonapi-adonis';
+import type { Document } from '@evoactivity/jsonapi-adonis';
 
+/**
+ * Runs a JSON:API action on behalf of an HTML page: failures come
+ * back as an `{ errors }` document with the response status set, and
+ * the content type is always text/html (jsonApi.render() stamps the
+ * JSON:API media type, which must not win here).
+ */
 export async function htmlAction(
   context: HttpContext,
-  callback: (context: HttpContext) => Promise<Response>
-) {
+  callback: (context: HttpContext) => Promise<Document>
+): Promise<Document> {
   let { response } = context;
 
-  response.header('content-type', 'text/html; charset=utf-8');
-
   try {
-    /**
-     * This could call auth,
-     * or any other method that _could_ throw an error.
-     */
     let result = await callback(context);
 
-    response.safeStatus(jsonapi.statusFrom(result as any));
+    response.header('content-type', 'text/html; charset=utf-8');
     return result;
   } catch (error) {
-    // Uncomment for debugging
-    console.error('catch: ', error.message, error.name, error.stack);
+    let { status, body } = toErrorDocument(error, false);
 
-    if ('name' in error) {
-      switch (error.name) {
-        /**
-         * Thrown from
-         *   context.auth.authenticateUsing(...)
-         */
-        case 'E_UNAUTHORIZED_ACCESS': {
-          response.status(401);
-
-          return jsonapi.notAuthenticated(error);
-        }
-      }
-    }
-
-    response.status(500);
-
-    return jsonapi.serverError(error);
+    response.status(status);
+    response.header('content-type', 'text/html; charset=utf-8');
+    return body;
   }
 }

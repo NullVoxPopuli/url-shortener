@@ -1,65 +1,11 @@
-import {
-  assets,
-  compatPrebuild,
-  contentFor,
-  hbs,
-  optimizeDeps,
-  resolver,
-  scripts,
-  templateTag,
-} from "@embroider/vite";
-
-import { babel } from "@rollup/plugin-babel";
 import { defineConfig } from "vite";
+import { ember } from "@nullvoxpopuli/ember-vite";
+import { scopedCSS } from "ember-scoped-css/vite";
 
-const extensions = [
-  ".mjs",
-  ".gjs",
-  ".js",
-  ".mts",
-  ".gts",
-  ".ts",
-  ".hbs",
-  ".json",
-];
-
-export default defineConfig(({ mode }) => {
-  return {
-    resolve: {
-      extensions,
-    },
-    plugins: [
-      hbs(),
-      templateTag(),
-      scripts(),
-      resolver(),
-      compatPrebuild(),
-      assets(),
-      contentFor(),
-
-      babel({
-        babelHelpers: "runtime",
-        extensions,
-      }),
-    ],
-    optimizeDeps: optimizeDeps(),
-    server: {
-      port: 4200,
-    },
-    build: {
-      outDir: "dist",
-      rollupOptions: {
-        input: {
-          main: "index.html",
-          ...(shouldBuildTests(mode)
-            ? { tests: "tests/index.html" }
-            : undefined),
-        },
-      },
-    },
-  };
+export default defineConfig({
+  plugins: [scopedCSS(), ember()],
+  server: {
+    port: 5002,
+    allowedHosts: ['app.nvp.local', '.nvp.local'],
+  },
 });
-
-function shouldBuildTests(mode) {
-  return mode !== "production" || process.env.FORCE_BUILD_TESTS;
-}

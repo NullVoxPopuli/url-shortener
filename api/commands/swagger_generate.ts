@@ -1,5 +1,5 @@
 import { BaseCommand } from '@adonisjs/core/ace';
-import { CommandOptions } from '@adonisjs/core/types/ace';
+import type { CommandOptions } from '@adonisjs/core/types/ace';
 import { stripIndent } from 'common-tags';
 
 export default class SwaggerGenerate extends BaseCommand {
@@ -21,7 +21,9 @@ import { join } from 'node:path';
 import { merge } from 'ts-deepmerge';
 import v1 from '#controllers/api/v1/swag';
 import type { OpenAPIObject } from 'openapi3-ts/oas31';
-import { specName, mimeType } from '#jsonapi';
+import { JSON_API_MEDIA_TYPE as mimeType } from '@evoactivity/jsonapi-adonis';
+
+const specName = '{ json:api }';
 import { componentSchemaRef, jsonapiRef, ref } from '#openapi';
 import { DOMAIN } from '#start/env';
 
@@ -84,6 +86,16 @@ const SWAGGER_SCHEMAS = {
       },
     },
   },
+  NotFound: {
+    description: 'Not Found',
+    content: {
+      [mimeType]: {
+        schema: {
+          $ref: '#/components/schemas/Error',
+        },
+      },
+    },
+  },
   UnsupportedMediaType: {
     description: 'Unsupported Media Type',
     content: {
@@ -97,7 +109,8 @@ const SWAGGER_SCHEMAS = {
     schema: {
       type: 'object',
       properties: {
-        status: { type: 'integer' },
+        // per spec, the status member is a string
+        status: { type: 'string' },
         title: { type: 'string' },
         detail: { type: 'string' },
         source: { type: 'string' },
@@ -161,9 +174,19 @@ function generate() {
         Authenticated users are limited to 100 requests per minute.
 
         All endpoints use the \`${mimeType}\` MIME type for both \`Accept\` and \`Content-Type\` headers.
+
+        The links endpoints accept an API key via \`Authorization: Bearer nvp_...\` — create one in the dashboard under "API Keys". Keys carry scopes (\`links:read\`, \`links:write\`) and are pinned to the account they were created in. Everything else requires the first-party browser session.
       `,
     },
     components: {
+      securitySchemes: {
+        apiKey: {
+          type: 'http',
+          scheme: 'bearer',
+          description:
+            'An API key (`nvp_...`), created in the dashboard under "API Keys". Keys are scoped (`links:read`, `links:write`) and pinned to one account.',
+        },
+      },
       schemas: {
         jsonapi: {
           $ref: 'https://raw.githubusercontent.com/json-api/json-api/refs/heads/gh-pages/_schemas/1.0/schema.json',

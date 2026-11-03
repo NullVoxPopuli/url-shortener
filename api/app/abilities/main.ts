@@ -1,5 +1,5 @@
-import User from '#models/user';
-import Link from '#models/link';
+import type User from '#models/user';
+import type Link from '#models/link';
 import { Bouncer } from '@adonisjs/bouncer';
 
 export const editLink = Bouncer.ability((user: User, link: Link) => {

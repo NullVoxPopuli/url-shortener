@@ -1,16 +1,21 @@
 import Link from '#models/link';
-import { render } from '#jsonapi/data';
+import { authenticateWithScope } from '#services/api_keys';
 import type { HttpContext } from '@adonisjs/core/http';
 
 export async function listLinks(context: HttpContext) {
-  let { auth, response } = context;
+  let { account } = await authenticateWithScope(context, 'links:read');
 
-  let user = await auth.authenticate();
-  let links = await Link.query().withScopes((scopes) => {
-    scopes.visibleTo(user);
-    scopes.notExpired();
-  });
+  // Newest first, one page at a time: ?page[number]= and ?page[size]=
+  // (default size from config/jsonapi.ts). The document carries
+  // first / prev / next / last links and meta.page.
+  let links = await context.jsonApi
+    .query(Link)
+    .where('owned_by', account.id)
+    .withScopes((scopes) => {
+      scopes.notExpired();
+    })
+    .orderBy('created_at', 'desc')
+    .paginate(...context.jsonApi.page);
 
-  response.status(200);
-  return render.links(links);
+  return context.jsonApi.render(links);
 }
