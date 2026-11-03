@@ -33,7 +33,7 @@ const V1: Omit<OpenAPIObject, 'info' | 'openapi'> = {
       get: {
         summary: 'List links',
         description:
-          "Lists the account's links. Accepts an API key with the `links:read` scope. Supports `sort` (e.g. `-createdAt`), `page[number]`/`page[size]`, and `fields[link]` sparse fieldsets.",
+          "Lists the account's links, newest first, one page at a time. Accepts an API key with the `links:read` scope. `page[number]` and `page[size]` (default 20) pick the page; the document's `links` carry `first`, `prev`, `next`, and `last`, and `meta.page` carries `number`, `size`, `total`, and `lastPage`. Supports `sort` (e.g. `-createdAt`) and `fields[link]` sparse fieldsets.",
         security: [{ apiKey: [] }],
         parameters: [accountParam, includeParam('ownedBy,createdBy')],
         responses: {

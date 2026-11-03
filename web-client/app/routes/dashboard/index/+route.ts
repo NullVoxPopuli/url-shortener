@@ -13,7 +13,8 @@ export default class DashboardIndexRoute extends Route {
 
     return {
       billing: this.store.request(getBillingStatus(accountId)),
-      links: this.store.request(getLinks(accountId)),
+      // the overview shows the newest few; the links page has them all
+      links: this.store.request(getLinks(accountId, { size: 5 })),
     };
   }
 }

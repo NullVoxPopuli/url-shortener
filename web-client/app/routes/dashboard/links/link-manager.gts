@@ -7,9 +7,11 @@ import { cacheKeyFor } from '@warp-drive/core';
 import { Request } from '@warp-drive/ember';
 import { dataFromEvent } from 'ember-primitives/components/form';
 import { Button } from 'nvp.ui';
+import { Pagination } from 'nvp.ui/pagination';
 
 import { messageFrom } from '#app/data/errors';
 import { text } from '#app/data/form';
+import { pageOf } from '#app/data/pagination';
 import { createLink, deleteLink, updateLink } from '#app/data/requests';
 
 import { LinksTable } from '../links-table.gts';
@@ -34,6 +36,10 @@ function hasNoEdits(billing: BillingStatus) {
 
 function errorMessage(error: unknown) {
   return messageFrom(error);
+}
+
+function isPaged(totalPages: number) {
+  return totalPages > 1;
 }
 
 interface Signature {
@@ -235,13 +241,25 @@ export default class LinkManager extends Component<Signature> {
                       link edits for this month.</p>
                   {{/if}}
 
-                  <LinksTable
-                    @links={{linksDoc.data}}
-                    @watermark={{isWatermarked billingDoc.data}}
-                    @onDelete={{this.delete}}
-                    @isDeleting={{this.isWorking}}
-                    @editing={{this.editingFor billingDoc.data}}
-                  />
+                  {{#let (pageOf linksDoc) as |page|}}
+                    <LinksTable
+                      @links={{linksDoc.data}}
+                      @watermark={{isWatermarked billingDoc.data}}
+                      @onDelete={{this.delete}}
+                      @isDeleting={{this.isWorking}}
+                      @editing={{this.editingFor billingDoc.data}}
+                    >
+                      <:footer>
+                        {{#if (isPaged page.totalPages)}}
+                          <span class="muted">Page
+                            {{page.currentPage}}
+                            of
+                            {{page.totalPages}}</span>
+                          <Pagination @totalPages={{page.totalPages}} aria-label="Link pages" />
+                        {{/if}}
+                      </:footer>
+                    </LinksTable>
+                  {{/let}}
                 </section>
             </:content>
           </Request>

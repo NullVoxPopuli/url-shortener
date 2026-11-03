@@ -119,9 +119,21 @@ export function getPlans() {
 
 // Links
 
-export function getLinks(accountId?: string) {
+/**
+ * One page of links, newest first.
+ * The document's `meta.page` says where the page sits.
+ */
+export function getLinks(accountId?: string, page?: { number?: number; size?: number }) {
   return answersFor(
-    query<Link>('link', params({ accountId, include: 'ownedBy,createdBy' })),
+    query<Link>(
+      'link',
+      params({
+        accountId,
+        include: 'ownedBy,createdBy',
+        'page[number]': page?.number ? String(page.number) : undefined,
+        'page[size]': page?.size ? String(page.size) : undefined,
+      })
+    ),
     ['link']
   );
 }
